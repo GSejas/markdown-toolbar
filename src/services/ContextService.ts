@@ -114,7 +114,7 @@ export class ContextService {
    */
   public async getCurrentContext(): Promise<IDocumentContext | null> {
     const activeEditor = this.vscode.window.activeTextEditor;
-    
+
     if (!activeEditor || activeEditor.document.languageId !== 'markdown') {
       return null;
     }
@@ -127,7 +127,7 @@ export class ContextService {
     // Detect fresh context
     try {
       const context = await this.contextDetector.detectDocumentContext(activeEditor.document);
-      
+
       // Update cache
       if (this.config.enableCaching) {
         this.cachedContext = context;
@@ -155,7 +155,7 @@ export class ContextService {
    */
   public onDidChangeContext(callback: (event: IContextChangeEvent) => void): { dispose(): void } {
     this.changeCallbacks.push(callback);
-    
+
     return {
       dispose: () => {
         const index = this.changeCallbacks.indexOf(callback);
@@ -186,7 +186,7 @@ export class ContextService {
   } {
     const now = Date.now();
     const cacheAge = this.cacheTimestamp > 0 ? now - this.cacheTimestamp : -1;
-    
+
     return {
       isCacheValid: this.cachedContext !== null && cacheAge < this.config.cacheTimeout,
       cacheAge,
@@ -278,7 +278,7 @@ export class ContextService {
   private handleEditorChange(editor: any): void {
     // Invalidate cache when switching documents
     this.invalidateCache();
-    
+
     // Trigger immediate context detection
     this.debouncedRefresh();
   }
@@ -289,7 +289,7 @@ export class ContextService {
   private handleConfigurationChange(): void {
     const config = this.vscode.workspace.getConfiguration(CONFIG_KEYS.root);
     const newDebounceTimeout = config.get('contextUpdateDebounce', this.config.debounceTimeout);
-    
+
     if (newDebounceTimeout !== this.config.debounceTimeout) {
       this.config.debounceTimeout = newDebounceTimeout;
     }
@@ -305,11 +305,11 @@ export class ContextService {
     try {
       const previousContext = this.cachedContext;
       const currentContext = await this.getCurrentContext();
-      
+
       // Emit change event if context actually changed
       if (this.hasContextChanged(previousContext, currentContext)) {
         const changedProperties = this.getChangedProperties(previousContext, currentContext);
-        
+
         const event: IContextChangeEvent = {
           previousContext,
           currentContext: currentContext!,
@@ -358,7 +358,7 @@ export class ContextService {
           changedProperties: ['hasSelection', 'inTable', 'inTaskList', 'inCodeBlock', 'inList'],
           timestamp: Date.now()
         };
-        
+
         this.emitContextChange(clearEvent);
         this.invalidateCache();
       }
@@ -412,7 +412,7 @@ export class ContextService {
    * Check if context has actually changed
    */
   private hasContextChanged(
-    previous: IDocumentContext | null, 
+    previous: IDocumentContext | null,
     current: IDocumentContext | null
   ): boolean {
     if (!previous && !current) return false;

@@ -28,25 +28,25 @@
 export const CONFIG_KEYS = {
   // Root configuration section
   root: 'markdownToolbar',
-  
+
   // New preset system
   preset: 'markdownToolbar.preset',                         // 'core'|'writer'|'pro'|'custom'
   customVisible: 'markdownToolbar.custom.visibleButtons',   // ButtonId[]
-  
+
   // UI behavior
   compact: 'markdownToolbar.compact',                       // boolean - compact toolbar mode
   statusBarEnabled: 'markdownToolbar.statusBar.enabled',    // boolean - show preset switcher in status bar
-  
+
   // Legacy settings (deprecated but supported for migration)
   enabled: 'markdownToolbar.enabled',                       // boolean - overall enable/disable
   position: 'markdownToolbar.position',                     // 'left'|'right' - status bar position  
   buttons: 'markdownToolbar.buttons',                       // string[] - old button system
-  
+
   // Advanced settings
   autoDetectDependencies: 'markdownToolbar.autoDetectDependencies',    // boolean
   showMissingExtensionNotifications: 'markdownToolbar.showMissingExtensionNotifications', // boolean
   fallbackBehavior: 'markdownToolbar.fallbackBehavior',                // 'internal'|'cta'|'hide'
-  
+
   // Performance settings
   contextUpdateDebounce: 'markdownToolbar.contextUpdateDebounce',      // number (ms)
   dependencyCacheTimeout: 'markdownToolbar.dependencyCacheTimeout'     // number (ms)
@@ -80,65 +80,65 @@ export const CONFIG_SCHEMA = {
     default: DEFAULT_CONFIG.preset,
     description: 'Active toolbar preset'
   },
-  
+
   'custom.visibleButtons': {
     type: 'array',
     items: { type: 'string' },
     default: DEFAULT_CONFIG.customVisible,
     description: 'Visible buttons in custom preset (determines order)'
   },
-  
+
   compact: {
     type: 'boolean',
     default: DEFAULT_CONFIG.compact,
     description: 'Use compact toolbar mode'
   },
-  
+
   'statusBar.enabled': {
     type: 'boolean',
     default: DEFAULT_CONFIG.statusBarEnabled,
     description: 'Show preset switcher in status bar'
   },
-  
+
   enabled: {
     type: 'boolean',
     default: DEFAULT_CONFIG.enabled,
     description: 'Enable markdown toolbar'
   },
-  
+
   position: {
     type: 'string',
     enum: ['left', 'right'],
     default: DEFAULT_CONFIG.position,
     description: 'Status bar position'
   },
-  
+
   buttons: {
     type: 'array',
     items: { type: 'string' },
     default: DEFAULT_CONFIG.buttons,
     description: 'Legacy button configuration'
   },
-  
+
   autoDetectDependencies: {
     type: 'boolean',
     default: DEFAULT_CONFIG.autoDetectDependencies,
     description: 'Automatically detect extension dependencies'
   },
-  
+
   showMissingExtensionNotifications: {
     type: 'boolean',
     default: DEFAULT_CONFIG.showMissingExtensionNotifications,
     description: 'Show notifications for missing extensions'
   },
-  
+
   fallbackBehavior: {
     type: 'string',
     enum: ['internal', 'cta', 'hide'],
     default: DEFAULT_CONFIG.fallbackBehavior,
     description: 'Behavior when delegated commands are not available'
   },
-  
+
   contextUpdateDebounce: {
     type: 'number',
     minimum: 50,
@@ -146,7 +146,7 @@ export const CONFIG_SCHEMA = {
     default: DEFAULT_CONFIG.contextUpdateDebounce,
     description: 'Debounce delay for context updates (ms)'
   },
-  
+
   dependencyCacheTimeout: {
     type: 'number',
     minimum: 5000,

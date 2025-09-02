@@ -30,42 +30,42 @@ import { ICommandContext } from '../index';
  * @returns Disposable for the command
  */
 export function createCodeCommand(context: ICommandContext): vscode.Disposable {
-  return vscode.commands.registerCommand('markdownToolbar.code', async () => {
-    try {
-      const editor = context.getActiveEditor();
-      if (!editor || editor.document.languageId !== 'markdown') {
-        return;
-      }
+    return vscode.commands.registerCommand('markdownToolbar.code', async () => {
+        try {
+            const editor = context.getActiveEditor();
+            if (!editor || editor.document.languageId !== 'markdown') {
+                return;
+            }
 
-      const document = editor.document;
-      const selection = editor.selection;
-      const text = document.getText();
-      
-      const selectionStart = document.offsetAt(selection.start);
-      const selectionEnd = document.offsetAt(selection.end);
+            const document = editor.document;
+            const selection = editor.selection;
+            const text = document.getText();
 
-      // Format the text
-      const result = context.formatter.formatCode(text, selectionStart, selectionEnd);
+            const selectionStart = document.offsetAt(selection.start);
+            const selectionEnd = document.offsetAt(selection.end);
 
-      // Apply the edit
-      const success = await context.executeEdit((editBuilder) => {
-        const fullRange = new vscode.Range(
-          document.positionAt(0),
-          document.positionAt(text.length)
-        );
-        editBuilder.replace(fullRange, result.text);
-      });
+            // Format the text
+            const result = context.formatter.formatCode(text, selectionStart, selectionEnd);
 
-      if (success) {
-        // Update selection
-        const newStart = document.positionAt(result.selectionStart);
-        const newEnd = document.positionAt(result.selectionEnd);
-        editor.selection = new vscode.Selection(newStart, newEnd);
-      }
+            // Apply the edit
+            const success = await context.executeEdit((editBuilder) => {
+                const fullRange = new vscode.Range(
+                    document.positionAt(0),
+                    document.positionAt(text.length)
+                );
+                editBuilder.replace(fullRange, result.text);
+            });
 
-    } catch (error) {
-      console.error('Code command error:', error);
-      context.showErrorMessage('Failed to apply code formatting');
-    }
-  });
+            if (success) {
+                // Update selection
+                const newStart = document.positionAt(result.selectionStart);
+                const newEnd = document.positionAt(result.selectionEnd);
+                editor.selection = new vscode.Selection(newStart, newEnd);
+            }
+
+        } catch (error) {
+            console.error('Code command error:', error);
+            context.showErrorMessage('Failed to apply code formatting');
+        }
+    });
 }

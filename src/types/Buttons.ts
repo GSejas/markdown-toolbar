@@ -30,28 +30,28 @@ export type PresetId = 'core' | 'writer' | 'pro' | 'custom';
 export type ButtonId =
   // Preview
   | 'preview.side' | 'preview.current'
-  
+
   // Format  
   | 'fmt.bold' | 'fmt.italic' | 'fmt.strike'
-  
+
   // Structure
   | 'list.toggle' | 'task.toggle'
-  
+
   // Code
   | 'code.inline' | 'code.block'
-  
+
   // Media
   | 'link.insert' | 'image.insert' | 'image.paste'
-  
+
   // TOC (requires MAIO)
   | 'toc.create' | 'toc.update' | 'toc.addNumbers' | 'toc.removeNumbers'
-  
+
   // Tables
   | 'table.menu'
-  
+
   // Quality (requires markdownlint)
   | 'lint.fix' | 'lint.workspace'
-  
+
   // Enhanced preview (requires MPE)
   | 'preview.mpe.side' | 'preview.mpe.current';
 
@@ -90,7 +90,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Open preview to the side'
   },
   'preview.current': {
-    id: 'preview.current', 
+    id: 'preview.current',
     title: 'Preview',
     icon: '$(preview)',
     category: 'preview',
@@ -98,7 +98,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     delegatesTo: 'markdown.showPreview',
     tooltip: 'Open preview in current editor group'
   },
-  
+
   // Format
   'fmt.bold': {
     id: 'fmt.bold',
@@ -113,7 +113,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   },
   'fmt.italic': {
     id: 'fmt.italic',
-    title: 'Italic', 
+    title: 'Italic',
     icon: '$(italic)',
     category: 'format',
     commandId: 'mdToolbar.fmt.italic',
@@ -126,21 +126,21 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     id: 'fmt.strike',
     title: 'Strikethrough',
     icon: '$(text-size)',
-    category: 'format', 
+    category: 'format',
     commandId: 'mdToolbar.fmt.strike',
     delegatesTo: 'markdown.extension.editing.toggleStrikethrough',
     fallbackCommand: 'mdToolbar.internal.strikethrough',
     requiresExtension: 'yzhang.markdown-all-in-one',
     tooltip: 'Toggle strikethrough formatting'
   },
-  
+
   // Structure
   'list.toggle': {
     id: 'list.toggle',
     title: 'Toggle List',
     icon: '$(list-unordered)',
     category: 'structure',
-    commandId: 'mdToolbar.list.toggle', 
+    commandId: 'mdToolbar.list.toggle',
     delegatesTo: 'markdown.extension.editing.toggleList',
     fallbackCommand: 'mdToolbar.internal.list',
     requiresExtension: 'yzhang.markdown-all-in-one',
@@ -156,7 +156,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Toggle task list item',
     when: 'mdToolbar.onTaskLine'
   },
-  
+
   // Code
   'code.inline': {
     id: 'code.inline',
@@ -175,12 +175,12 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     icon: '$(terminal)',
     category: 'code',
     commandId: 'mdToolbar.code.block',
-    delegatesTo: 'markdown.extension.editing.toggleCodeBlock', 
+    delegatesTo: 'markdown.extension.editing.toggleCodeBlock',
     fallbackCommand: 'mdToolbar.internal.codeBlock',
     requiresExtension: 'yzhang.markdown-all-in-one',
     tooltip: 'Toggle code block formatting'
   },
-  
+
   // Media
   'link.insert': {
     id: 'link.insert',
@@ -194,7 +194,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'image.insert': {
     id: 'image.insert',
     title: 'Insert Image',
-    icon: '$(image)', 
+    icon: '$(image)',
     category: 'media',
     commandId: 'mdToolbar.image.insert',
     fallbackCommand: 'mdToolbar.internal.image',
@@ -211,7 +211,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Paste image from clipboard',
     when: 'mdToolbar.hasPasteImage'
   },
-  
+
   // TOC
   'toc.create': {
     id: 'toc.create',
@@ -257,7 +257,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Remove section numbers from TOC',
     when: 'mdToolbar.hasMAIO'
   },
-  
+
   // Tables
   'table.menu': {
     id: 'table.menu',
@@ -269,7 +269,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Table formatting options',
     when: 'mdToolbar.inTable'
   },
-  
+
   // Quality 
   'lint.fix': {
     id: 'lint.fix',
@@ -293,7 +293,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     tooltip: 'Lint all markdown files in workspace',
     when: 'mdToolbar.hasMarkdownlint'
   },
-  
+
   // Enhanced Preview
   'preview.mpe.side': {
     id: 'preview.mpe.side',
@@ -308,7 +308,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   },
   'preview.mpe.current': {
     id: 'preview.mpe.current',
-    title: 'Enhanced Preview', 
+    title: 'Enhanced Preview',
     icon: '$(preview)',
     category: 'preview',
     commandId: 'mdToolbar.preview.mpe.current',
@@ -326,7 +326,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, IPresetDefinition> = {
     description: 'Essential formatting tools for quick notes',
     buttons: [
       'preview.side',
-      'fmt.bold', 
+      'fmt.bold',
       'fmt.italic',
       'list.toggle',
       'code.inline',
@@ -335,18 +335,18 @@ export const PRESET_DEFINITIONS: Record<PresetId, IPresetDefinition> = {
     ]
   },
   writer: {
-    id: 'writer', 
+    id: 'writer',
     name: 'Writer',
     description: 'Tools for documentation and long-form writing',
     buttons: [
       'preview.side',
       'fmt.bold',
-      'fmt.italic', 
+      'fmt.italic',
       'fmt.strike',
       'list.toggle',
       'task.toggle',
       'code.inline',
-      'code.block', 
+      'code.block',
       'link.insert',
       'image.insert',
       'image.paste',
@@ -365,7 +365,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, IPresetDefinition> = {
       'preview.mpe.side',
       'fmt.bold',
       'fmt.italic',
-      'fmt.strike', 
+      'fmt.strike',
       'list.toggle',
       'task.toggle',
       'code.inline',
@@ -374,7 +374,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, IPresetDefinition> = {
       'image.insert',
       'image.paste',
       'toc.create',
-      'toc.update', 
+      'toc.update',
       'toc.addNumbers',
       'toc.removeNumbers',
       'table.menu',

@@ -30,75 +30,75 @@ import { ICommandContext } from '../index';
  * @returns Disposable for the command
  */
 export function createListCommand(context: ICommandContext): vscode.Disposable {
-  return vscode.commands.registerCommand('markdownToolbar.list', async () => {
-    try {
-      const editor = context.getActiveEditor();
-      if (!editor || editor.document.languageId !== 'markdown') {
-        return;
-      }
+    return vscode.commands.registerCommand('markdownToolbar.list', async () => {
+        try {
+            const editor = context.getActiveEditor();
+            if (!editor || editor.document.languageId !== 'markdown') {
+                return;
+            }
 
-      const document = editor.document;
-      const selection = editor.selection;
-      const text = document.getText();
-      
-      let selectionStart = document.offsetAt(selection.start);
-      let selectionEnd = document.offsetAt(selection.end);
+            const document = editor.document;
+            const selection = editor.selection;
+            const text = document.getText();
 
-      // If no selection, select the current line
-      if (selectionStart === selectionEnd) {
-        const currentLine = context.detector.getLineAt(text, selectionStart);
-        selectionStart = currentLine.start;
-        selectionEnd = currentLine.end;
-      } else {
-        // Expand selection to include full lines
-        const startLine = context.detector.getLineAt(text, selectionStart);
-        const endLine = context.detector.getLineAt(text, selectionEnd);
-        selectionStart = startLine.start;
-        selectionEnd = endLine.end;
-      }
+            let selectionStart = document.offsetAt(selection.start);
+            let selectionEnd = document.offsetAt(selection.end);
 
-      // Check if user wants bullet or numbered list
-      const listTypeChoice = await vscode.window.showQuickPick([
-        {
-          label: '$(list-unordered) Bullet List',
-          description: 'Create or toggle bullet list',
-          value: 'bullet' as const
-        },
-        {
-          label: '$(list-ordered) Numbered List', 
-          description: 'Create or toggle numbered list',
-          value: 'numbered' as const
+            // If no selection, select the current line
+            if (selectionStart === selectionEnd) {
+                const currentLine = context.detector.getLineAt(text, selectionStart);
+                selectionStart = currentLine.start;
+                selectionEnd = currentLine.end;
+            } else {
+                // Expand selection to include full lines
+                const startLine = context.detector.getLineAt(text, selectionStart);
+                const endLine = context.detector.getLineAt(text, selectionEnd);
+                selectionStart = startLine.start;
+                selectionEnd = endLine.end;
+            }
+
+            // Check if user wants bullet or numbered list
+            const listTypeChoice = await vscode.window.showQuickPick([
+                {
+                    label: '$(list-unordered) Bullet List',
+                    description: 'Create or toggle bullet list',
+                    value: 'bullet' as const
+                },
+                {
+                    label: '$(list-ordered) Numbered List',
+                    description: 'Create or toggle numbered list',
+                    value: 'numbered' as const
+                }
+            ], {
+                placeHolder: 'Select list type'
+            });
+
+            if (!listTypeChoice) {
+                return; // User cancelled
+            }
+
+            // Format the text
+            const result = context.formatter.formatList(text, selectionStart, selectionEnd, listTypeChoice.value);
+
+            // Apply the edit
+            const success = await context.executeEdit((editBuilder) => {
+                const fullRange = new vscode.Range(
+                    document.positionAt(0),
+                    document.positionAt(text.length)
+                );
+                editBuilder.replace(fullRange, result.text);
+            });
+
+            if (success) {
+                // Update selection
+                const newStart = document.positionAt(result.selectionStart);
+                const newEnd = document.positionAt(result.selectionEnd);
+                editor.selection = new vscode.Selection(newStart, newEnd);
+            }
+
+        } catch (error) {
+            console.error('List command error:', error);
+            context.showErrorMessage('Failed to format list');
         }
-      ], {
-        placeHolder: 'Select list type'
-      });
-
-      if (!listTypeChoice) {
-        return; // User cancelled
-      }
-
-      // Format the text
-      const result = context.formatter.formatList(text, selectionStart, selectionEnd, listTypeChoice.value);
-
-      // Apply the edit
-      const success = await context.executeEdit((editBuilder) => {
-        const fullRange = new vscode.Range(
-          document.positionAt(0),
-          document.positionAt(text.length)
-        );
-        editBuilder.replace(fullRange, result.text);
-      });
-
-      if (success) {
-        // Update selection
-        const newStart = document.positionAt(result.selectionStart);
-        const newEnd = document.positionAt(result.selectionEnd);
-        editor.selection = new vscode.Selection(newStart, newEnd);
-      }
-
-    } catch (error) {
-      console.error('List command error:', error);
-      context.showErrorMessage('Failed to format list');
-    }
-  });
+    });
 }

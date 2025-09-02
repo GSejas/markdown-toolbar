@@ -75,7 +75,7 @@ export class PresetManager implements IPresetManager {
   ) {
     this.vscode = vscodeImpl || require('vscode');
     this.dependencyDetector = dependencyDetector!; // Required dependency
-    
+
     this.initialize();
   }
 
@@ -90,7 +90,7 @@ export class PresetManager implements IPresetManager {
 
     const config = this.vscode.workspace.getConfiguration(CONFIG_KEYS.root);
     const presetId = config.get('preset', DEFAULT_CONFIG.preset) as PresetId;
-    
+
     // Validate preset ID
     if (!this.isValidPresetId(presetId)) {
       console.warn(`Invalid preset ID: ${presetId}, falling back to core`);
@@ -124,7 +124,7 @@ export class PresetManager implements IPresetManager {
     }
 
     const previousPreset = this.getCurrentPreset();
-    
+
     try {
       // Update configuration
       const config = this.vscode.workspace.getConfiguration(CONFIG_KEYS.root);
@@ -135,10 +135,10 @@ export class PresetManager implements IPresetManager {
 
       // Clear cache to force refresh
       this.currentPresetCache = null;
-      
+
       // Get new preset for comparison
       const currentPreset = this.getCurrentPreset();
-      
+
       // Emit change event
       const event: IPresetChangeEvent = {
         previousPreset: previousPreset.id,
@@ -166,7 +166,7 @@ export class PresetManager implements IPresetManager {
     // Filter buttons based on extension availability
     return preset.buttons.filter(buttonId => {
       const buttonDef = BUTTON_DEFINITIONS[buttonId];
-      
+
       // If button has no extension requirement, always include it
       if (!buttonDef.requiresExtension) {
         return true;
@@ -183,12 +183,12 @@ export class PresetManager implements IPresetManager {
   public getCustomButtons(): ButtonId[] {
     const config = this.vscode.workspace.getConfiguration(CONFIG_KEYS.root);
     const customButtons = config.get('custom.visibleButtons', DEFAULT_CONFIG.customVisible) as string[] | undefined;
-    
+
     // Handle undefined result
     if (!customButtons || !Array.isArray(customButtons)) {
       return [];
     }
-    
+
     // Validate and filter custom buttons
     return customButtons.filter(buttonId => this.isValidButtonId(buttonId)) as ButtonId[];
   }
@@ -199,7 +199,7 @@ export class PresetManager implements IPresetManager {
   public async setCustomButtons(buttons: ButtonId[]): Promise<void> {
     // Validate and filter buttons
     const validButtons = buttons.filter(buttonId => this.isValidButtonId(buttonId));
-    
+
     if (validButtons.length !== buttons.length) {
       const invalidButtons = buttons.filter(buttonId => !this.isValidButtonId(buttonId));
       console.warn(`Filtered out invalid button IDs: ${invalidButtons.join(', ')}`);
@@ -209,8 +209,8 @@ export class PresetManager implements IPresetManager {
       // Update configuration
       const config = this.vscode.workspace.getConfiguration(CONFIG_KEYS.root);
       await config.update(
-        'custom.visibleButtons', 
-        validButtons, 
+        'custom.visibleButtons',
+        validButtons,
         this.vscode.ConfigurationTarget.Global
       );
 
@@ -231,7 +231,7 @@ export class PresetManager implements IPresetManager {
    */
   public onDidChangePreset(callback: (event: IPresetChangeEvent) => void): { dispose(): void } {
     this.changeCallbacks.push(callback);
-    
+
     return {
       dispose: () => {
         const index = this.changeCallbacks.indexOf(callback);
@@ -285,12 +285,12 @@ export class PresetManager implements IPresetManager {
    */
   private handleConfigurationChange(event: any): void {
     const previousPreset = this.currentPresetCache?.id || 'core';
-    
+
     // Clear cache to force refresh
     this.currentPresetCache = null;
-    
+
     const currentPreset = this.getCurrentPreset();
-    
+
     // Emit change event if preset actually changed
     if (previousPreset !== currentPreset.id) {
       const changeEvent: IPresetChangeEvent = {
@@ -319,7 +319,7 @@ export class PresetManager implements IPresetManager {
 
     const currentPreset = this.getCurrentPreset();
     const suggestedPreset = this.suggestPresetUpgrade(currentPreset.id, event.extensionId);
-    
+
     if (suggestedPreset && suggestedPreset !== currentPreset.id) {
       const changeEvent: IPresetChangeEvent = {
         previousPreset: currentPreset.id,
@@ -351,8 +351,8 @@ export class PresetManager implements IPresetManager {
 
     // Suggest Pro if user has Writer and gets markdownlint or MPE
     if (currentPresetId === 'writer') {
-      if (newExtensionId === 'DavidAnson.vscode-markdownlint' || 
-          newExtensionId === 'shd101wyy.markdown-preview-enhanced') {
+      if (newExtensionId === 'DavidAnson.vscode-markdownlint' ||
+        newExtensionId === 'shd101wyy.markdown-preview-enhanced') {
         // Check if all Pro requirements are now met
         const state = this.dependencyDetector.getCurrentState();
         if (state.hasMAIO && (state.hasMarkdownlint || state.hasMPE)) {
@@ -369,7 +369,7 @@ export class PresetManager implements IPresetManager {
    */
   private async updateContextKeys(): Promise<void> {
     const preset = this.getCurrentPreset();
-    
+
     try {
       await this.vscode.commands.executeCommand('setContext', CONTEXT_KEYS.preset, preset.id);
     } catch (error) {

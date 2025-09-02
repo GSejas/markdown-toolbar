@@ -129,7 +129,7 @@ export class FallbackCommands {
       // Single line
       const line = document.lineAt(selection.start.line);
       const newText = this.formatter.toggleBulletList(line.text);
-      
+
       await editor.edit((editBuilder: any) => {
         editBuilder.replace(line.range, newText);
       });
@@ -137,7 +137,7 @@ export class FallbackCommands {
       // Multiple lines
       const startLine = selection.start.line;
       const endLine = selection.end.line;
-      
+
       await editor.edit((editBuilder: any) => {
         for (let i = startLine; i <= endLine; i++) {
           const line = document.lineAt(i);
@@ -162,7 +162,7 @@ export class FallbackCommands {
       // Single line
       const line = document.lineAt(selection.start.line);
       const newText = this.formatter.toggleTaskList(line.text);
-      
+
       await editor.edit((editBuilder: any) => {
         editBuilder.replace(line.range, newText);
       });
@@ -170,7 +170,7 @@ export class FallbackCommands {
       // Multiple lines
       const startLine = selection.start.line;
       const endLine = selection.end.line;
-      
+
       await editor.edit((editBuilder: any) => {
         for (let i = startLine; i <= endLine; i++) {
           const line = document.lineAt(i);
@@ -196,7 +196,7 @@ export class FallbackCommands {
 
     const codeBlock = this.formatter.createCodeBlock(language || '');
     const selection = editor.selection;
-    
+
     await editor.edit((editBuilder: any) => {
       if (selection.isEmpty) {
         editBuilder.insert(selection.start, codeBlock);
@@ -243,7 +243,7 @@ export class FallbackCommands {
 
     if (linkText && url) {
       const link = this.formatter.createLink(linkText, url);
-      
+
       await editor.edit((editBuilder: any) => {
         if (selection.isEmpty) {
           editBuilder.insert(selection.start, link);
@@ -274,7 +274,7 @@ export class FallbackCommands {
     if (url) {
       const image = this.formatter.createImage(altText, url);
       const selection = editor.selection;
-      
+
       await editor.edit((editBuilder: any) => {
         editBuilder.insert(selection.start, image);
       });
@@ -296,7 +296,7 @@ export class FallbackCommands {
       // No selection - insert markers and position cursor
       const position = selection.start;
       const text = `${startMarker}${endMarker}`;
-      
+
       await editor.edit((editBuilder: any) => {
         editBuilder.insert(position, text);
       });
@@ -307,9 +307,9 @@ export class FallbackCommands {
     } else {
       // Has selection - wrap or unwrap
       const selectedText = document.getText(selection);
-      const isFormatted = selectedText.startsWith(startMarker) && 
-                         selectedText.endsWith(endMarker) &&
-                         selectedText.length > startMarker.length + endMarker.length;
+      const isFormatted = selectedText.startsWith(startMarker) &&
+        selectedText.endsWith(endMarker) &&
+        selectedText.length > startMarker.length + endMarker.length;
 
       let newText: string;
       if (isFormatted) {

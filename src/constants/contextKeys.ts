@@ -31,26 +31,26 @@ export const CONTEXT_KEYS = {
   hasMarkdownlint: 'mdToolbar.hasMarkdownlint',
   hasPasteImage: 'mdToolbar.hasPasteImage',
   hasMPE: 'mdToolbar.hasMPE',
-  
+
   // Current preset
   preset: 'mdToolbar.preset',           // 'core'|'writer'|'pro'|'custom'
-  
+
   // Context-aware features
   inTable: 'mdToolbar.inTable',
   onTaskLine: 'mdToolbar.onTaskLine',
-  
+
   // Formatting context (for button state updates)
   isBold: 'mdToolbar.isBold',
-  isItalic: 'mdToolbar.isItalic', 
+  isItalic: 'mdToolbar.isItalic',
   isCode: 'mdToolbar.isCode',
   isStrikethrough: 'mdToolbar.isStrikethrough',
   isLink: 'mdToolbar.isLink',
   isList: 'mdToolbar.isList',
-  
+
   // Editor state
   isMarkdownFile: 'editorLangId == markdown',
   hasSelection: 'mdToolbar.hasSelection',
-  
+
   // UI state
   toolbarEnabled: 'mdToolbar.enabled',
   compactMode: 'mdToolbar.compact'
@@ -62,25 +62,25 @@ export const CONTEXT_KEYS = {
 export const CONTEXT_KEY_GROUPS = {
   DEPENDENCIES: [
     CONTEXT_KEYS.hasMAIO,
-    CONTEXT_KEYS.hasMarkdownlint, 
+    CONTEXT_KEYS.hasMarkdownlint,
     CONTEXT_KEYS.hasPasteImage,
     CONTEXT_KEYS.hasMPE
   ],
-  
+
   CONTEXT_AWARENESS: [
     CONTEXT_KEYS.inTable,
     CONTEXT_KEYS.onTaskLine
   ],
-  
+
   FORMATTING_STATE: [
     CONTEXT_KEYS.isBold,
     CONTEXT_KEYS.isItalic,
-    CONTEXT_KEYS.isCode, 
+    CONTEXT_KEYS.isCode,
     CONTEXT_KEYS.isStrikethrough,
     CONTEXT_KEYS.isLink,
     CONTEXT_KEYS.isList
   ],
-  
+
   UI_STATE: [
     CONTEXT_KEYS.preset,
     CONTEXT_KEYS.toolbarEnabled,

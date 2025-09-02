@@ -36,13 +36,13 @@ export interface IMarkdownContext {
   isCode: boolean;
   isLink: boolean;
   isList: boolean;
-  
+
   // New context types
   isStrikethrough: boolean;
   isInCodeBlock: boolean;
   inTable: boolean;
   onTaskLine: boolean;
-  
+
   // Range information
   boldRange?: { start: number; end: number };
   italicRange?: { start: number; end: number };
@@ -52,14 +52,14 @@ export interface IMarkdownContext {
   linkRange?: { start: number; end: number };
   tableRange?: { start: number; end: number };
   taskRange?: { start: number; end: number };
-  
+
   // Content extraction
   linkText?: string;
   linkUrl?: string;
   listType?: 'bullet' | 'numbered' | 'none';
   taskState?: 'incomplete' | 'complete';
   codeBlockLanguage?: string;
-  
+
   // Table context
   tableContext?: ITableContext;
 }

@@ -30,7 +30,7 @@
  */
 export const EXTENSION_IDS = {
   MAIO: 'yzhang.markdown-all-in-one',
-  MARKDOWNLINT: 'DavidAnson.vscode-markdownlint', 
+  MARKDOWNLINT: 'DavidAnson.vscode-markdownlint',
   PASTE_IMAGE: 'mushan.vscode-paste-image',
   MPE: 'shd101wyy.markdown-preview-enhanced'
 } as const;
@@ -58,10 +58,10 @@ export interface IDependencyState {
   hasMarkdownlint: boolean;
   hasPasteImage: boolean;
   hasMPE: boolean;
-  
+
   // Detailed extension info
   extensions: Record<string, IExtensionInfo>;
-  
+
   // Last update timestamp for caching
   lastUpdated: number;
 }
@@ -85,37 +85,37 @@ export interface IDependencyDetector {
    * Get current state of all dependencies
    */
   getCurrentState(): IDependencyState;
-  
+
   /**
    * Detect a specific extension
    */
   detectExtension(extensionId: string): IExtensionInfo;
-  
+
   /**
    * Check if extension is available for use (installed and active)
    */
   isExtensionAvailable(extensionId: string): boolean;
-  
+
   /**
    * Check if extension is installed (regardless of active state)
    */
   isExtensionInstalled(extensionId: string): boolean;
-  
+
   /**
    * Attempt to activate an extension if it's installed but not active
    */
   ensureExtensionActive(extensionId: string): Promise<boolean>;
-  
+
   /**
    * Listen for extension state changes
    */
   onDidChangeExtensions(callback: (event: IDependencyChangeEvent) => void): any; // Disposable
-  
+
   /**
    * Refresh detection state (for manual refresh)
    */
   refresh(): Promise<IDependencyState>;
-  
+
   /**
    * Dispose resources
    */
@@ -128,13 +128,13 @@ export interface IDependencyDetector {
 export interface IDependencyDetectorConfig {
   // Cache detection results for this many milliseconds
   cacheTimeout: number;
-  
+
   // Extensions to track
   trackedExtensions: string[];
-  
+
   // Whether to auto-detect extension changes
   autoDetectChanges: boolean;
-  
+
   // Whether to show notifications about missing dependencies
   showMissingDependencyNotifications: boolean;
 }
@@ -159,15 +159,15 @@ export interface ICommandDelegationService {
    * Execute a command, with fallback if delegation fails
    */
   executeCommand(
-    buttonId: string, 
+    buttonId: string,
     args?: any[]
   ): Promise<ICommandDelegationResult>;
-  
+
   /**
    * Check if command can be delegated (extension available)
    */
   canDelegate(buttonId: string): boolean;
-  
+
   /**
    * Show CTA to install missing extension
    */

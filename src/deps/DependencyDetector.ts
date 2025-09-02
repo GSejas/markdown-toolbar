@@ -52,7 +52,7 @@ export class DependencyDetector implements IDependencyDetector {
   private contextKeyManager: ContextKeyManager;
 
   constructor(
-    vscodeImpl?: any, 
+    vscodeImpl?: any,
     config: IDependencyDetectorConfig = {},
     contextKeyManager?: ContextKeyManager
   ) {
@@ -62,7 +62,7 @@ export class DependencyDetector implements IDependencyDetector {
       autoDetectChanges: true,
       ...config
     };
-    
+
     // Use provided context key manager or create new one
     this.contextKeyManager = contextKeyManager || new ContextKeyManager(vscodeImpl);
 
@@ -76,7 +76,7 @@ export class DependencyDetector implements IDependencyDetector {
    */
   public getCurrentState(): IDependencyState {
     const now = Date.now();
-    
+
     // Return cached state if still valid
     if (this.cachedState && (now - this.cachedState.lastUpdated) < this.config.cacheTimeout) {
       return this.cachedState;
@@ -113,7 +113,7 @@ export class DependencyDetector implements IDependencyDetector {
   public detectExtension(extensionId: string): IExtensionInfo {
     try {
       const extension = this.vscode.extensions.getExtension(extensionId);
-      
+
       if (!extension) {
         return this.createMissingExtensionInfo(extensionId);
       }
@@ -121,7 +121,7 @@ export class DependencyDetector implements IDependencyDetector {
       // Extension exists (is installed)
       const isActive = extension.isActive;
       const isInstalled = true;
-      
+
       // Check if extension is disabled (installed but not active due to user settings)
       // Note: There's no direct API to check if disabled, but we can infer it
       // If extension is installed but not active, it might be disabled or just not activated yet
@@ -189,7 +189,7 @@ export class DependencyDetector implements IDependencyDetector {
    */
   public onDidChangeExtensions(callback: (event: IDependencyChangeEvent) => void): { dispose(): void } {
     this.changeCallbacks.push(callback);
-    
+
     return {
       dispose: () => {
         const index = this.changeCallbacks.indexOf(callback);
@@ -205,17 +205,17 @@ export class DependencyDetector implements IDependencyDetector {
    */
   public async refresh(): Promise<IDependencyState> {
     const previousState = this.cachedState;
-    
+
     // Clear cache to force refresh
     this.cachedState = null;
-    
+
     const currentState = this.getCurrentState();
-    
+
     // Emit change events if state actually changed
     if (previousState) {
       this.detectAndEmitChanges(previousState, currentState);
     }
-    
+
     return currentState;
   }
 
@@ -233,7 +233,7 @@ export class DependencyDetector implements IDependencyDetector {
     this.disposables = [];
     this.changeCallbacks = [];
     this.cachedState = null;
-    
+
     // Clean up context key manager
     this.contextKeyManager.dispose();
   }
@@ -289,7 +289,7 @@ export class DependencyDetector implements IDependencyDetector {
    */
   private detectAndEmitChanges(previousState: IDependencyState, currentState: IDependencyState): void {
     const changes = this.compareStates(previousState, currentState);
-    
+
     changes.forEach(change => {
       this.changeCallbacks.forEach(callback => {
         try {
@@ -322,18 +322,18 @@ export class DependencyDetector implements IDependencyDetector {
           timestamp: Date.now()
         });
       }
-      
+
       // Extension was uninstalled
       else if (prevExt?.isInstalled && !currExt?.isInstalled) {
         changes.push({
           extensionId,
-          changeType: 'uninstalled', 
+          changeType: 'uninstalled',
           previousState: previous,
           currentState: current,
           timestamp: Date.now()
         });
       }
-      
+
       // Extension was activated
       else if (prevExt?.isInstalled && !prevExt?.isActive && currExt?.isActive) {
         changes.push({
@@ -344,7 +344,7 @@ export class DependencyDetector implements IDependencyDetector {
           timestamp: Date.now()
         });
       }
-      
+
       // Extension was deactivated
       else if (prevExt?.isActive && currExt?.isInstalled && !currExt?.isActive) {
         changes.push({
@@ -390,7 +390,7 @@ export class DependencyDetector implements IDependencyDetector {
   private extractCommands(extension: any): string[] {
     try {
       const commands = extension.packageJSON?.contributes?.commands;
-      return Array.isArray(commands) 
+      return Array.isArray(commands)
         ? commands.map((cmd: any) => cmd.command).filter(Boolean)
         : [];
     } catch (error) {

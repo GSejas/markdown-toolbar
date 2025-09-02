@@ -74,7 +74,7 @@ export class ContextKeyManager implements IContextKeyManager {
    */
   public async setContexts(contexts: Record<string, ContextKeyValue>): Promise<void> {
     const updates: Promise<void>[] = [];
-    
+
     for (const [key, value] of Object.entries(contexts)) {
       // Only update if value actually changed
       if (this.currentKeys.get(key) !== value) {
@@ -97,10 +97,10 @@ export class ContextKeyManager implements IContextKeyManager {
    * Clear all context keys managed by this instance
    */
   public async clearAll(): Promise<void> {
-    const clearPromises = Array.from(this.currentKeys.keys()).map(key => 
+    const clearPromises = Array.from(this.currentKeys.keys()).map(key =>
       this.clearContext(key)
     );
-    
+
     await Promise.all(clearPromises);
   }
 

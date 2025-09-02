@@ -73,7 +73,7 @@ export class CommandFactory {
    */
   public static createButtonHandler(buttonId: ButtonId): ICommandHandler {
     const buttonDef = BUTTON_DEFINITIONS[buttonId];
-    
+
     return {
       execute: async (context: ICommandContext, ...args: any[]): Promise<ICommandResult> => {
         return this.executeButtonCommand(buttonDef, context, ...args);
@@ -95,7 +95,7 @@ export class CommandFactory {
       // Check if extension is required and available
       if (buttonDef.requiresExtension) {
         const isAvailable = dependencyDetector.isExtensionAvailable(buttonDef.requiresExtension);
-        
+
         if (!isAvailable) {
           return this.handleMissingExtension(buttonDef, context);
         }
@@ -108,7 +108,7 @@ export class CommandFactory {
           return { success: true };
         } catch (error) {
           console.warn(`Failed to execute delegated command ${buttonDef.delegatesTo}:`, error instanceof Error ? error.message : String(error));
-          
+
           // Fall back to internal implementation if available
           if (buttonDef.fallbackCommand) {
             try {
@@ -116,9 +116,9 @@ export class CommandFactory {
               return { success: true, fallbackUsed: true };
             } catch (fallbackError) {
               console.error(`Failed to execute fallback command ${buttonDef.fallbackCommand}:`, fallbackError);
-              return { 
-                success: false, 
-                message: `Both primary and fallback commands failed: ${error instanceof Error ? error.message : String(error)}` 
+              return {
+                success: false,
+                message: `Both primary and fallback commands failed: ${error instanceof Error ? error.message : String(error)}`
               };
             }
           }
@@ -131,9 +131,9 @@ export class CommandFactory {
 
     } catch (error) {
       console.error(`Error executing command for button ${buttonDef.id}:`, error);
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Unknown error'
       };
     }
   }
@@ -153,14 +153,14 @@ export class CommandFactory {
         if (buttonDef.fallbackCommand) {
           try {
             await vscode.commands.executeCommand(buttonDef.fallbackCommand);
-            return { 
-              success: true, 
+            return {
+              success: true,
               fallbackUsed: true,
               message: `Used internal implementation (${buttonDef.requiresExtension} not available)`
             };
           } catch (error) {
-            return { 
-              success: false, 
+            return {
+              success: false,
               message: `Internal implementation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
               extensionRequired: buttonDef.requiresExtension
             };
@@ -175,16 +175,16 @@ export class CommandFactory {
           'Install Extension',
           'Cancel'
         );
-        
+
         if (action === 'Install Extension') {
           await vscode.commands.executeCommand(
             'workbench.extensions.installExtension',
             buttonDef.requiresExtension
           );
         }
-        
-        return { 
-          success: false, 
+
+        return {
+          success: false,
           message: 'Extension installation required',
           extensionRequired: buttonDef.requiresExtension
         };
@@ -192,15 +192,15 @@ export class CommandFactory {
       case 'hide':
       default:
         // Button should be hidden, but if somehow executed, show error
-        return { 
-          success: false, 
+        return {
+          success: false,
           message: `Feature unavailable: ${buttonDef.requiresExtension} extension not installed`,
           extensionRequired: buttonDef.requiresExtension
         };
     }
 
-    return { 
-      success: false, 
+    return {
+      success: false,
       message: 'Extension required but not available',
       extensionRequired: buttonDef.requiresExtension
     };
@@ -272,15 +272,15 @@ export class PresetSwitchHandler implements ICommandHandler {
       }
 
       await presetManager.switchPreset(presetId as any);
-      
-      return { 
-        success: true, 
-        message: `Switched to ${presetId} preset` 
+
+      return {
+        success: true,
+        message: `Switched to ${presetId} preset`
       };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to switch preset' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to switch preset'
       };
     }
   }
@@ -319,14 +319,14 @@ export class CustomizeButtonsHandler implements ICommandHandler {
       const buttonIds = selected.map((item: any) => item.value) as ButtonId[];
       await presetManager.setCustomButtons(buttonIds);
 
-      return { 
-        success: true, 
-        message: `Custom preset updated with ${buttonIds.length} buttons` 
+      return {
+        success: true,
+        message: `Custom preset updated with ${buttonIds.length} buttons`
       };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to customize buttons' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to customize buttons'
       };
     }
   }
@@ -362,7 +362,7 @@ export class AnalyzeDependenciesHandler implements ICommandHandler {
         '## Available Buttons',
         ...effectiveButtons.map(buttonId => {
           const button = BUTTON_DEFINITIONS[buttonId];
-          const status = button.requiresExtension 
+          const status = button.requiresExtension
             ? (dependencyDetector.isExtensionAvailable(button.requiresExtension) ? '✅' : '⚠️')
             : '✅';
           return `- ${status} ${button.title} (${button.id})`;
@@ -385,17 +385,17 @@ export class AnalyzeDependenciesHandler implements ICommandHandler {
         content: report,
         language: 'markdown'
       });
-      
+
       await vscode.window.showTextDocument(document);
 
-      return { 
-        success: true, 
-        message: 'Dependency analysis report generated' 
+      return {
+        success: true,
+        message: 'Dependency analysis report generated'
       };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error instanceof Error ? error.message : 'Failed to analyze dependencies' 
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to analyze dependencies'
       };
     }
   }
