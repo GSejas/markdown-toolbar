@@ -32,19 +32,14 @@ interface MermaidBlock {
   errorMessage?: string;
 }
 
-interface HeaderElement {
-  level: number;
+interface CodeBlock {
   content: string;
+  language: string;
   range: vscode.Range;
   lineNumber: number;
 }
 
-interface TableElement {
-  headerRow: vscode.Range;
-  rows: vscode.Range[];
-  lineNumber: number;
-  columnCount: number;
-}
+// Header and table interfaces removed - handled by dedicated providers
 
 export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
   private context: vscode.ExtensionContext;
@@ -58,34 +53,36 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
 
   async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
     if (token.isCancellationRequested) {
+      logger.info('[MermaidCodeLens] Cancellation requested, returning empty array');
       return [];
     }
 
     // Only process markdown files
     if (document.languageId !== 'markdown') {
+      logger.info(`[MermaidCodeLens] Skipping non-markdown file: ${document.languageId}`);
       return [];
     }
 
+    logger.info(`[MermaidCodeLens] Processing markdown document: ${document.fileName}`);
     const codeLenses: vscode.CodeLens[] = [];
 
     // Find mermaid blocks
     const mermaidBlocks = this.findMermaidBlocks(document);
+    logger.info(`[MermaidCodeLens] Found ${mermaidBlocks.length} mermaid blocks`);
     for (const block of mermaidBlocks) {
       codeLenses.push(...this.createMermaidCodeLenses(block));
     }
 
-    // Find headers
-    const headers = this.findHeaders(document);
-    for (const header of headers) {
-      codeLenses.push(...this.createHeaderCodeLenses(header));
+    // Find regular code blocks
+    const codeBlocks = this.findCodeBlocks(document);
+    logger.info(`[MermaidCodeLens] Found ${codeBlocks.length} code blocks`);
+    for (const block of codeBlocks) {
+      codeLenses.push(...this.createCodeBlockCodeLenses(block));
     }
 
-    // Find tables
-    const tables = this.findTables(document);
-    for (const table of tables) {
-      codeLenses.push(...this.createTableCodeLenses(table));
-    }
+    // Headers and tables removed - handled by dedicated providers
 
+    logger.info(`[MermaidCodeLens] Total CodeLens items created: ${codeLenses.length}`);
     return codeLenses;
   }
 
@@ -142,84 +139,61 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
     return blocks;
   }
 
-  private findHeaders(document: vscode.TextDocument): HeaderElement[] {
-    const headers: HeaderElement[] = [];
+  private findCodeBlocks(document: vscode.TextDocument): CodeBlock[] {
+    const blocks: CodeBlock[] = [];
     const text = document.getText();
     const lines = text.split('\n');
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
-
-      if (headerMatch) {
-        const level = headerMatch[1].length;
-        const content = headerMatch[2];
-        const range = new vscode.Range(
-          new vscode.Position(i, 0),
-          new vscode.Position(i, line.length)
-        );
-
-        headers.push({
-          level,
-          content,
-          range,
-          lineNumber: i
-        });
-      }
-    }
-
-    return headers;
-  }
-
-  private findTables(document: vscode.TextDocument): TableElement[] {
-    const tables: TableElement[] = [];
-    const text = document.getText();
-    const lines = text.split('\n');
+    let inCodeBlock = false;
+    let blockStart = -1;
+    let blockContent = '';
+    let blockLanguage = '';
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Check if line looks like a table header
-      if (line.includes('|') && line.trim().startsWith('|') && line.trim().endsWith('|')) {
-        // Check if next line is a separator
-        if (i + 1 < lines.length) {
-          const nextLine = lines[i + 1];
-          if (nextLine.match(/^\|[\s\-:]+\|$/)) {
-            // This is a table
-            const headerRange = new vscode.Range(
-              new vscode.Position(i, 0),
-              new vscode.Position(i, line.length)
-            );
+      if (line.trim().startsWith('```')) {
+        if (!inCodeBlock) {
+          // Starting a code block
+          const langMatch = line.trim().match(/^```(\w+)?/);
+          blockLanguage = langMatch?.[1] || 'text';
 
-            const rows: vscode.Range[] = [];
-            const columnCount = (line.match(/\|/g) || []).length - 1;
-
-            // Find table rows
-            for (let j = i + 2; j < lines.length; j++) {
-              const rowLine = lines[j];
-              if (rowLine.includes('|') && rowLine.trim().startsWith('|') && rowLine.trim().endsWith('|')) {
-                rows.push(new vscode.Range(
-                  new vscode.Position(j, 0),
-                  new vscode.Position(j, rowLine.length)
-                ));
-              } else {
-                break;
-              }
-            }
-
-            tables.push({
-              headerRow: headerRange,
-              rows,
-              lineNumber: i,
-              columnCount
-            });
+          // Skip mermaid blocks (handled separately)
+          if (blockLanguage === 'mermaid') {
+            continue;
           }
+
+          inCodeBlock = true;
+          blockStart = i;
+          blockContent = '';
+        } else {
+          // Ending a code block
+          const range = new vscode.Range(
+            new vscode.Position(blockStart, 0),
+            new vscode.Position(i, line.length)
+          );
+
+          blocks.push({
+            content: blockContent,
+            language: blockLanguage,
+            range,
+            lineNumber: blockStart
+          });
+
+          inCodeBlock = false;
         }
+        continue;
+      }
+
+      if (inCodeBlock) {
+        blockContent += line + '\n';
       }
     }
 
-    return tables;
+    return blocks;
   }
+
+  // Header and table finding methods removed - handled by dedicated providers
 
   private createMermaidCodeLenses(block: MermaidBlock): vscode.CodeLens[] {
     const codeLenses: vscode.CodeLens[] = [];
@@ -232,12 +206,7 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
       arguments: [block.content, block.diagramType]
     };
 
-    // Edit command
-    const editCommand = {
-      title: '✏️ Edit',
-      command: 'markdownToolbar.editMermaid',
-      arguments: [block.range]
-    };
+    // Edit command removed as requested
 
     // Export command
     const exportCommand = {
@@ -249,7 +218,6 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
     const range = new vscode.Range(line, 0, line, 0);
 
     codeLenses.push(new vscode.CodeLens(range, previewCommand));
-    codeLenses.push(new vscode.CodeLens(range, editCommand));
     codeLenses.push(new vscode.CodeLens(range, exportCommand));
 
     // Add syntax error warning if needed
@@ -265,82 +233,25 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
     return codeLenses;
   }
 
-  private createHeaderCodeLenses(header: HeaderElement): vscode.CodeLens[] {
+  private createCodeBlockCodeLenses(block: CodeBlock): vscode.CodeLens[] {
     const codeLenses: vscode.CodeLens[] = [];
-    const line = header.lineNumber;
+    const line = block.lineNumber;
     const range = new vscode.Range(line, 0, line, 0);
 
-    // H+ (increase header level)
-    if (header.level > 1) {
-      const increaseCommand = {
-        title: 'H+ Bigger',
-        command: 'markdownToolbar.increaseHeaderLevel',
-        arguments: [header.range, header.level]
-      };
-      codeLenses.push(new vscode.CodeLens(range, increaseCommand));
-    }
-
-    // H- (decrease header level)
-    if (header.level < 6) {
-      const decreaseCommand = {
-        title: 'H- Smaller',
-        command: 'markdownToolbar.decreaseHeaderLevel',
-        arguments: [header.range, header.level]
-      };
-      codeLenses.push(new vscode.CodeLens(range, decreaseCommand));
-    }
-
-    // TOC integration
-    const tocCommand = {
-      title: '📑 Add to TOC',
-      command: 'markdownToolbar.addToToc',
-      arguments: [header.content, header.level]
+    // Copy code block content
+    const copyCommand = {
+      title: "$(copy) Copy",
+      command: 'mdToolbar.codeblock.copy',
+      arguments: [block.content, block.language],
+      tooltip: `Copy ${block.language} code block to clipboard`
     };
-    codeLenses.push(new vscode.CodeLens(range, tocCommand));
+
+    codeLenses.push(new vscode.CodeLens(range, copyCommand));
 
     return codeLenses;
   }
 
-  private createTableCodeLenses(table: TableElement): vscode.CodeLens[] {
-    const codeLenses: vscode.CodeLens[] = [];
-    const line = table.lineNumber;
-    const range = new vscode.Range(line, 0, line, 0);
-
-    // Add column
-    const addColumnCommand = {
-      title: '➕ Column',
-      command: 'markdownToolbar.addTableColumn',
-      arguments: [table.headerRow, table.rows]
-    };
-
-    // Add row
-    const addRowCommand = {
-      title: '➕ Row',
-      command: 'markdownToolbar.addTableRow',
-      arguments: [table.headerRow, table.rows]
-    };
-
-    // Format table
-    const formatCommand = {
-      title: '📐 Format',
-      command: 'markdownToolbar.formatTable',
-      arguments: [table.headerRow, table.rows]
-    };
-
-    // Sort table
-    const sortCommand = {
-      title: '🔽 Sort',
-      command: 'markdownToolbar.sortTable',
-      arguments: [table.headerRow, table.rows]
-    };
-
-    codeLenses.push(new vscode.CodeLens(range, addColumnCommand));
-    codeLenses.push(new vscode.CodeLens(range, addRowCommand));
-    codeLenses.push(new vscode.CodeLens(range, formatCommand));
-    codeLenses.push(new vscode.CodeLens(range, sortCommand));
-
-    return codeLenses;
-  }
+  // Header and table CodeLens creation methods removed - handled by dedicated providers
 
   private detectMermaidType(content: string): string {
     const trimmed = content.trim();

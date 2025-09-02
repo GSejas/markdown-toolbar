@@ -116,7 +116,7 @@ describe('PresetManager', () => {
     it('should return custom preset with user-defined buttons', () => {
       // Arrange
       const customButtons: ButtonId[] = ['fmt.bold', 'fmt.italic', 'toc.create'];
-      
+
       const testMockConfig = {
         get: vi.fn((key: string, defaultValue?: any) => {
           if (key === 'preset') return 'custom';
@@ -311,7 +311,7 @@ describe('PresetManager', () => {
       // Assert
       expect(mockConfig.update).toHaveBeenCalledWith(
         'preset',
-        'writer', 
+        'writer',
         mockVscode.ConfigurationTarget.Global
       );
       expect(mockVscode.commands.executeCommand).toHaveBeenCalledWith(
@@ -342,7 +342,7 @@ describe('PresetManager', () => {
     it('should handle switch to invalid preset', async () => {
       // Act & Assert - Should not throw
       await expect(presetManager.switchPreset('invalid' as PresetId)).resolves.toBeUndefined();
-      
+
       // Should not update settings for invalid preset
       expect(mockConfig.update).not.toHaveBeenCalled();
     });
@@ -394,7 +394,7 @@ describe('PresetManager', () => {
       // Arrange
       const buttonsWithInvalid = [
         'fmt.bold',
-        'invalid.button' as ButtonId,  
+        'invalid.button' as ButtonId,
         'fmt.italic',
         'another.invalid' as ButtonId
       ];
@@ -427,7 +427,7 @@ describe('PresetManager', () => {
 
       // Act - Simulate MAIO installation
       mockDependencyState.hasMAIO = true;
-      mockDependencyDetector.isExtensionAvailable.mockImplementation((extId: string) => 
+      mockDependencyDetector.isExtensionAvailable.mockImplementation((extId: string) =>
         extId === 'yzhang.markdown-all-in-one'
       );
 
@@ -454,7 +454,7 @@ describe('PresetManager', () => {
         if (key === 'preset') return 'writer';
         return undefined;
       });
-      
+
       mockDependencyState.hasMAIO = false; // Extension removed
       mockDependencyDetector.isExtensionAvailable.mockReturnValue(false);
 
@@ -477,7 +477,7 @@ describe('PresetManager', () => {
       // Arrange
       const changeCallback = vi.fn();
       presetManager.onDidChangePreset(changeCallback);
-      
+
       // Set up a different preset for the configuration change
       mockConfig.get.mockImplementation((key: string, defaultValue?: any) => {
         if (key === 'preset') return 'writer'; // Change from default 'core'

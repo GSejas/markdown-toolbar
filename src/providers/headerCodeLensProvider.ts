@@ -48,125 +48,109 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   async provideCodeLenses(
-    document: vscode.TextDocument, 
+    document: vscode.TextDocument,
     token: vscode.CancellationToken
   ): Promise<vscode.CodeLens[]> {
-    if (token.isCancellationRequested || document.languageId !== 'markdown') {
+    logger.info(`[HeaderCodeLens] provideCodeLenses called for ${document.fileName}`);
+    logger.info(`[HeaderCodeLens] Document language: ${document.languageId}`);
+    logger.info(`[HeaderCodeLens] Token cancelled: ${token.isCancellationRequested}`);
+
+    if (token.isCancellationRequested) {
+      logger.info(`[HeaderCodeLens] Cancellation requested, returning empty array`);
+      return [];
+    }
+
+    if (document.languageId !== 'markdown') {
+      logger.info(`[HeaderCodeLens] Skipping non-markdown file: ${document.languageId}`);
       return [];
     }
 
     const codeLenses: vscode.CodeLens[] = [];
-    
+
     try {
       const structure = this.analyzeDocumentStructure(document);
-      
+      logger.info(`[HeaderCodeLens] Found ${structure.headers.length} headers in document`);
+      logger.info(`[HeaderCodeLens] Document has ${document.lineCount} lines`);
+
+      if (structure.headers.length === 0) {
+        logger.info(`[HeaderCodeLens] No headers found - document content preview:`)
+        logger.info(`[HeaderCodeLens] First 10 lines: ${document.getText().split('\n').slice(0, 10).join(' | ')}`);
+      }
+
       for (const header of structure.headers) {
         const range = new vscode.Range(header.line, 0, header.line, 0);
-        
-        // Level adjustment commands
-        if (header.level > 1) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: "H+",
-            command: 'mdToolbar.header.increaseLevel',
-            arguments: [document.uri, header.line],
-            tooltip: 'Increase header level (make smaller)'
-          }));
-        }
-        
-        if (header.level < 6) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: "H-",
-            command: 'mdToolbar.header.decreaseLevel', 
-            arguments: [document.uri, header.line],
-            tooltip: 'Decrease header level (make larger)'
-          }));
-        }
+        logger.info(`[HeaderCodeLens] Processing header "${header.title}" at line ${header.line}, level ${header.level}, hasContent: ${header.hasContent}`);
 
-        // TOC operations (only for top-level headers)
-        if (header.level === 1) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: "📋 Insert TOC",
-            command: 'mdToolbar.header.insertTOC',
-            arguments: [document.uri, header.line],
-            tooltip: 'Insert table of contents after this header'
-          }));
-        }
+        // Level adjustment commands removed - handled by MermaidCodeLensProvider
 
-        // Navigation commands
+        // Navigation commands  
         const headerIndex = structure.headers.indexOf(header);
-        
+
         if (headerIndex > 0) {
+          logger.info(`[HeaderCodeLens] Adding "Move Up" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "⬆️ Move Up",
+            title: "$(arrow-up) Up",
             command: 'mdToolbar.header.moveUp',
             arguments: [document.uri, header.line],
             tooltip: 'Move section up'
           }));
         }
-        
+
         if (headerIndex < structure.headers.length - 1) {
+          logger.info(`[HeaderCodeLens] Adding "Move Down" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "⬇️ Move Down", 
+            title: "$(arrow-down) Down",
             command: 'mdToolbar.header.moveDown',
             arguments: [document.uri, header.line],
             tooltip: 'Move section down'
           }));
         }
 
-        // Section management
-        if (header.hasContent) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: `📊 ${header.wordCount} words`,
-            command: 'mdToolbar.header.showStats',
-            arguments: [document.uri, header.line],
-            tooltip: 'Show section statistics'
-          }));
-        }
-
         // Copy link to section
+        logger.info(`[HeaderCodeLens] Adding "Copy Link" for header "${header.title}"`);
         codeLenses.push(new vscode.CodeLens(range, {
-          title: "🔗 Copy Link",
+          title: "$(link) Copy Link",
           command: 'mdToolbar.header.copyLink',
           arguments: [document.uri, header.line, header.anchor],
           tooltip: 'Copy markdown link to this section'
         }));
 
-        // Fold section (if has content)
+        // Copy complete section content
         if (header.hasContent) {
+          logger.info(`[HeaderCodeLens] Adding "Copy Section" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "📁 Fold",
+            title: "$(copy) Copy Section",
+            command: 'mdToolbar.header.copySection',
+            arguments: [document.uri, header.line],
+            tooltip: 'Copy complete section content to clipboard'
+          }));
+        }
+
+        // Fold section (if has content) - rightmost position
+        if (header.hasContent) {
+          logger.info(`[HeaderCodeLens] Adding "Fold" for header "${header.title}"`);
+          codeLenses.push(new vscode.CodeLens(range, {
+            title: "$(fold) Fold",
             command: 'mdToolbar.header.foldSection',
             arguments: [document.uri, header.line],
             tooltip: 'Fold this section'
           }));
         }
-
-        // Delete section (with confirmation)
-        if (header.hasContent || structure.headers.length > 1) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: "🗑️ Delete",
-            command: 'mdToolbar.header.deleteSection',
-            arguments: [document.uri, header.line],
-            tooltip: 'Delete this section (with confirmation)'
-          }));
-        }
       }
 
-      // Document-level commands on first header
-      if (structure.headers.length > 0) {
-        const firstHeader = structure.headers[0];
-        const range = new vscode.Range(firstHeader.line, 0, firstHeader.line, 0);
-        
-        codeLenses.push(new vscode.CodeLens(range, {
-          title: `📄 ${structure.totalWords} words, ${structure.sectionsCount} sections`,
-          command: 'mdToolbar.document.showStats',
-          arguments: [document.uri],
-          tooltip: 'Show document statistics'
-        }));
-      }
+      // Document-level stats removed to reduce clutter
 
     } catch (error) {
-      logger.error('Error providing header CodeLenses:', error);
+      logger.error('[HeaderCodeLens] Error providing CodeLenses:', error);
+    }
+
+    logger.info(`[HeaderCodeLens] Returning ${codeLenses.length} CodeLens items`);
+    if (codeLenses.length > 0) {
+      logger.info(`[HeaderCodeLens] CodeLens summary:`, codeLenses.map(cl => ({
+        title: cl.command?.title || 'No title',
+        command: cl.command?.command || 'No command',
+        line: cl.range.start.line
+      })));
     }
 
     return codeLenses;
@@ -177,19 +161,19 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     const lines = text.split('\n');
     const headers: HeaderInfo[] = [];
     let totalWords = 0;
-    
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
-      
+
       if (headerMatch) {
         const level = headerMatch[1].length;
         const title = headerMatch[2].trim();
         const anchor = this.createAnchor(title);
-        
+
         // Calculate content for this section
         const sectionInfo = this.analyzeSectionContent(lines, i);
-        
+
         headers.push({
           level,
           title,
@@ -199,7 +183,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
           hasContent: sectionInfo.hasContent,
           wordCount: sectionInfo.wordCount
         });
-        
+
         totalWords += sectionInfo.wordCount;
       } else {
         // Count words in non-header lines
@@ -219,29 +203,29 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     let wordCount = 0;
     let hasContent = false;
     let i = headerLineIndex + 1;
-    
+
     // Look for content until next header of same or higher level
     const currentLevel = this.getHeaderLevel(lines[headerLineIndex]);
-    
+
     while (i < lines.length) {
       const line = lines[i];
       const headerLevel = this.getHeaderLevel(line);
-      
+
       // Stop at next header of same or higher level
       if (headerLevel > 0 && headerLevel <= currentLevel) {
         break;
       }
-      
+
       const lineWords = this.countWords(line);
       wordCount += lineWords;
-      
+
       if (lineWords > 0) {
         hasContent = true;
       }
-      
+
       i++;
     }
-    
+
     return { hasContent, wordCount };
   }
 
@@ -282,7 +266,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
 
     const line = document.lineAt(lineNumber);
     const headerMatch = line.text.match(/^(#{1,6})\s+(.+)$/);
-    
+
     if (!headerMatch) {
       logger.warn('No header found at line', lineNumber);
       return;
@@ -291,13 +275,13 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     const currentLevel = headerMatch[1].length;
     const newLevel = Math.max(1, Math.min(6, currentLevel + adjustment));
     const title = headerMatch[2];
-    
+
     if (newLevel === currentLevel) {
       return; // No change needed
     }
 
     const newHeader = '#'.repeat(newLevel) + ' ' + title;
-    
+
     await editor.edit(editBuilder => {
       editBuilder.replace(line.range, newHeader);
     });
@@ -311,7 +295,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
 
     const structure = this.analyzeDocumentStructure(document);
     const tocLines = ['', '## Table of Contents', ''];
-    
+
     // Generate TOC entries
     for (const header of structure.headers) {
       if (header.level > 1) { // Skip H1 since we're inserting TOC after H1
@@ -320,11 +304,11 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         tocLines.push(`${indent}- ${link}`);
       }
     }
-    
+
     tocLines.push(''); // Empty line after TOC
-    
+
     const insertPosition = new vscode.Position(afterLineNumber + 1, 0);
-    
+
     await editor.edit(editBuilder => {
       editBuilder.insert(insertPosition, tocLines.join('\n'));
     });
@@ -346,33 +330,33 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
 
     const structure = this.analyzeDocumentStructure(document);
     const currentHeader = structure.headers.find(h => h.line === headerLineNumber);
-    
+
     if (!currentHeader) {
       return;
     }
 
     const currentIndex = structure.headers.indexOf(currentHeader);
     const targetIndex = currentIndex + direction;
-    
+
     if (targetIndex < 0 || targetIndex >= structure.headers.length) {
       return; // Can't move beyond boundaries
     }
 
     const targetHeader = structure.headers[targetIndex];
     const lines = document.getText().split('\n');
-    
+
     // Get section content
     const sectionStart = currentHeader.line;
     const nextHeaderIndex = structure.headers.findIndex((h, i) => i > currentIndex && h.level <= currentHeader.level);
     const sectionEnd = nextHeaderIndex >= 0 ? structure.headers[nextHeaderIndex].line - 1 : lines.length - 1;
-    
+
     const sectionLines = lines.slice(sectionStart, sectionEnd + 1);
-    
+
     // Get target section
     const targetSectionStart = targetHeader.line;
     const targetNextHeaderIndex = structure.headers.findIndex((h, i) => i > targetIndex && h.level <= targetHeader.level);
     const targetSectionEnd = targetNextHeaderIndex >= 0 ? structure.headers[targetNextHeaderIndex].line - 1 : lines.length - 1;
-    
+
     // Complex operation - would need careful implementation to avoid conflicts
     // For now, show a message that this is a complex operation
     vscode.window.showInformationMessage(
@@ -383,22 +367,46 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   public async copyHeaderLink(document: vscode.TextDocument, lineNumber: number, anchor: string): Promise<void> {
     const line = document.lineAt(lineNumber);
     const headerMatch = line.text.match(/^#{1,6}\s+(.+)$/);
-    
+
     if (!headerMatch) {
       return;
     }
 
     const title = headerMatch[1];
     const markdownLink = `[${title}](#${anchor})`;
-    
+
     await vscode.env.clipboard.writeText(markdownLink);
     vscode.window.showInformationMessage(`Copied link: ${markdownLink}`);
+  }
+
+  public async copyHeaderSection(document: vscode.TextDocument, lineNumber: number): Promise<void> {
+    const structure = this.analyzeDocumentStructure(document);
+    const header = structure.headers.find(h => h.line === lineNumber);
+
+    if (!header) {
+      return;
+    }
+
+    const lines = document.getText().split('\n');
+    const currentIndex = structure.headers.indexOf(header);
+
+    // Find section boundaries
+    const sectionStart = header.line;
+    const nextHeaderIndex = structure.headers.findIndex((h, i) => i > currentIndex && h.level <= header.level);
+    const sectionEnd = nextHeaderIndex >= 0 ? structure.headers[nextHeaderIndex].line - 1 : lines.length - 1;
+
+    // Extract section content
+    const sectionLines = lines.slice(sectionStart, sectionEnd + 1);
+    const sectionContent = sectionLines.join('\n').trim();
+
+    await vscode.env.clipboard.writeText(sectionContent);
+    vscode.window.showInformationMessage(`Copied section "${header.title}" (${sectionLines.length} lines)`);
   }
 
   public async showHeaderStats(document: vscode.TextDocument, lineNumber: number): Promise<void> {
     const structure = this.analyzeDocumentStructure(document);
     const header = structure.headers.find(h => h.line === lineNumber);
-    
+
     if (!header) {
       return;
     }
@@ -410,7 +418,7 @@ Word Count: ${header.wordCount}
 Has Content: ${header.hasContent ? 'Yes' : 'No'}
 Anchor: #${header.anchor}
     `.trim();
-    
+
     vscode.window.showInformationMessage(message);
   }
 
@@ -431,7 +439,7 @@ Anchor: #${header.anchor}
   public async deleteSection(document: vscode.TextDocument, lineNumber: number): Promise<void> {
     const structure = this.analyzeDocumentStructure(document);
     const header = structure.headers.find(h => h.line === lineNumber);
-    
+
     if (!header) {
       return;
     }
@@ -442,7 +450,7 @@ Anchor: #${header.anchor}
       'Delete',
       'Cancel'
     );
-    
+
     if (response !== 'Delete') {
       return;
     }
@@ -455,12 +463,12 @@ Anchor: #${header.anchor}
     // Find section boundaries
     const currentIndex = structure.headers.indexOf(header);
     const nextHeaderIndex = structure.headers.findIndex((h, i) => i > currentIndex && h.level <= header.level);
-    
+
     const startLine = header.line;
     const endLine = nextHeaderIndex >= 0 ? structure.headers[nextHeaderIndex].line - 1 : document.lineCount - 1;
-    
+
     const deleteRange = new vscode.Range(startLine, 0, endLine + 1, 0);
-    
+
     await editor.edit(editBuilder => {
       editBuilder.delete(deleteRange);
     });
@@ -468,7 +476,7 @@ Anchor: #${header.anchor}
 
   public async showDocumentStats(document: vscode.TextDocument): Promise<void> {
     const structure = this.analyzeDocumentStructure(document);
-    
+
     const message = `
 Document Statistics:
 Total Words: ${structure.totalWords}
@@ -477,7 +485,7 @@ Sections: ${structure.sectionsCount}
 Headers by Level:
 ${this.getHeaderLevelStats(structure.headers)}
     `.trim();
-    
+
     vscode.window.showInformationMessage(message);
   }
 
@@ -486,7 +494,7 @@ ${this.getHeaderLevelStats(structure.headers)}
       counts[header.level] = (counts[header.level] || 0) + 1;
       return counts;
     }, {} as Record<number, number>);
-    
+
     return Object.entries(levelCounts)
       .map(([level, count]) => `  H${level}: ${count}`)
       .join('\n');

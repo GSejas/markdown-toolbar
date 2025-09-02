@@ -5,6 +5,8 @@ out/
 dist/
 .vscode-test/
 .vscode-test-web/
+.vscode-test-data/
+.vscode-test-extensions/
 
 # Build outputs
 *.js.map
@@ -65,6 +67,7 @@ pnpm-lock.yaml
 # IDE files
 .vscode/settings.json
 .vscode/launch.json
+.vscode/healthwatch/
 .idea/
 *.swp
 *.swo

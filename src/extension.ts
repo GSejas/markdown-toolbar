@@ -37,6 +37,7 @@ import { FallbackCommands } from './commands/FallbackCommands';
 
 // Engine and utilities
 import { ContextDetector } from './engine/ContextDetector';
+import { MarkdownFormatter } from './engine/MarkdownFormatter';
 import { BUTTON_DEFINITIONS } from './types/Buttons';
 import { CONFIG_KEYS } from './constants/configKeys';
 
@@ -81,7 +82,9 @@ class ExtensionState {
 			this.setupEventListeners();
 
 			// Register providers
+			logger.info('About to call registerProviders...');
 			this.registerProviders(context);
+			logger.info('registerProviders call completed');
 
 			// Add disposables to context
 			context.subscriptions.push(
@@ -110,7 +113,8 @@ class ExtensionState {
 			this.presetManager?.dispose();
 			this.dependencyDetector?.dispose();
 			this.contextKeyManager?.dispose();
-			this.statusBarManager?.dispose();			// Dispose all event listeners
+			this.statusBarManager?.dispose();
+			// Dispose all event listeners
 			this.disposables.forEach(disposable => {
 				try {
 					disposable.dispose();
@@ -192,11 +196,18 @@ class ExtensionState {
 	 */
 	private initializeCommands(context: vscode.ExtensionContext): void {
 		// Initialize fallback commands (internal implementations)
+		logger.info('[Extension] Initializing fallback commands...');
 		this.fallbackCommands = new FallbackCommands(vscode);
 		this.fallbackCommands.registerAll(context);
+		logger.info('[Extension] Fallback commands registered');
+
+		// Header commands now handled by CodeLens providers and CommandFactory
+		logger.info('[Extension] Header commands handled by CodeLens providers');
 
 		// Register all button command handlers with CommandFactory
+		logger.info('[Extension] Registering button command handlers...');
 		CommandFactory.registerAllButtonHandlers();
+		logger.info('[Extension] Button command handlers registered');
 
 		// Get all command IDs from buttons and utilities
 		const buttonCommandIds = Object.values(BUTTON_DEFINITIONS).map(button => button.commandId);
@@ -204,7 +215,22 @@ class ExtensionState {
 			'mdToolbar.switchPreset',
 			'mdToolbar.customizeButtons',
 			'mdToolbar.debug.analyzeDependencies',
-			// 'mdToolbar.debug.cyclePreset'
+			// Header CodeLens commands
+			'mdToolbar.header.moveUp',
+			'mdToolbar.header.moveDown',
+			'mdToolbar.header.copyLink',
+			'mdToolbar.header.copySection',
+			'mdToolbar.header.foldSection',
+			// Code block commands
+			'mdToolbar.codeblock.copy',
+			// Table CodeLens commands
+			'mdToolbar.table.addRow',
+			'mdToolbar.table.addColumn',
+			'mdToolbar.table.format',
+			'mdToolbar.table.sort',
+			'mdToolbar.table.align',
+			'mdToolbar.table.removeRow'
+			// Note: 'mdToolbar.debug.cyclePreset' is registered through BUTTON_DEFINITIONS
 		];
 		const allCommandIds = [...buttonCommandIds, ...utilityCommandIds];
 
@@ -212,14 +238,20 @@ class ExtensionState {
 		allCommandIds.forEach(commandId => {
 			const handler = CommandFactory.getHandler(commandId);
 			if (handler) {
+				logger.info(`[Extension] Registering command handler for: ${commandId}`);
 				const disposable = vscode.commands.registerCommand(commandId, async (...args) => {
+					logger.info(`[Extension] Command executed: ${commandId}`);
+					logger.info(`[Extension] Command arguments:`, args);
+
 					if (!this.commandContext) {
-						logger.warn('Command context not initialized');
+						logger.warn('[Extension] Command context not initialized');
 						return;
 					}
 
 					try {
+						logger.info(`[Extension] Executing handler for: ${commandId}`);
 						const result = await handler.execute(this.commandContext, ...args);
+						logger.info(`[Extension] Command result for ${commandId}:`, result);
 
 						if (!result.success && result.message) {
 							if (result.extensionRequired) {
@@ -266,6 +298,7 @@ class ExtensionState {
 	 * Register CodeLens and Hover providers with smart dependency detection
 	 */
 	private registerProviders(context: vscode.ExtensionContext): void {
+		logger.info('registerProviders method called - starting provider registration...');
 		// Checkbox providers - only if competing extension not installed  
 		const hasCheckboxExtension = this.dependencyDetector?.isExtensionAvailable('markdown-checkbox-preview');
 		if (!hasCheckboxExtension) {
@@ -324,21 +357,32 @@ class ExtensionState {
 
 		// Table providers - always register (high user value, no major competing extensions)
 		import('./providers/tableCodeLensProvider').then(({ TableCodeLensProvider }) => {
+			logger.info('[Extension] Loading TableCodeLensProvider...');
 			const tableProvider = new TableCodeLensProvider();
+			logger.info('[Extension] TableCodeLensProvider instance created');
 			context.subscriptions.push(
 				vscode.languages.registerCodeLensProvider({ language: 'markdown' }, tableProvider)
 			);
-			logger.info('Table CodeLens provider registered');
-		}).catch(err => logger.warn('Failed to load table CodeLens provider:', err));
+			logger.info('[Extension] Table CodeLens provider registered successfully');
+		}).catch(err => {
+			logger.error('[Extension] Failed to load table CodeLens provider:', err);
+			logger.warn('Failed to load table CodeLens provider:', err);
+		});
 
 		// Header providers - always register (navigation is essential)
+		logger.info('[Extension] Starting HeaderCodeLensProvider registration...');
 		import('./providers/headerCodeLensProvider').then(({ HeaderCodeLensProvider }) => {
+			logger.info('[Extension] HeaderCodeLensProvider import successful, creating instance...');
 			const headerProvider = new HeaderCodeLensProvider();
-			context.subscriptions.push(
-				vscode.languages.registerCodeLensProvider({ language: 'markdown' }, headerProvider)
-			);
-			logger.info('Header CodeLens provider registered');
-		}).catch(err => logger.warn('Failed to load header CodeLens provider:', err));
+			logger.info('[Extension] HeaderCodeLensProvider instance created, registering with VS Code...');
+			const providerDisposable = vscode.languages.registerCodeLensProvider({ language: 'markdown' }, headerProvider);
+			context.subscriptions.push(providerDisposable);
+			logger.info('[Extension] Header CodeLens provider registered successfully with VS Code');
+			logger.info('[Extension] Provider disposable added to subscriptions');
+		}).catch(err => {
+			logger.error('[Extension] Failed to load header CodeLens provider:', err);
+			logger.error('[Extension] Error details:', err.message, err.stack);
+		});
 
 		logger.info('Provider registration completed with smart dependency detection');
 	}

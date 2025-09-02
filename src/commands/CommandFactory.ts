@@ -92,10 +92,17 @@ export class CommandFactory {
   ): Promise<ICommandResult> {
     const { vscode, dependencyDetector, fallbackBehavior } = context;
 
+    logger.info(`[CommandFactory] Executing button command: ${buttonDef.id}`);
+    logger.info(`[CommandFactory] Command ID: ${buttonDef.commandId}`);
+    logger.info(`[CommandFactory] Delegates to: ${buttonDef.delegatesTo || 'none'}`);
+    logger.info(`[CommandFactory] Fallback command: ${buttonDef.fallbackCommand || 'none'}`);
+    logger.info(`[CommandFactory] Arguments:`, args);
+
     try {
       // Check if extension is required and available
       if (buttonDef.requiresExtension) {
         const isAvailable = dependencyDetector.isExtensionAvailable(buttonDef.requiresExtension);
+        logger.info(`[CommandFactory] Extension ${buttonDef.requiresExtension} available: ${isAvailable}`);
 
         if (!isAvailable) {
           return this.handleMissingExtension(buttonDef, context);
@@ -104,16 +111,20 @@ export class CommandFactory {
 
       // Try to delegate to external command first
       if (buttonDef.delegatesTo) {
+        logger.info(`[CommandFactory] Attempting to delegate to: ${buttonDef.delegatesTo}`);
         try {
           await vscode.commands.executeCommand(buttonDef.delegatesTo, ...args);
+          logger.info(`[CommandFactory] Successfully executed delegated command: ${buttonDef.delegatesTo}`);
           return { success: true };
         } catch (error) {
           logger.warn(`Failed to execute delegated command ${buttonDef.delegatesTo}:`, error instanceof Error ? error.message : String(error));
 
           // Fall back to internal implementation if available
           if (buttonDef.fallbackCommand) {
+            logger.info(`[CommandFactory] Attempting fallback command: ${buttonDef.fallbackCommand}`);
             try {
               await vscode.commands.executeCommand(buttonDef.fallbackCommand, ...args);
+              logger.info(`[CommandFactory] Successfully executed fallback command: ${buttonDef.fallbackCommand}`);
               return { success: true, fallbackUsed: true };
             } catch (fallbackError) {
               logger.error(`Failed to execute fallback command ${buttonDef.fallbackCommand}:`, fallbackError);
@@ -127,7 +138,9 @@ export class CommandFactory {
       }
 
       // Execute direct command
+      logger.info(`[CommandFactory] Executing direct command: ${buttonDef.commandId}`);
       await vscode.commands.executeCommand(buttonDef.commandId, ...args);
+      logger.info(`[CommandFactory] Successfully executed direct command: ${buttonDef.commandId}`);
       return { success: true };
 
     } catch (error) {
@@ -667,56 +680,58 @@ export class TableFormatHandler implements ICommandHandler {
   }
 }
 
-/**
- * Header command handlers
- */
-export class HeaderIncreaseLevelHandler implements ICommandHandler {
-  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+export class TableSortHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
-      await headerProvider.increaseHeaderLevel(document, lineNumber);
-      return { success: true };
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      // TODO: Implement sortTable method in TableCodeLensProvider
+      context.vscode.window.showInformationMessage('Table sorting not yet implemented');
+      return { success: true, message: 'Table sorting feature coming soon' };
     } catch (error) {
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to increase header level'
+        message: error instanceof Error ? error.message : 'Failed to sort table'
       };
     }
   }
 }
 
-export class HeaderDecreaseLevelHandler implements ICommandHandler {
-  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+export class TableAlignHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
-      await headerProvider.decreaseHeaderLevel(document, lineNumber);
-      return { success: true };
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      // TODO: Implement alignTable method in TableCodeLensProvider
+      context.vscode.window.showInformationMessage('Table alignment picker not yet implemented');
+      return { success: true, message: 'Table alignment feature coming soon' };
     } catch (error) {
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to decrease header level'
+        message: error instanceof Error ? error.message : 'Failed to align table'
       };
     }
   }
 }
 
-export class HeaderInsertTOCHandler implements ICommandHandler {
-  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+export class TableRemoveRowHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
-      await headerProvider.insertTOC(document, lineNumber);
-      return { success: true };
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      // TODO: Implement removeRowFromTable method in TableCodeLensProvider
+      context.vscode.window.showInformationMessage('Remove row not yet implemented');
+      return { success: true, message: 'Remove row feature coming soon' };
     } catch (error) {
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Failed to insert TOC'
+        message: error instanceof Error ? error.message : 'Failed to remove table row'
       };
     }
   }
 }
+
+// Legacy header command handlers removed - functionality moved to CodeLens providers
 
 export class HeaderCopyLinkHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number, anchor: string): Promise<ICommandResult> {
@@ -778,12 +793,101 @@ export class PresetCycleHandler implements ICommandHandler {
 CommandFactory.registerHandler('mdToolbar.table.addRow', new TableAddRowHandler());
 CommandFactory.registerHandler('mdToolbar.table.addColumn', new TableAddColumnHandler());
 CommandFactory.registerHandler('mdToolbar.table.format', new TableFormatHandler());
+CommandFactory.registerHandler('mdToolbar.table.sort', new TableSortHandler());
+CommandFactory.registerHandler('mdToolbar.table.align', new TableAlignHandler());
+CommandFactory.registerHandler('mdToolbar.table.removeRow', new TableRemoveRowHandler());
 
-// Register header command handlers
-CommandFactory.registerHandler('mdToolbar.header.increaseLevel', new HeaderIncreaseLevelHandler());
-CommandFactory.registerHandler('mdToolbar.header.decreaseLevel', new HeaderDecreaseLevelHandler());
-CommandFactory.registerHandler('mdToolbar.header.insertTOC', new HeaderInsertTOCHandler());
+// Legacy header command handlers removed - these are not used by CodeLens providers
+
+// Register preset cycling handler  
+CommandFactory.registerHandler('mdToolbar.debug.cyclePreset', new PresetCycleHandler());
+
+// Register additional header commands for CodeLens providers
+export class HeaderMoveUpHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.moveHeaderUp(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to move header up'
+      };
+    }
+  }
+}
+
+export class HeaderMoveDownHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.moveHeaderDown(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to move header down'
+      };
+    }
+  }
+}
+
+export class HeaderFoldSectionHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.foldSection(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to fold section'
+      };
+    }
+  }
+}
+
+export class HeaderCopySectionHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.copyHeaderSection(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to copy section'
+      };
+    }
+  }
+}
+
+export class CodeBlockCopyHandler implements ICommandHandler {
+  async execute(context: ICommandContext, content: string, language: string): Promise<ICommandResult> {
+    try {
+      await context.vscode.env.clipboard.writeText(content.trim());
+      context.vscode.window.showInformationMessage(`Copied ${language} code block to clipboard`);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to copy code block'
+      };
+    }
+  }
+}
+
+// Register header CodeLens commands
+CommandFactory.registerHandler('mdToolbar.header.moveUp', new HeaderMoveUpHandler());
+CommandFactory.registerHandler('mdToolbar.header.moveDown', new HeaderMoveDownHandler());
 CommandFactory.registerHandler('mdToolbar.header.copyLink', new HeaderCopyLinkHandler());
+CommandFactory.registerHandler('mdToolbar.header.copySection', new HeaderCopySectionHandler());
+CommandFactory.registerHandler('mdToolbar.header.foldSection', new HeaderFoldSectionHandler());
 
-// Register preset cycling handler
-// Remove duplicate registration - this is handled by registerAllButtonHandlers()
+// Register code block commands
+CommandFactory.registerHandler('mdToolbar.codeblock.copy', new CodeBlockCopyHandler());

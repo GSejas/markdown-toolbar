@@ -517,8 +517,7 @@ export const PRESET_DEFINITIONS: Record<PresetId, IPresetDefinition> = {
       'list.toggle',
       'code.inline',
       'link.insert',
-      'image.insert',
-      'debug.presetCycle'  // Add debug button to core preset
+      'image.insert'
     ]
   },
   writer: {

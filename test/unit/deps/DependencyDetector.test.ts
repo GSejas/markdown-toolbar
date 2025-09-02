@@ -9,7 +9,7 @@ describe('DependencyDetector', () => {
 
   beforeEach(() => {
     mockExtensions = new Map();
-    
+
     mockVscode = {
       extensions: {
         getExtension: vi.fn((id: string) => mockExtensions.get(id)),
@@ -39,7 +39,7 @@ describe('DependencyDetector', () => {
       expect(extensionInfo).toEqual({
         id: EXTENSION_IDS.MAIO,
         name: 'yzhang-markdown-all-in-one',
-        displayName: 'Markdown All in One', 
+        displayName: 'Markdown All in One',
         isInstalled: true,
         isActive: true,
         isDisabled: false,
@@ -88,15 +88,15 @@ describe('DependencyDetector', () => {
   describe('Dependency State Management', () => {
     it('should return current state with all dependencies', async () => {
       // Arrange - Set up all known extensions
-      mockExtensions.set(EXTENSION_IDS.MAIO, { 
-        id: EXTENSION_IDS.MAIO, 
-        packageJSON: { displayName: 'MAIO' }, 
-        isActive: true 
+      mockExtensions.set(EXTENSION_IDS.MAIO, {
+        id: EXTENSION_IDS.MAIO,
+        packageJSON: { displayName: 'MAIO' },
+        isActive: true
       });
-      mockExtensions.set(EXTENSION_IDS.PASTE_IMAGE, { 
-        id: EXTENSION_IDS.PASTE_IMAGE, 
-        packageJSON: { displayName: 'Paste Image' }, 
-        isActive: true 
+      mockExtensions.set(EXTENSION_IDS.PASTE_IMAGE, {
+        id: EXTENSION_IDS.PASTE_IMAGE,
+        packageJSON: { displayName: 'Paste Image' },
+        isActive: true
       });
 
       // Act
@@ -105,7 +105,7 @@ describe('DependencyDetector', () => {
       // Assert
       expect(state).toEqual({
         hasMAIO: true,
-        hasMarkdownlint: false,  
+        hasMarkdownlint: false,
         hasPasteImage: true,
         hasMPE: false,
         extensions: expect.objectContaining({
@@ -114,7 +114,7 @@ describe('DependencyDetector', () => {
             isActive: true
           }),
           [EXTENSION_IDS.PASTE_IMAGE]: expect.objectContaining({
-            isInstalled: true, 
+            isInstalled: true,
             isActive: true
           })
         }),
@@ -143,10 +143,10 @@ describe('DependencyDetector', () => {
 
       // Act
       const state1 = await detector.getCurrentState();
-      
+
       // Wait for cache to expire
       await new Promise(resolve => setTimeout(resolve, 60));
-      
+
       const state2 = await detector.getCurrentState();
 
       // Assert
@@ -157,10 +157,10 @@ describe('DependencyDetector', () => {
   describe('Context Key Management', () => {
     it('should set context keys based on dependency state', async () => {
       // Arrange
-      mockExtensions.set(EXTENSION_IDS.MAIO, { 
-        id: EXTENSION_IDS.MAIO, 
-        packageJSON: {}, 
-        isActive: true 
+      mockExtensions.set(EXTENSION_IDS.MAIO, {
+        id: EXTENSION_IDS.MAIO,
+        packageJSON: {},
+        isActive: true
       });
 
       // Act
@@ -169,8 +169,8 @@ describe('DependencyDetector', () => {
       // Assert - Context keys should be set via the context manager
       // The actual calls might be batched, so we just verify commands were executed
       expect(mockVscode.commands.executeCommand).toHaveBeenCalledWith(
-        'setContext', 
-        'mdToolbar.hasMAIO', 
+        'setContext',
+        'mdToolbar.hasMAIO',
         true
       );
     });
@@ -186,7 +186,7 @@ describe('DependencyDetector', () => {
         packageJSON: {},
         isActive: true
       });
-      
+
       // Force refresh
       detector.refresh();
 
@@ -216,7 +216,7 @@ describe('DependencyDetector', () => {
       // Arrange
       const changeCallback = vi.fn();
       detector.onDidChangeExtensions(changeCallback);
-      
+
       const initialState = await detector.getCurrentState();
 
       // Simulate VS Code extension change event
@@ -228,7 +228,7 @@ describe('DependencyDetector', () => {
         packageJSON: {},
         isActive: true
       });
-      
+
       onChangeCallback(); // Simulate VS Code firing the change event
 
       // Assert
@@ -264,7 +264,7 @@ describe('DependencyDetector', () => {
       // Arrange
       const mockDisposable = { dispose: vi.fn() };
       mockVscode.extensions.onDidChange.mockReturnValue(mockDisposable);
-      
+
       // Create a new detector to trigger the constructor logic
       const newDetector = new DependencyDetector(mockVscode);
 

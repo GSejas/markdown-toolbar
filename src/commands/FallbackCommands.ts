@@ -9,8 +9,59 @@
  * @interModuleDependency: ../engine/MarkdownFormatter
  * @requirementsTraceability:
  *   {@link Requirements.REQ_COMMANDS_005} (Fallback Command Implementation)
- *   {@link Requirements.REQ_COMMANDS_006} (Graceful Degradation)
- *   {@link Requirements.REQ_COMMANDS_007} (Internal Formatting Logic)
+ *   {@link Requirements.REQ_COMMANDS_006} (Gracefu  // Table quick menu
+  private async showTableMenu(): Promise<void> {
+    logger.info('[TableMenu] showTableMenu called');
+    
+    try {
+      logger.info('[TableMenu] Showing quick pick menu');
+      const choice = await this.vscode.window.showQuickPick([
+        { label: 'Insert 2x2 table', description: 'Simple 2 columns x 2 rows' },
+        { label: 'Insert header-only table', description: 'Header row with separators' }
+      ] as any);
+      
+      logger.info('[TableMenu] User selection:', choice ? choice.label : 'cancelled');
+      
+      if (!choice) {
+        logger.info('[TableMenu] No choice selected, returning');
+        return;
+      }
+      
+      const editor = this.vscode.window.activeTextEditor;
+      logger.info('[TableMenu] Active editor:', editor ? 'found' : 'not found');
+      
+      if (!editor) {
+        logger.warn('[TableMenu] No active editor, cannot insert table');
+        return;
+      }
+      
+      const insert = choice.label === 'Insert 2x2 table'
+        ? `| Header 1 | Header 2 |\n|---|---|\n| Cell 1 | Cell 2 |\n| Cell 3 | Cell 4 |\n`
+        : `| Header 1 | Header 2 |\n|---|---|\n`;
+      
+      logger.info('[TableMenu] Inserting table text:', insert.substring(0, 50) + '...');
+      
+      await editor.edit((editBuilder: import('vscode').TextEditorEdit) => {
+        logger.info('[TableMenu] Inside edit callback, getting fresh selection');
+        // Process current selection to avoid cloning issues
+        const selection = editor.selection;
+        logger.info('[TableMenu] Selection:', {
+          start: { line: selection.start.line, character: selection.start.character },
+          end: { line: selection.end.line, character: selection.end.character },
+          isEmpty: selection.isEmpty
+        });
+        
+        logger.info('[TableMenu] Replacing selection with table');
+        editBuilder.replace(selection, insert);
+        logger.info('[TableMenu] Table insertion completed successfully');
+      });
+      
+      logger.info('[TableMenu] showTableMenu completed successfully');
+    } catch (error) {
+      logger.error('[TableMenu] Error in showTableMenu:', error);
+      throw error;
+    }
+  }   {@link Requirements.REQ_COMMANDS_007} (Internal Formatting Logic)
  * @briefDescription: Provides internal implementations of markdown formatting commands when external extensions are not available. Ensures the toolbar remains functional with basic formatting capabilities
  * @methods: registerAll, toggleBold, toggleItalic, toggleStrikethrough, toggleList, insertLink
  * @contributors: VS Code Extension Team
