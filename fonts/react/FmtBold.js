@@ -1,0 +1,4 @@
+import React from 'react';
+export const FmtBold = props => (
+  <svg viewBox="0 0 20 20"  {...props} className={`MyIcons ${props.className ? props.className : ''}`}><path d="M6 4v16h5.2c1.4 0 2.6-.3 3.6-.8s1.8-1.2 2.3-2.1c.5-.9.8-1.9.8-3.1 0-1.2-.3-2.2-.8-3.1s-1.3-1.6-2.3-2.1c-1-.5-2.2-.8-3.6-.8H6zm3 2h2.2c.8 0 1.4.2 1.9.5s.7.8.7 1.5c0 .7-.2 1.2-.7 1.5s-1.1.5-1.9.5H9V6zm0 6h2.8c.9 0 1.6.2 2.1.6s.8.9.8 1.6c0 .7-.3 1.2-.8 1.6s-1.2.6-2.1.6H9v-4.4z" fillRule="evenodd" /></svg>
+);

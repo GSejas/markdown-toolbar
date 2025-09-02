@@ -1,0 +1,76 @@
+@font-face {
+  font-family: "MyIcons";
+  src: url('MyIcons.eot?t=1756806269820'); /* IE9*/
+  src: url('MyIcons.eot?t=1756806269820#iefix') format('embedded-opentype') /* IE6-IE8 */,
+  url('MyIcons.woff2?t=1756806269820') format('woff2'),
+  url('MyIcons.woff?t=1756806269820') format('woff'),
+  url('MyIcons.ttf?t=1756806269820') format('truetype'),
+  url('MyIcons.svg?t=1756806269820') format('svg');
+}
+
+[class^="MyIcons-"], [class*=" MyIcons-"] {
+  font-family: 'MyIcons' !important;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.MyIcons-add-plus-svgrepo-com::before { content: "\ea01"; }
+.MyIcons-blockquote-toggle::before { content: "\ea02"; }
+.MyIcons-blockquote::before { content: "\ea03"; }
+.MyIcons-break-line::before { content: "\ea04"; }
+.MyIcons-code-block::before { content: "\ea05"; }
+.MyIcons-code-inline::before { content: "\ea06"; }
+.MyIcons-fmt-bold::before { content: "\ea07"; }
+.MyIcons-fmt-italic::before { content: "\ea08"; }
+.MyIcons-fmt-strike::before { content: "\ea09"; }
+.MyIcons-font - heading toggle::before { content: "\ea0a"; }
+.MyIcons-footnote-insert::before { content: "\ea0b"; }
+.MyIcons-format-separator-svgrepo-com::before { content: "\ea0c"; }
+.MyIcons-heading-0-svgrepo-com::before { content: "\ea0d"; }
+.MyIcons-heading-cycle::before { content: "\ea0e"; }
+.MyIcons-heading-h1-svgrepo-com::before { content: "\ea0f"; }
+.MyIcons-heading-h1::before { content: "\ea10"; }
+.MyIcons-heading-h2-svgrepo-com::before { content: "\ea11"; }
+.MyIcons-heading-h2::before { content: "\ea12"; }
+.MyIcons-heading-h3-svgrepo-com::before { content: "\ea13"; }
+.MyIcons-heading-h3::before { content: "\ea14"; }
+.MyIcons-heading-h4-svgrepo-com::before { content: "\ea15"; }
+.MyIcons-heading-h5-svgrepo-com::before { content: "\ea16"; }
+.MyIcons-heading-h6-svgrepo-com::before { content: "\ea17"; }
+.MyIcons-heading-toggle::before { content: "\ea18"; }
+.MyIcons-horizontal-rule-svgrepo-com::before { content: "\ea19"; }
+.MyIcons-horizontal-rule::before { content: "\ea1a"; }
+.MyIcons-hr-insert::before { content: "\ea1b"; }
+.MyIcons-image-insert::before { content: "\ea1c"; }
+.MyIcons-image-paste-v2::before { content: "\ea1d"; }
+.MyIcons-image-paste::before { content: "\ea1e"; }
+.MyIcons-image-plus-svgrepo-com::before { content: "\ea1f"; }
+.MyIcons-image-square-svgrepo-com::before { content: "\ea20"; }
+.MyIcons-link-insert::before { content: "\ea21"; }
+.MyIcons-lint-fix-v2::before { content: "\ea22"; }
+.MyIcons-lint-fix::before { content: "\ea23"; }
+.MyIcons-lint-workspace::before { content: "\ea24"; }
+.MyIcons-list-toggle::before { content: "\ea25"; }
+.MyIcons-math-block::before { content: "\ea26"; }
+.MyIcons-math-inline::before { content: "\ea27"; }
+.MyIcons-page-break-svgrepo-com::before { content: "\ea28"; }
+.MyIcons-paste-svgrepo-com::before { content: "\ea29"; }
+.MyIcons-preview-current::before { content: "\ea2a"; }
+.MyIcons-preview-mpe-current::before { content: "\ea2b"; }
+.MyIcons-preview-mpe-side::before { content: "\ea2c"; }
+.MyIcons-preview-side::before { content: "\ea2d"; }
+.MyIcons-quote-left-solid-svgrepo-com::before { content: "\ea2e"; }
+.MyIcons-table-menu::before { content: "\ea2f"; }
+.MyIcons-table-of-contents-svgrepo-com::before { content: "\ea30"; }
+.MyIcons-table-svgrepo-com::before { content: "\ea31"; }
+.MyIcons-task-toggle::before { content: "\ea32"; }
+.MyIcons-toc-add-numbers::before { content: "\ea33"; }
+.MyIcons-toc-create::before { content: "\ea34"; }
+.MyIcons-toc-remove-numbers::before { content: "\ea35"; }
+.MyIcons-toc-update::before { content: "\ea36"; }
+.MyIcons-toggle-off-outlined-svgrepo-com::before { content: "\ea37"; }
+.MyIcons-Untitled design (1)::before { content: "\ea38"; }
+
+

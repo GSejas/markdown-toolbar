@@ -80,6 +80,9 @@ class ExtensionState {
 			// Set up event listeners
 			this.setupEventListeners();
 
+			// Register providers
+			this.registerProviders(context);
+
 			// Add disposables to context
 			context.subscriptions.push(
 				{
@@ -132,6 +135,13 @@ class ExtensionState {
 		// Initialize context key manager
 		this.contextKeyManager = new ContextKeyManager();
 
+		// Set debug mode context key (detect if running in debug mode)
+		const isDebugMode = process.env.VSCODE_DEBUG_MODE === 'true' ||
+			vscode.env.sessionId.includes('debug') ||
+			vscode.workspace.getConfiguration('mdToolbar').get('debugMode', false);
+		await this.contextKeyManager.setContext('mdToolbar.debugMode', isDebugMode);
+		logger.info(`Debug mode: ${isDebugMode}`);
+
 		// Initialize dependency detector
 		this.dependencyDetector = new DependencyDetector(
 			vscode,
@@ -178,21 +188,31 @@ class ExtensionState {
 	}
 
 	/**
-	 * Initialize command system
+	 * Initialize unified command system
 	 */
 	private initializeCommands(context: vscode.ExtensionContext): void {
-		// Initialize fallback commands
+		// Initialize fallback commands (internal implementations)
 		this.fallbackCommands = new FallbackCommands(vscode);
 		this.fallbackCommands.registerAll(context);
 
-		// Register all button command handlers
+		// Register all button command handlers with CommandFactory
 		CommandFactory.registerAllButtonHandlers();
 
-		// Register all commands with VS Code
-		Object.values(BUTTON_DEFINITIONS).forEach(button => {
-			const handler = CommandFactory.getHandler(button.commandId);
+		// Get all command IDs from buttons and utilities
+		const buttonCommandIds = Object.values(BUTTON_DEFINITIONS).map(button => button.commandId);
+		const utilityCommandIds = [
+			'mdToolbar.switchPreset',
+			'mdToolbar.customizeButtons',
+			'mdToolbar.debug.analyzeDependencies',
+			// 'mdToolbar.debug.cyclePreset'
+		];
+		const allCommandIds = [...buttonCommandIds, ...utilityCommandIds];
+
+		// Register all commands with VS Code using unified pattern
+		allCommandIds.forEach(commandId => {
+			const handler = CommandFactory.getHandler(commandId);
 			if (handler) {
-				const disposable = vscode.commands.registerCommand(button.commandId, async (...args) => {
+				const disposable = vscode.commands.registerCommand(commandId, async (...args) => {
 					if (!this.commandContext) {
 						logger.warn('Command context not initialized');
 						return;
@@ -221,41 +241,11 @@ class ExtensionState {
 						}
 
 						if (result.fallbackUsed) {
-							logger.info(`Used fallback for command ${button.commandId}`);
+							logger.info(`Used fallback for command ${commandId}`);
 						}
-					} catch (error) {
-						logger.error(`Error executing command ${button.commandId}:`, error);
-						vscode.window.showErrorMessage(`Command failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-					}
-				});
 
-				this.disposables.push(disposable);
-			}
-		});
-
-		// Register utility commands
-		const utilityCommands = [
-			'mdToolbar.switchPreset',
-			'mdToolbar.customizeButtons',
-			'mdToolbar.debug.analyzeDependencies'
-		];
-
-		utilityCommands.forEach(commandId => {
-			const handler = CommandFactory.getHandler(commandId);
-			if (handler) {
-				const disposable = vscode.commands.registerCommand(commandId, async (...args) => {
-					if (!this.commandContext) {
-						logger.warn('Command context not initialized');
-						return;
-					}
-
-					try {
-						const result = await handler.execute(this.commandContext, ...args);
-
-						if (result.success && result.message) {
+						if (result.success && result.message && utilityCommandIds.includes(commandId)) {
 							vscode.window.showInformationMessage(result.message);
-						} else if (!result.success && result.message) {
-							vscode.window.showErrorMessage(result.message);
 						}
 					} catch (error) {
 						logger.error(`Error executing command ${commandId}:`, error);
@@ -264,10 +254,93 @@ class ExtensionState {
 				});
 
 				this.disposables.push(disposable);
+			} else {
+				logger.warn(`No handler found for command: ${commandId}`);
 			}
 		});
 
-		logger.info(`Registered ${this.disposables.length} commands`);
+		logger.info(`Registered ${this.disposables.length - context.subscriptions.length} commands via unified CommandFactory`);
+	}
+
+	/**
+	 * Register CodeLens and Hover providers with smart dependency detection
+	 */
+	private registerProviders(context: vscode.ExtensionContext): void {
+		// Checkbox providers - only if competing extension not installed  
+		const hasCheckboxExtension = this.dependencyDetector?.isExtensionAvailable('markdown-checkbox-preview');
+		if (!hasCheckboxExtension) {
+			import('./providers/checkboxCodeLensProvider').then(({ CheckboxCodeLensProvider }) => {
+				const checkboxProvider = new CheckboxCodeLensProvider(context);
+				context.subscriptions.push(
+					vscode.languages.registerCodeLensProvider({ language: 'markdown' }, checkboxProvider)
+				);
+				logger.info('Checkbox CodeLens provider registered (no competing extension found)');
+			}).catch(err => logger.warn('Failed to load checkbox CodeLens provider:', err));
+
+			import('./providers/checkboxHoverProvider').then((module) => {
+				const CheckboxHoverProvider = module.CheckboxHoverProvider || (module as any).default;
+				if (CheckboxHoverProvider) {
+					const hoverProvider = new CheckboxHoverProvider(context);
+					context.subscriptions.push(
+						vscode.languages.registerHoverProvider({ language: 'markdown' }, hoverProvider)
+					);
+					logger.info('Checkbox Hover provider registered (no competing extension found)');
+				}
+			}).catch(err => logger.warn('Failed to load checkbox Hover provider:', err));
+		} else {
+			logger.info('Skipping checkbox providers - competing extension detected');
+		}
+
+		// Mermaid providers - only if competing extensions not installed
+		const hasMermaidPro = this.dependencyDetector?.isExtensionAvailable('mermaid-export-pro');
+		const hasMermaidExtension = this.dependencyDetector?.isExtensionAvailable('bierner.markdown-mermaid');
+
+		if (!hasMermaidPro && !hasMermaidExtension) {
+			import('./providers/mermaidCodeLensProvider').then((module) => {
+				const MermaidCodeLensProvider = module.MermaidCodeLensProvider || (module as any).default;
+				if (MermaidCodeLensProvider) {
+					const mermaidProvider = new MermaidCodeLensProvider(context);
+					context.subscriptions.push(
+						vscode.languages.registerCodeLensProvider({ language: 'markdown' }, mermaidProvider)
+					);
+					logger.info('Mermaid CodeLens provider registered (no competing extension found)');
+				}
+			}).catch(err => logger.warn('Failed to load mermaid CodeLens provider:', err));
+
+			import('./providers/mermaidHoverProvider').then((module) => {
+				// Handle different possible export structures
+				const HoverProvider = (module as any).MermaidHoverProvider || (module as any).default;
+				if (HoverProvider) {
+					const mermaidHoverProvider = new HoverProvider(context);
+					context.subscriptions.push(
+						vscode.languages.registerHoverProvider({ language: 'markdown' }, mermaidHoverProvider)
+					);
+					logger.info('Mermaid Hover provider registered (no competing extension found)');
+				}
+			}).catch(err => logger.warn('Failed to load mermaid Hover provider:', err));
+		} else {
+			logger.info('Skipping mermaid providers - competing extension detected');
+		}
+
+		// Table providers - always register (high user value, no major competing extensions)
+		import('./providers/tableCodeLensProvider').then(({ TableCodeLensProvider }) => {
+			const tableProvider = new TableCodeLensProvider();
+			context.subscriptions.push(
+				vscode.languages.registerCodeLensProvider({ language: 'markdown' }, tableProvider)
+			);
+			logger.info('Table CodeLens provider registered');
+		}).catch(err => logger.warn('Failed to load table CodeLens provider:', err));
+
+		// Header providers - always register (navigation is essential)
+		import('./providers/headerCodeLensProvider').then(({ HeaderCodeLensProvider }) => {
+			const headerProvider = new HeaderCodeLensProvider();
+			context.subscriptions.push(
+				vscode.languages.registerCodeLensProvider({ language: 'markdown' }, headerProvider)
+			);
+			logger.info('Header CodeLens provider registered');
+		}).catch(err => logger.warn('Failed to load header CodeLens provider:', err));
+
+		logger.info('Provider registration completed with smart dependency detection');
 	}
 
 	/**

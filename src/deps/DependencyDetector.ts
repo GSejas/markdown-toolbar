@@ -75,7 +75,7 @@ export class DependencyDetector implements IDependencyDetector {
   /**
    * Get current state of all tracked dependencies
    */
-  public getCurrentState(): IDependencyState {
+  public async getCurrentState(): Promise<IDependencyState> {
     const now = Date.now();
 
     // Return cached state if still valid
@@ -83,11 +83,13 @@ export class DependencyDetector implements IDependencyDetector {
       return this.cachedState;
     }
 
-    // Detect all tracked extensions
+    // Detect all tracked extensions and try to activate them if needed
     const extensions: Record<string, IExtensionInfo> = {};
-    Object.values(EXTENSION_IDS).forEach(extensionId => {
+    for (const extensionId of Object.values(EXTENSION_IDS)) {
+      // Try to ensure extension is active before detecting
+      await this.ensureExtensionActive(extensionId);
       extensions[extensionId] = this.detectExtension(extensionId);
-    });
+    }
 
     // Build dependency state - use isActive for availability
     const state: IDependencyState = {
@@ -210,7 +212,7 @@ export class DependencyDetector implements IDependencyDetector {
     // Clear cache to force refresh
     this.cachedState = null;
 
-    const currentState = this.getCurrentState();
+    const currentState = await this.getCurrentState();
 
     // Emit change events if state actually changed
     if (previousState) {

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Toolbar Icons Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #cccccc;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 40px;
+        }
+        
+        .category {
+            margin-bottom: 40px;
+        }
+        
+        .category h2 {
+            color: #569cd6;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .icon-item {
+            background: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .icon-item:hover {
+            background: #383838;
+            border-color: #569cd6;
+        }
+        
+        .icon-item svg {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 10px;
+            color: #cccccc;
+        }
+        
+        .icon-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+        
+        .icon-description {
+            font-size: 12px;
+            color: #999999;
+            line-height: 1.4;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #569cd6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .light-theme {
+            background: #ffffff;
+            color: #333333;
+        }
+        
+        .light-theme .icon-item {
+            background: #f8f8f8;
+            border-color: #e0e0e0;
+        }
+        
+        .light-theme .icon-item:hover {
+            background: #e8e8e8;
+            border-color: #569cd6;
+        }
+        
+        .light-theme .icon-item svg {
+            color: #333333;
+        }
+        
+        .light-theme .category h2 {
+            color: #0066cc;
+            border-bottom-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    
+    <div class="container">
+        <h1>Markdown Toolbar Icons</h1>
+        
+        <div class="category">
+            <h2>Format Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 4v16h5.2c1.4 0 2.6-.3 3.6-.8s1.8-1.2 2.3-2.1c.5-.9.8-1.9.8-3.1 0-1.2-.3-2.2-.8-3.1s-1.3-1.6-2.3-2.1c-1-.5-2.2-.8-3.6-.8H6zm3 2h2.2c.8 0 1.4.2 1.9.5s.7.8.7 1.5c0 .7-.2 1.2-.7 1.5s-1.1.5-1.9.5H9V6zm0 6h2.8c.9 0 1.6.2 2.1.6s.8.9.8 1.6c0 .7-.3 1.2-.8 1.6s-1.2.6-2.1.6H9v-4.4z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">fmt-bold.svg</div>
+                    <div class="icon-description">Bold text formatting</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 4v16h3V4H7zm3 0l7 16h3l-7-16h-3z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">fmt-italic.svg</div>
+                    <div class="icon-description">Italic text formatting</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12h18v2H3v-2zm1.5-6h15v2h-15V6zm0 12h15v2h-15v-2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">fmt-strike.svg</div>
+                    <div class="icon-description">Strikethrough formatting</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>Structure Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="6" cy="6" r="2" fill="currentColor"/>
+                        <circle cx="6" cy="12" r="2" fill="currentColor"/>
+                        <circle cx="6" cy="18" r="2" fill="currentColor"/>
+                        <path d="M11 4h10v2H11V4zm0 6h10v2H11v-2zm0 6h10v2H11v-2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">list-toggle.svg</div>
+                    <div class="icon-description">Toggle bulleted/numbered lists</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="4" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="m4.5 6 1 1 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <rect x="3" y="10" width="4" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="3" y="17" width="4" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M11 6h10v2H11V6zm0 6h10v2H11v-2zm0 6h10v2H11v-2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">task-toggle.svg</div>
+                    <div class="icon-description">Toggle task list items</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>Code Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="8" width="18" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M6 11h2v2H6v-2zm4 0h8v2h-8v-2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">code-inline.svg</div>
+                    <div class="icon-description">Inline code formatting</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M6 8h2v2H6V8zm4 0h8v2h-8V8zm-4 4h2v2H6v-2zm4 0h8v2h-8v-2zm-4 4h2v2H6v-2zm4 0h4v2h-4v-2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">code-block.svg</div>
+                    <div class="icon-description">Code block formatting</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>Media Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="icon-name">link-insert.svg</div>
+                    <div class="icon-description">Insert/edit links</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                        <path d="m21 15-5-5L5 21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="icon-name">image-insert.svg</div>
+                    <div class="icon-description">Insert image from file</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="6" y="8" width="12" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="10" cy="11" r="1" fill="currentColor"/>
+                        <path d="m18 14-3-3-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="icon-name">image-paste.svg</div>
+                    <div class="icon-description">Paste image from clipboard</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>Preview Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="3" width="9" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="13" y="3" width="9" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M5 7h3v2H5V7zm0 4h6v2H5v-2zm0 4h3v2H5v-2z" fill="currentColor"/>
+                        <path d="M16 7h3v8h-3V7z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">preview-side.svg</div>
+                    <div class="icon-description">Open preview in side panel</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="3" width="20" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M5 7h3v2H5V7zm0 4h10v2H5v-2zm0 4h6v2H5v-2z" fill="currentColor"/>
+                        <circle cx="18" cy="8" r="1" fill="currentColor"/>
+                        <path d="M16 15h6v-4l-2-2-2 2-2 2v2z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">preview-current.svg</div>
+                    <div class="icon-description">Open preview in current tab</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="category">
+            <h2>Table & Quality Icons</h2>
+            <div class="icon-grid">
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M3 10h18M12 5v14M8 5v14M16 5v14" stroke="currentColor" stroke-width="2"/>
+                        <path d="M5 7h2v2H5V7zm5 0h2v2h-2V7zm5 0h2v2h-2V7z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">table-menu.svg</div>
+                    <div class="icon-description">Table formatting options</div>
+                </div>
+                
+                <div class="icon-item">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="currentColor"/>
+                    </svg>
+                    <div class="icon-name">lint-fix.svg</div>
+                    <div class="icon-description">Fix markdown linting issues</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+        }
+    </script>
+</body>
+</html>

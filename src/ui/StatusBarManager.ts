@@ -85,15 +85,17 @@ export class StatusBarManager {
             })
         );
 
-        // Initial setup
-        this.createStatusBarItems();
+        // Initial setup - don't await, just fire and forget
+        this.createStatusBarItems().catch(error => {
+            console.error('Failed to create status bar items:', error);
+        });
         this.updateVisibility(vscode.window.activeTextEditor);
     }
 
     /**
      * Creates status bar items based on current preset
      */
-    private createStatusBarItems(): void {
+    private async createStatusBarItems(): Promise<void> {
         const config = this.settings.getConfiguration();
         const alignment = config.position === 'left' ? vscode.StatusBarAlignment.Left : vscode.StatusBarAlignment.Right;
 
@@ -106,8 +108,8 @@ export class StatusBarManager {
         }
 
         // Get effective buttons from preset manager
-        const effectiveButtons = this.presetManager.getEffectiveButtons();
-        
+        const effectiveButtons = await this.presetManager.getEffectiveButtons();
+
         // Create items for each effective button
         effectiveButtons.forEach((buttonId, index) => {
             const buttonDef = BUTTON_DEFINITIONS[buttonId];
@@ -242,7 +244,9 @@ export class StatusBarManager {
      * Handles configuration changes
      */
     private onConfigurationChanged(): void {
-        this.createStatusBarItems();
+        this.createStatusBarItems().catch(error => {
+            console.error('Failed to recreate status bar items on config change:', error);
+        });
         this.updateVisibility(vscode.window.activeTextEditor);
     }
 

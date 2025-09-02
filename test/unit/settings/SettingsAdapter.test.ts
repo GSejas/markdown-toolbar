@@ -33,15 +33,20 @@ describe('SettingsAdapter', () => {
     });
 
     describe('isToolbarEnabled', () => {
-        it('should return default value when setting is undefined', () => {
-            mockConfig.get.mockReturnValue(undefined);
+        it('should return true when preset is set', () => {
+            mockConfig.get.mockReturnValue('core');
             const result = settings.isToolbarEnabled();
-            expect(result).toBe(true); // Default value
-            expect(mockConfig.get).toHaveBeenCalledWith('enabled', true);
+            expect(result).toBe(true);
         });
 
-        it('should return configured value when setting exists', () => {
-            mockConfig.get.mockReturnValue(false);
+        it('should return false when preset is null', () => {
+            mockConfig.get.mockReturnValue(null);
+            const result = settings.isToolbarEnabled();
+            expect(result).toBe(false);
+        });
+
+        it('should return false when preset is undefined', () => {
+            mockConfig.get.mockReturnValue(undefined);
             const result = settings.isToolbarEnabled();
             expect(result).toBe(false);
         });
@@ -54,10 +59,10 @@ describe('SettingsAdapter', () => {
             expect(result).toBe('right');
         });
 
-        it('should return left when configured', () => {
+        it('should always return right regardless of configuration', () => {
             mockConfig.get.mockReturnValue('left');
             const result = settings.getToolbarPosition();
-            expect(result).toBe('left');
+            expect(result).toBe('right');
         });
 
         it('should default to right for invalid values', () => {
@@ -68,20 +73,26 @@ describe('SettingsAdapter', () => {
     });
 
     describe('getActiveButtons', () => {
-        it('should return default buttons when setting is undefined', () => {
-            mockConfig.get.mockReturnValue(undefined);
+        it('should return empty array for non-custom preset', () => {
+            mockConfig.get
+                .mockReturnValueOnce('core')  // preset
+                .mockReturnValueOnce([]);     // custom buttons (not used)
             const result = settings.getActiveButtons();
-            expect(result).toEqual(['bold', 'italic', 'code', 'link', 'list']);
+            expect(result).toEqual([]);
         });
 
-        it('should return configured buttons', () => {
-            mockConfig.get.mockReturnValue(['bold', 'italic', 'link']);
+        it('should return custom buttons when preset is custom', () => {
+            mockConfig.get
+                .mockReturnValueOnce('custom')  // preset
+                .mockReturnValueOnce(['bold', 'italic', 'link']); // custom buttons
             const result = settings.getActiveButtons();
             expect(result).toEqual(['bold', 'italic', 'link']);
         });
 
-        it('should handle empty array', () => {
-            mockConfig.get.mockReturnValue([]);
+        it('should handle empty array for custom preset', () => {
+            mockConfig.get
+                .mockReturnValueOnce('custom')  // preset
+                .mockReturnValueOnce([]);       // custom buttons
             const result = settings.getActiveButtons();
             expect(result).toEqual([]);
         });
@@ -90,15 +101,16 @@ describe('SettingsAdapter', () => {
     describe('getConfiguration', () => {
         it('should return complete configuration object', () => {
             mockConfig.get
-                .mockReturnValueOnce(true)    // enabled
-                .mockReturnValueOnce('left')  // position
-                .mockReturnValueOnce(['bold', 'italic']); // buttons
+                .mockReturnValueOnce('core')    // preset for isToolbarEnabled
+                .mockReturnValueOnce('core')    // preset for getPreset
+                .mockReturnValueOnce([]);       // custom buttons (not used for non-custom preset)
 
             const result = settings.getConfiguration();
             expect(result).toEqual({
                 enabled: true,
-                position: 'left',
-                buttons: ['bold', 'italic']
+                position: 'right',
+                preset: 'core',
+                customButtons: []
             });
         });
     });
@@ -117,11 +129,11 @@ describe('SettingsAdapter', () => {
 
     describe('isValidButton', () => {
         it('should validate known button names', () => {
-            expect(settings.isValidButton('bold')).toBe(true);
-            expect(settings.isValidButton('italic')).toBe(true);
-            expect(settings.isValidButton('code')).toBe(true);
-            expect(settings.isValidButton('link')).toBe(true);
-            expect(settings.isValidButton('list')).toBe(true);
+            expect(settings.isValidButton('fmt.bold')).toBe(true);
+            expect(settings.isValidButton('fmt.italic')).toBe(true);
+            expect(settings.isValidButton('code.inline')).toBe(true);
+            expect(settings.isValidButton('link.insert')).toBe(true);
+            expect(settings.isValidButton('list.toggle')).toBe(true);
         });
 
         it('should reject unknown button names', () => {

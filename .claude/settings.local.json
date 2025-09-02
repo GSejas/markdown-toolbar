@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm run test:unit:*)",
       "Bash(npm run check-types:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(npm run compile:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,5 @@
+﻿<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M3 5h18v3H3V5zm0 5h18v2H3v-2zm0 4h18v2H3v-2zm0 4h18v2H3v-2z" fill="currentColor"/>
+  <text x="4" y="7" font-family="monospace" font-size="4" fill="currentColor" font-weight="bold">H1</text>
+</svg>
+

@@ -151,7 +151,7 @@ describe('PresetManager', () => {
   });
 
   describe('Effective Button Filtering', () => {
-    it('should return all buttons when all extensions are available', () => {
+    it('should return all buttons when all extensions are available', async () => {
       // Arrange - Create a fresh preset manager with Pro preset and all extensions available
       const testMockConfig = {
         get: vi.fn((key: string, defaultValue?: any) => {
@@ -191,14 +191,14 @@ describe('PresetManager', () => {
       const testPresetManager = new PresetManager(testMockVscode, testMockDependencyDetector);
 
       // Act
-      const effectiveButtons = testPresetManager.getEffectiveButtons();
+      const effectiveButtons = await testPresetManager.getEffectiveButtons();
 
       // Assert - Should include all Pro preset buttons
       const expectedButtons = PRESET_DEFINITIONS.pro.buttons;
       expect(effectiveButtons).toEqual(expectedButtons);
     });
 
-    it('should filter out buttons requiring missing extensions', () => {
+    it('should filter out buttons requiring missing extensions', async () => {
       // Arrange - Create a fresh preset manager with Pro preset and only MAIO available
       const testMockConfig = {
         get: vi.fn((key: string, defaultValue?: any) => {
@@ -240,7 +240,7 @@ describe('PresetManager', () => {
       const testPresetManager = new PresetManager(testMockVscode, testMockDependencyDetector);
 
       // Act
-      const effectiveButtons = testPresetManager.getEffectiveButtons();
+      const effectiveButtons = await testPresetManager.getEffectiveButtons();
 
       // Assert - Should exclude markdownlint and MPE buttons
       expect(effectiveButtons).not.toContain('lint.fix');
@@ -249,7 +249,7 @@ describe('PresetManager', () => {
       expect(effectiveButtons).toContain('toc.create'); // Should include MAIO buttons
     });
 
-    it('should handle custom preset with dependency filtering', () => {
+    it('should handle custom preset with dependency filtering', async () => {
       // Arrange
       const customButtons: ButtonId[] = [
         'preview.side',    // No dependency
@@ -296,7 +296,7 @@ describe('PresetManager', () => {
       const testPresetManager = new PresetManager(testMockVscode, testMockDependencyDetector);
 
       // Act
-      const effectiveButtons = testPresetManager.getEffectiveButtons();
+      const effectiveButtons = await testPresetManager.getEffectiveButtons();
 
       // Assert - Should only include buttons without dependencies
       expect(effectiveButtons).toEqual(['preview.side']);

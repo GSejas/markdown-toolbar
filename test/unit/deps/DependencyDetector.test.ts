@@ -86,7 +86,7 @@ describe('DependencyDetector', () => {
   });
 
   describe('Dependency State Management', () => {
-    it('should return current state with all dependencies', () => {
+    it('should return current state with all dependencies', async () => {
       // Arrange - Set up all known extensions
       mockExtensions.set(EXTENSION_IDS.MAIO, { 
         id: EXTENSION_IDS.MAIO, 
@@ -100,7 +100,7 @@ describe('DependencyDetector', () => {
       });
 
       // Act
-      const state = detector.getCurrentState();
+      const state = await detector.getCurrentState();
 
       // Assert
       expect(state).toEqual({
@@ -122,14 +122,14 @@ describe('DependencyDetector', () => {
       });
     });
 
-    it('should cache state for performance', () => {
+    it('should cache state for performance', async () => {
       // Arrange
       const cacheTimeout = 1000; // 1 second
       detector = new DependencyDetector(mockVscode, { cacheTimeout });
 
       // Act - Call twice quickly
-      const state1 = detector.getCurrentState();
-      const state2 = detector.getCurrentState();
+      const state1 = await detector.getCurrentState();
+      const state2 = await detector.getCurrentState();
 
       // Assert - Should use cache (same timestamp)
       expect(state1.lastUpdated).toBe(state2.lastUpdated);
@@ -142,12 +142,12 @@ describe('DependencyDetector', () => {
       detector = new DependencyDetector(mockVscode, { cacheTimeout });
 
       // Act
-      const state1 = detector.getCurrentState();
+      const state1 = await detector.getCurrentState();
       
       // Wait for cache to expire
       await new Promise(resolve => setTimeout(resolve, 60));
       
-      const state2 = detector.getCurrentState();
+      const state2 = await detector.getCurrentState();
 
       // Assert
       expect(state2.lastUpdated).toBeGreaterThan(state1.lastUpdated);
@@ -155,7 +155,7 @@ describe('DependencyDetector', () => {
   });
 
   describe('Context Key Management', () => {
-    it('should set context keys based on dependency state', () => {
+    it('should set context keys based on dependency state', async () => {
       // Arrange
       mockExtensions.set(EXTENSION_IDS.MAIO, { 
         id: EXTENSION_IDS.MAIO, 
@@ -164,7 +164,7 @@ describe('DependencyDetector', () => {
       });
 
       // Act
-      detector.getCurrentState(); // This should trigger context key updates
+      await detector.getCurrentState(); // This should trigger context key updates
 
       // Assert - Context keys should be set via the context manager
       // The actual calls might be batched, so we just verify commands were executed
@@ -175,9 +175,9 @@ describe('DependencyDetector', () => {
       );
     });
 
-    it('should update context keys when state changes', () => {
+    it('should update context keys when state changes', async () => {
       // Arrange - Initially no extensions
-      const initialState = detector.getCurrentState();
+      const initialState = await detector.getCurrentState();
       vi.clearAllMocks();
 
       // Act - Add an extension
@@ -212,12 +212,12 @@ describe('DependencyDetector', () => {
       expect(disposable).toHaveProperty('dispose');
     });
 
-    it('should emit change events when extensions are added', () => {
+    it('should emit change events when extensions are added', async () => {
       // Arrange
       const changeCallback = vi.fn();
       detector.onDidChangeExtensions(changeCallback);
       
-      const initialState = detector.getCurrentState();
+      const initialState = await detector.getCurrentState();
 
       // Simulate VS Code extension change event
       const onChangeCallback = mockVscode.extensions.onDidChange.mock.calls[0][0];

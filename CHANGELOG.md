@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 This release represents a complete rewrite of the Markdown Toolbar extension with modern architecture, intelligent preset management, and advanced dependency detection.
 
+  
+
 ### ✨ Added
 
 #### **Preset System**

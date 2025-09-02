@@ -334,6 +334,29 @@
         }
       ]
     },
+    "icons": {
+      "md-horizontal-rule": {
+        "description": "Horizontal rule icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea1a"
+        }
+      },
+      "md-image-plus": {
+        "description": "Image plus icon for insert image from file",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea1f"
+        }
+      },
+      "md-math-inline": {
+        "description": "Math inline icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea27"
+        }
+      }
+    },
     "submenus": [
       {
         "id": "mdToolbar.format",

@@ -104,8 +104,9 @@ export class MarkdownFormatter {
             const template = '**bold text**';
             const newText = text.substring(0, selectionStart) +
                 template +
-                logger.debug('Applied bold formatting', { selectionStart, selectionEnd });
-            text.substring(selectionEnd);
+                text.substring(selectionEnd);
+
+            logger.debug('Applied bold formatting', { selectionStart, selectionEnd });
 
             return {
                 text: newText,

@@ -1,0 +1,11 @@
+ADR_ID,Date,Title,Status,Decision_Maker,Impact,Effort,Risk,Dependencies,Implementation_Notes,Review_Date
+ADR-001,2025-09-02,Unified Command Registration Architecture,Implemented,Architecture Team,High,Medium,Low,CommandFactory refactor,Consolidated 3 systems into 1,2025-09-02
+ADR-002,2025-09-02,Smart Command Delegation Pattern,Implemented,Architecture Team,High,Low,Low,External extension detection,3-tier fallback strategy,2025-09-02
+ADR-003,2025-08-01,Pure Logic Layer Architecture,Implemented,Development Team,Medium,Low,Low,MarkdownFormatter class,No VS Code APIs in engine,2025-08-01
+ADR-004,2025-08-01,Button Definition System,Implemented,Development Team,Medium,Low,Low,BUTTON_DEFINITIONS object,Declarative configuration,2025-08-01
+ADR-005,2025-08-01,Preset-Based UI System,Implemented,UX Team,Medium,Low,Low,Preset management,4 preset categories,2025-08-01
+ADR-006,TBD,Table Management System,Proposed,TBD,Medium,Medium,Medium,Table editing APIs,Advanced table operations,TBD
+ADR-007,TBD,Export/Import Architecture,Proposed,TBD,High,High,Medium,External conversion tools,Multi-format support,TBD
+ADR-008,TBD,Plugin System Architecture,Proposed,TBD,High,High,High,Extension API design,Third-party extensibility,TBD
+ADR-009,TBD,Performance Optimization,Proposed,TBD,Medium,Medium,Low,Large file handling,Async processing patterns,TBD
+ADR-010,TBD,Markdown Variants Support,Proposed,TBD,Medium,Medium,Medium,Parser selection,Multiple syntax support,TBD

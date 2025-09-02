@@ -53,7 +53,7 @@ export interface IPresetChangeEvent {
 export interface IPresetManager {
   getCurrentPreset(): IPresetDefinition;
   switchPreset(presetId: PresetId): Promise<void>;
-  getEffectiveButtons(): ButtonId[];
+  getEffectiveButtons(): Promise<ButtonId[]>;
   getCustomButtons(): ButtonId[];
   setCustomButtons(buttons: ButtonId[]): Promise<void>;
   onDidChangePreset(callback: (event: IPresetChangeEvent) => void): { dispose(): void };
@@ -145,7 +145,7 @@ export class PresetManager implements IPresetManager {
         previousPreset: previousPreset.id,
         currentPreset: presetId,
         triggeredBy: 'user',
-        availableButtons: this.getEffectiveButtons(),
+        availableButtons: await this.getEffectiveButtons(),
         timestamp: Date.now()
       };
 
@@ -160,9 +160,9 @@ export class PresetManager implements IPresetManager {
   /**
    * Get effective buttons filtered by extension availability
    */
-  public getEffectiveButtons(): ButtonId[] {
+  public async getEffectiveButtons(): Promise<ButtonId[]> {
     const preset = this.getCurrentPreset();
-    const dependencyState = this.dependencyDetector.getCurrentState();
+    const dependencyState = await this.dependencyDetector.getCurrentState();
 
     // Filter buttons based on extension availability
     return preset.buttons.filter(buttonId => {
@@ -266,14 +266,18 @@ export class PresetManager implements IPresetManager {
     // Listen for configuration changes
     const configDisposable = this.vscode.workspace.onDidChangeConfiguration((event: any) => {
       if (event.affectsConfiguration(CONFIG_KEYS.root)) {
-        this.handleConfigurationChange(event);
+        this.handleConfigurationChange(event).catch(error => {
+          console.error('Failed to handle configuration change:', error);
+        });
       }
     });
     this.disposables.push(configDisposable);
 
     // Listen for dependency changes for auto-switching
     const depDisposable = this.dependencyDetector.onDidChangeExtensions((event) => {
-      this.handleDependencyChange(event);
+      this.handleDependencyChange(event).catch(error => {
+        console.error('Failed to handle dependency change:', error);
+      });
     });
     this.disposables.push(depDisposable);
 
@@ -284,7 +288,7 @@ export class PresetManager implements IPresetManager {
   /**
    * Handle VS Code configuration changes
    */
-  private handleConfigurationChange(event: any): void {
+  private async handleConfigurationChange(event: any): Promise<void> {
     const previousPreset = this.currentPresetCache?.id || 'core';
 
     // Clear cache to force refresh
@@ -294,11 +298,12 @@ export class PresetManager implements IPresetManager {
 
     // Emit change event if preset actually changed
     if (previousPreset !== currentPreset.id) {
+      const availableButtons = await this.getEffectiveButtons();
       const changeEvent: IPresetChangeEvent = {
         previousPreset,
         currentPreset: currentPreset.id,
         triggeredBy: 'config',
-        availableButtons: this.getEffectiveButtons(),
+        availableButtons,
         timestamp: Date.now()
       };
 
@@ -312,21 +317,24 @@ export class PresetManager implements IPresetManager {
   /**
    * Handle extension dependency changes for auto-switching
    */
-  private handleDependencyChange(event: any): void {
+  /**
+   * Handle dependency changes
+   */
+  private async handleDependencyChange(event: any): Promise<void> {
     // Only handle installation events for auto-switching suggestions
     if (event.changeType !== 'installed') {
       return;
     }
 
     const currentPreset = this.getCurrentPreset();
-    const suggestedPreset = this.suggestPresetUpgrade(currentPreset.id, event.extensionId);
+    const suggestedPreset = await this.suggestPresetUpgrade(currentPreset.id, event.extensionId);
 
     if (suggestedPreset && suggestedPreset !== currentPreset.id) {
       const changeEvent: IPresetChangeEvent = {
         previousPreset: currentPreset.id,
         currentPreset: currentPreset.id, // Not actually changing yet
         triggeredBy: 'auto',
-        availableButtons: this.getEffectiveButtons(),
+        availableButtons: await this.getEffectiveButtons(),
         suggestedPreset,
         reason: 'extension-installed',
         timestamp: Date.now()
@@ -339,7 +347,7 @@ export class PresetManager implements IPresetManager {
   /**
    * Suggest preset upgrade based on newly available extensions
    */
-  private suggestPresetUpgrade(currentPresetId: PresetId, newExtensionId: string): PresetId | null {
+  private async suggestPresetUpgrade(currentPresetId: PresetId, newExtensionId: string): Promise<PresetId | null> {
     // Don't suggest upgrades for custom preset
     if (currentPresetId === 'custom') {
       return null;
@@ -355,7 +363,7 @@ export class PresetManager implements IPresetManager {
       if (newExtensionId === 'DavidAnson.vscode-markdownlint' ||
         newExtensionId === 'shd101wyy.markdown-preview-enhanced') {
         // Check if all Pro requirements are now met
-        const state = this.dependencyDetector.getCurrentState();
+        const state = await this.dependencyDetector.getCurrentState();
         if (state.hasMAIO && (state.hasMarkdownlint || state.hasMPE)) {
           return 'pro';
         }

@@ -8,6 +8,9 @@ export default defineConfig({
         ],
         globals: true,
         environment: 'node',
+        alias: {
+            vscode: new URL('./test/utils/vscode-mock.ts', import.meta.url).pathname
+        },
         coverage: {
             provider: 'v8',
             reportsDirectory: 'coverage',

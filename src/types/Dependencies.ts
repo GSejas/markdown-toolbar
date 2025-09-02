@@ -84,7 +84,7 @@ export interface IDependencyDetector {
   /**
    * Get current state of all dependencies
    */
-  getCurrentState(): IDependencyState;
+  getCurrentState(): Promise<IDependencyState>;
 
   /**
    * Detect a specific extension

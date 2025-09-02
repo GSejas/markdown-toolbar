@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyIcons Font Preview</title>
+  <link rel="stylesheet" href="../../fonts/MyIcons.css">
+  <style>
+    body { font-family: system-ui,Segoe UI,Roboto,Helvetica,Arial; padding: 24px; color:#222 }
+    h1 { margin:0 0 12px }
+    .controls { margin: 10px 0 18px }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:12px }
+    .item { background:#fff; border:1px solid #e6e6e6; border-radius:8px; padding:12px; display:flex; gap:8px; align-items:center }
+    .glyph { font-size:28px; width:40px; text-align:center }
+    .meta { font-size:13px; color:#333 }
+    .classname { font-family: monospace; font-size:12px; color:#444; word-break:break-all }
+    input[type=search] { padding:8px 10px; font-size:14px; width:320px; border-radius:6px; border:1px solid #ccc }
+    label.note { font-size:12px; color:#666; margin-left:8px }
+  </style>
+</head>
+<body>
+  <h1>MyIcons — Font Preview</h1>
+  <div class="controls">
+    <input id="filter" type="search" placeholder="Filter icons by name (e.g. 'fmt' or 'heading')" />
+    <span class="note">Using stylesheet: <code>../../fonts/MyIcons.css</code></span>
+  </div>
+  <div id="grid" class="grid"></div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const filter = document.getElementById('filter');
+    
+    // Static list of icon classes based on SVG files in assets/icons
+    // Update this list when adding new SVG files
+    const icons = [
+      'MyIcons-add-plus-svgrepo-com',
+      'MyIcons-blockquote-toggle',
+      'MyIcons-blockquote',
+      'MyIcons-break-line',
+      'MyIcons-code-block',
+      'MyIcons-code-inline',
+      'MyIcons-fmt-bold',
+      'MyIcons-fmt-italic',
+      'MyIcons-fmt-strike',
+      'MyIcons-footnote-insert',
+      'MyIcons-format-separator-svgrepo-com',
+      'MyIcons-heading-0-svgrepo-com',
+      'MyIcons-heading-cycle',
+      'MyIcons-heading-h1-svgrepo-com',
+      'MyIcons-heading-h1',
+      'MyIcons-heading-h2-svgrepo-com',
+      'MyIcons-heading-h2',
+      'MyIcons-heading-h3-svgrepo-com',
+      'MyIcons-heading-h3',
+      'MyIcons-heading-h4-svgrepo-com',
+      'MyIcons-heading-h5-svgrepo-com',
+      'MyIcons-heading-h6-svgrepo-com',
+      'MyIcons-heading-toggle',
+      'MyIcons-horizontal-rule-svgrepo-com',
+      'MyIcons-horizontal-rule',
+      'MyIcons-hr-insert',
+      'MyIcons-image-insert',
+      'MyIcons-image-paste-v2',
+      'MyIcons-image-paste',
+      'MyIcons-image-square-svgrepo-com',
+      'MyIcons-link-insert',
+      'MyIcons-lint-fix-v2',
+      'MyIcons-lint-fix',
+      'MyIcons-lint-workspace',
+      'MyIcons-list-toggle',
+      'MyIcons-math-block',
+      'MyIcons-math-inline',
+      'MyIcons-page-break-svgrepo-com',
+      'MyIcons-paste-svgrepo-com',
+      'MyIcons-preview-current',
+      'MyIcons-preview-mpe-current',
+      'MyIcons-preview-mpe-side',
+      'MyIcons-preview-side',
+      'MyIcons-quote-left-solid-svgrepo-com',
+      'MyIcons-table-menu',
+      'MyIcons-table-of-contents-svgrepo-com',
+      'MyIcons-table-svgrepo-com',
+      'MyIcons-task-toggle',
+      'MyIcons-toc-add-numbers',
+      'MyIcons-toc-create',
+      'MyIcons-toc-remove-numbers',
+      'MyIcons-toc-update',
+      'MyIcons-toggle-off-outlined-svgrepo-com'
+    ].sort();
+
+    function render(list) {
+      grid.innerHTML = '';
+      for (const name of list) {
+        const it = document.createElement('div');
+        it.className = 'item';
+        const glyph = document.createElement('div');
+        glyph.className = 'glyph ' + name;
+        glyph.setAttribute('aria-hidden','true');
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const label = document.createElement('div');
+        label.className = 'classname';
+        label.textContent = '.' + name;
+        meta.appendChild(label);
+        it.appendChild(glyph);
+        it.appendChild(meta);
+        grid.appendChild(it);
+      }
+    }
+
+    filter.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) render(icons);
+      else render(icons.filter(n => n.toLowerCase().includes(q)));
+    });
+
+    // Initial render
+    render(icons);
+  </script>
+
+  <p style="margin-top:18px; font-size:13px; color:#666">If an icon shows as an empty box, it may not have been generated into the font or the CSS class name differs; re-run the font generator and inspect <code>fonts/MyIcons.css</code>.</p>
+</body>
+</html>

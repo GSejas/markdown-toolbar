@@ -22,7 +22,7 @@
  * @vulnerabilitiesAssessment: Input validation, VS Code API sandboxing, proper error handling, resource disposal
  */
 
-import { ButtonId, IButtonDefinition, BUTTON_DEFINITIONS } from '../types/Buttons';
+import { ButtonId, PresetId, IButtonDefinition, BUTTON_DEFINITIONS } from '../types/Buttons';
 import { IDependencyDetector } from '../types/Dependencies';
 import { IPresetManager } from '../presets/PresetManager';
 import { ContextService } from '../services/ContextService';
@@ -229,6 +229,13 @@ export class CommandFactory {
   }
 
   /**
+   * Clear all registered handlers (useful for tests to reset state)
+   */
+  public static clearHandlers(): void {
+    this.handlers.clear();
+  }
+
+  /**
    * Register all button command handlers
    */
   public static registerAllButtonHandlers(): void {
@@ -341,9 +348,9 @@ export class AnalyzeDependenciesHandler implements ICommandHandler {
     const { vscode, dependencyDetector, presetManager, contextService } = context;
 
     try {
-      const dependencyState = dependencyDetector.getCurrentState();
+      const dependencyState = await dependencyDetector.getCurrentState();
       const currentPreset = presetManager.getCurrentPreset();
-      const effectiveButtons = presetManager.getEffectiveButtons();
+      const effectiveButtons = await presetManager.getEffectiveButtons();
       const cacheStats = contextService.getCacheStats();
 
       const report = [
@@ -402,7 +409,381 @@ export class AnalyzeDependenciesHandler implements ICommandHandler {
   }
 }
 
+/**
+ * Extended command handlers for markdown features
+ */
+
+/**
+ * Footnote command handler
+ */
+export class FootnoteHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    const { vscode } = context;
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'markdown') {
+      return { success: false, message: 'Active markdown editor required' };
+    }
+
+    try {
+      const document = editor.document;
+      const text = document.getText();
+
+      // Find the next footnote number
+      const footnoteMatches = text.match(/\[\^(\d+)\]/g) || [];
+      const numbers = footnoteMatches.map((match: string) => parseInt(match.match(/\d+/)![0], 10));
+      const nextNumber = numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+
+      const footnoteRef = `[^${nextNumber}]`;
+
+      await editor.edit((editBuilder: any) => {
+        // Access selection inside edit callback to avoid cloning issues
+        const selection = editor.selection;
+        // Insert footnote reference at cursor
+        editBuilder.replace(selection, footnoteRef);
+
+        // Add footnote definition at end of document
+        const lastLine = document.lineAt(document.lineCount - 1);
+        const insertPosition = lastLine.range.end;
+        editBuilder.insert(insertPosition, `\n\n[^${nextNumber}]: `);
+      });
+
+      // Move cursor to footnote definition
+      const newLastLine = editor.document.lineAt(editor.document.lineCount - 1);
+      const endPosition = newLastLine.range.end;
+      editor.selection = new vscode.Selection(endPosition, endPosition);
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to insert footnote'
+      };
+    }
+  }
+}
+
+/**
+ * Inline math command handler
+ */
+export class MathInlineHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    const { vscode } = context;
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'markdown') {
+      return { success: false, message: 'Active markdown editor required' };
+    }
+
+    try {
+      await editor.edit((editBuilder: any) => {
+        // Access selection inside edit callback to avoid cloning issues
+        const selection = editor.selection;
+        const text = editor.document.getText(selection);
+
+        if (text.startsWith('$') && text.endsWith('$') && text.length > 2) {
+          // Remove math
+          editBuilder.replace(selection, text.slice(1, -1));
+        } else {
+          // Add math
+          editBuilder.replace(selection, `$${text}$`);
+        }
+      });
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to toggle inline math'
+      };
+    }
+  }
+}
+
+/**
+ * Math block command handler
+ */
+export class MathBlockHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    const { vscode } = context;
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'markdown') {
+      return { success: false, message: 'Active markdown editor required' };
+    }
+
+    try {
+      let textWasEmpty = false;
+      let originalSelection: any;
+
+      await editor.edit((editBuilder: any) => {
+        // Access selection inside edit callback to avoid cloning issues
+        const selection = editor.selection;
+        const text = editor.document.getText(selection);
+        textWasEmpty = !text.trim();
+        originalSelection = selection;
+
+        const mathBlock = text.trim()
+          ? `\n$$\n${text}\n$$\n`
+          : `\n$$\n\n$$\n`;
+
+        editBuilder.replace(selection, mathBlock);
+      });
+
+      // Position cursor inside math block if it was empty
+      if (textWasEmpty && originalSelection) {
+        const newPosition = originalSelection.start.translate(2, 0);
+        editor.selection = new vscode.Selection(newPosition, newPosition);
+      }
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to insert math block'
+      };
+    }
+  }
+}
+
+/**
+ * Horizontal rule command handler
+ */
+export class HorizontalRuleHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    const { vscode } = context;
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'markdown') {
+      return { success: false, message: 'Active markdown editor required' };
+    }
+
+    try {
+      await editor.edit((editBuilder: any) => {
+        // Access selection inside the edit callback to avoid cloning issues
+        const selection = editor.selection;
+        editBuilder.replace(selection, '\n---\n');
+      });
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to insert horizontal rule'
+      };
+    }
+  }
+}
+
+/**
+ * Line break command handler
+ */
+export class LineBreakHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    const { vscode } = context;
+    const editor = vscode.window.activeTextEditor;
+
+    if (!editor || editor.document.languageId !== 'markdown') {
+      return { success: false, message: 'Active markdown editor required' };
+    }
+
+    try {
+      await editor.edit((editBuilder: any) => {
+        // Access selection inside edit callback to avoid cloning issues
+        const selection = editor.selection;
+        editBuilder.replace(selection, '  \n');
+      });
+
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to insert line break'
+      };
+    }
+  }
+}
+
 // Register specialized handlers
 CommandFactory.registerHandler('mdToolbar.switchPreset', new PresetSwitchHandler());
 CommandFactory.registerHandler('mdToolbar.customizeButtons', new CustomizeButtonsHandler());
 CommandFactory.registerHandler('mdToolbar.debug.analyzeDependencies', new AnalyzeDependenciesHandler());
+
+// Register extended command handlers
+CommandFactory.registerHandler('mdToolbar.footnote.insert', new FootnoteHandler());
+CommandFactory.registerHandler('mdToolbar.math.inline', new MathInlineHandler());
+CommandFactory.registerHandler('mdToolbar.math.block', new MathBlockHandler());
+CommandFactory.registerHandler('mdToolbar.hr.insert', new HorizontalRuleHandler());
+CommandFactory.registerHandler('mdToolbar.break.line', new LineBreakHandler());
+
+/**
+ * Table command handlers
+ */
+export class TableAddRowHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      await tableProvider.addRowToTable(document, tableStartLine);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to add table row'
+      };
+    }
+  }
+}
+
+export class TableAddColumnHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      await tableProvider.addColumnToTable(document, tableStartLine);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to add table column'
+      };
+    }
+  }
+}
+
+export class TableFormatHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
+      await tableProvider.formatTable(document, tableStartLine);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to format table'
+      };
+    }
+  }
+}
+
+/**
+ * Header command handlers
+ */
+export class HeaderIncreaseLevelHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.increaseHeaderLevel(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to increase header level'
+      };
+    }
+  }
+}
+
+export class HeaderDecreaseLevelHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.decreaseHeaderLevel(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to decrease header level'
+      };
+    }
+  }
+}
+
+export class HeaderInsertTOCHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.insertTOC(document, lineNumber);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to insert TOC'
+      };
+    }
+  }
+}
+
+export class HeaderCopyLinkHandler implements ICommandHandler {
+  async execute(context: ICommandContext, uri: any, lineNumber: number, anchor: string): Promise<ICommandResult> {
+    try {
+      const document = await context.vscode.workspace.openTextDocument(uri);
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      await headerProvider.copyHeaderLink(document, lineNumber, anchor);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to copy header link'
+      };
+    }
+  }
+}
+
+export class PresetCycleHandler implements ICommandHandler {
+  async execute(context: ICommandContext): Promise<ICommandResult> {
+    try {
+      // Define the test preset order for cycling
+      const testPresetOrder: PresetId[] = [
+        'test-minimal',
+        'test-student',
+        'test-blogger',
+        'test-developer',
+        'test-researcher',
+        'test-presenter',
+        'test-qa',
+        'test-mobile',
+        'test-power',
+        'test-accessibility',
+        'core', // Back to core preset
+        'writer',
+        'pro'
+      ];
+
+      const currentPreset = context.presetManager?.getCurrentPreset();
+      const currentIndex = testPresetOrder.indexOf(currentPreset?.id || 'core');
+      const nextIndex = (currentIndex + 1) % testPresetOrder.length;
+      const nextPreset = testPresetOrder[nextIndex];
+
+      await context.presetManager?.switchPreset(nextPreset);
+
+      return {
+        success: true,
+        message: `Switched to ${nextPreset} preset (${nextIndex + 1}/${testPresetOrder.length})`
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Failed to cycle presets'
+      };
+    }
+  }
+}
+
+// Register table command handlers
+CommandFactory.registerHandler('mdToolbar.table.addRow', new TableAddRowHandler());
+CommandFactory.registerHandler('mdToolbar.table.addColumn', new TableAddColumnHandler());
+CommandFactory.registerHandler('mdToolbar.table.format', new TableFormatHandler());
+
+// Register header command handlers
+CommandFactory.registerHandler('mdToolbar.header.increaseLevel', new HeaderIncreaseLevelHandler());
+CommandFactory.registerHandler('mdToolbar.header.decreaseLevel', new HeaderDecreaseLevelHandler());
+CommandFactory.registerHandler('mdToolbar.header.insertTOC', new HeaderInsertTOCHandler());
+CommandFactory.registerHandler('mdToolbar.header.copyLink', new HeaderCopyLinkHandler());
+
+// Register preset cycling handler
+// Remove duplicate registration - this is handled by registerAllButtonHandlers()
