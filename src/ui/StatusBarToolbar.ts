@@ -168,12 +168,12 @@ export class StatusBarToolbar {
         preset: 'core' as PresetId
       },
       {
-        label: '$(edit) Writer', 
+        label: '$(pencil) Writer', 
         description: 'Tools for documentation',
         preset: 'writer' as PresetId
       },
       {
-        label: '$(tools) Pro',
+        label: '$(wrench) Pro',
         description: 'Full toolkit with quality checks',
         preset: 'pro' as PresetId
       },

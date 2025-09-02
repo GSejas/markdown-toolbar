@@ -223,7 +223,7 @@ export type ButtonId =
 
   { "command": "mdToolbar.fmt.bold", "title": "$(bold) Bold" },
   { "command": "mdToolbar.fmt.italic", "title": "$(italic) Italic" },
-  { "command": "mdToolbar.fmt.strike", "title": "$(strikethrough) Strikethrough" },
+  { "command": "mdToolbar.fmt.strike", "title": "$(text-size) Strikethrough" },
 
   { "command": "mdToolbar.list.toggle", "title": "$(list-unordered) Toggle List" },
   { "command": "mdToolbar.task.toggle", "title": "$(checklist) Toggle Task" },
@@ -300,7 +300,7 @@ export type ButtonId =
 | preview\.current     | Preview                 | `markdown.showPreview`                                   | –             | `editorLangId==markdown`                                             | `$(preview)`        | Preview   |
 | fmt.bold             | Bold                    | MAIO `markdown.extension.editing.toggleBold` or internal | MAIO optional | `editorLangId==markdown`                                             | `$(bold)`           | Format    |
 | fmt.italic           | Italic                  | MAIO `...toggleItalic` or internal                       | MAIO optional | same                                                                 | `$(italic)`         | Format    |
-| fmt.strike           | Strikethrough           | MAIO `...toggleStrikethrough` or internal                | MAIO optional | same                                                                 | `$(strikethrough)`  | Format    |
+| fmt.strike           | Strikethrough           | MAIO `...toggleStrikethrough` or internal                | MAIO optional | same                                                                 | `$(text-size)`      | Format    |
 | list.toggle          | Toggle List             | MAIO `...toggleList` or internal                         | MAIO optional | same                                                                 | `$(list-unordered)` | Structure |
 | task.toggle          | Toggle Task             | internal                                                 | –             | `editorLangId==markdown && mdToolbar.onTaskLine`                     | `$(checklist)`      | Structure |
 | code.inline          | Code                    | MAIO `...toggleCodeSpan` or internal                     | MAIO optional | `editorLangId==markdown`                                             | `` ` ``             | Code      |
