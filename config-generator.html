@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Toolbar Configuration Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .preset-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .preset-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .preset-card.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .preset-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .preset-card .buttons {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .button-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .category-header {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .button-item {
+            padding: 12px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .button-item:hover {
+            border-color: #cbd5e0;
+            background: #f7fafc;
+        }
+
+        .button-item.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .button-item .icon {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .toolbar-preview {
+            background: #2d3748;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            font-size: 14px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .setting-item {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .setting-item input, .setting-item select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .setting-item input:focus, .setting-item select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .config-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #2d3748;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .preset-grid, .button-categories {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Markdown Toolbar Configuration</h1>
+            <p>Create your perfect markdown toolbar with visual drag-and-drop configuration</p>
+        </div>
+
+        <div class="content">
+            <!-- Quick Start Section -->
+            <div class="section">
+                <h2>🚀 Quick Start - Choose a Preset</h2>
+                <p>Start with a preset that matches your workflow, then customize as needed.</p>
+                <div class="preset-grid">
+                    <div class="preset-card" data-preset="core">
+                        <h3>📝 Core</h3>
+                        <p>Essential formatting tools for quick notes and basic markdown editing.</p>
+                        <div class="buttons">7 buttons: Bold, Italic, Code, Links, Lists, Images, Preview</div>
+                    </div>
+                    
+                    <div class="preset-card" data-preset="writer">
+                        <h3>✍️ Writer</h3>
+                        <p>Perfect for documentation, blogging, and long-form content creation.</p>
+                        <div class="buttons">15 buttons: All Core + Tables, TOC, Tasks, Advanced formatting</div>
+                    </div>
+                    
+                    <div class="preset-card" data-preset="pro">
+                        <h3>🔧 Pro</h3>
+                        <p>Complete toolkit for technical writers and documentation maintainers.</p>
+                        <div class="buttons">22 buttons: Everything + Quality tools, Enhanced preview, Math</div>
+                    </div>
+                    
+                    <div class="preset-card" data-preset="custom">
+                        <h3>⚙️ Custom</h3>
+                        <p>Build your own perfect toolbar by selecting exactly the features you need.</p>
+                        <div class="buttons">Your choice: Pick from 50+ markdown features</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Configuration Section -->
+            <div class="section">
+                <h2>🎨 Custom Button Selection</h2>
+                <p>Click buttons to add/remove them from your toolbar. Selected buttons appear highlighted.</p>
+                <div class="button-categories" id="buttonCategories">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="selectedCount">0</div>
+                        <div class="stat-label">Selected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="availableCount">50+</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="categoryCount">8</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Preview Section -->
+            <div class="section">
+                <h2>👀 Live Toolbar Preview</h2>
+                <p>This is exactly how your toolbar will appear in VS Code's status bar:</p>
+                <div class="toolbar-preview" id="toolbarPreview">
+                    $(markdown) CORE [**B**] [*I*] [`C`] [🔗] [• List] [🖼️] [👁️]
+                </div>
+                <div id="previewStatus">7 buttons active • Core preset</div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="section">
+                <h2>⚙️ Advanced Settings</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="compactMode"> 
+                            Compact Mode
+                        </label>
+                        <small>Use smaller, more condensed buttons</small>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="statusBarEnabled" checked> 
+                            Status Bar Preset Switcher
+                        </label>
+                        <small>Show preset switcher in status bar</small>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Position in Status Bar:</label>
+                        <select id="position">
+                            <option value="left">Left Side</option>
+                            <option value="right" selected>Right Side</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <label>Context Behavior:</label>
+                        <select id="contextBehavior">
+                            <option value="smart" selected>Smart (context-aware)</option>
+                            <option value="always">Always show all buttons</option>
+                            <option value="minimal">Minimal (only when relevant)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Export -->
+            <div class="section">
+                <h2>📤 Generated Configuration</h2>
+                <p>Copy this configuration to your VS Code settings.json file:</p>
+                <div class="config-output" id="configOutput">
+// Paste this in your VS Code settings.json
+{
+  "markdownToolbar.preset": "core",
+  "markdownToolbar.custom.visibleButtons": [],
+  "markdownToolbar.compact": false,
+  "markdownToolbar.statusBar.enabled": true,
+  "markdownToolbar.position": "right"
+}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="controls">
+                <button class="btn" onclick="copyConfig()">📋 Copy Config</button>
+                <button class="btn" onclick="downloadConfig()">💾 Download JSON</button>
+                <button class="btn btn-secondary" onclick="shareConfig()">📤 Share Config</button>
+                <button class="btn btn-secondary" onclick="resetToCore()">🔄 Reset to Core</button>
+                <button class="btn btn-secondary" onclick="loadTemplate()">📄 Load Template</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // All available markdown toolbar buttons
+        const BUTTON_DEFINITIONS = {
+            // Preview
+            'preview.side': { title: 'Preview (Side)', icon: '👁️', category: 'Preview' },
+            'preview.current': { title: 'Preview', icon: '👁️', category: 'Preview' },
+            'preview.mpe.side': { title: 'Enhanced Preview', icon: '🔍', category: 'Preview' },
+            
+            // Format
+            'fmt.bold': { title: 'Bold', icon: '**B**', category: 'Format' },
+            'fmt.italic': { title: 'Italic', icon: '*I*', category: 'Format' },
+            'fmt.strike': { title: 'Strikethrough', icon: '~~S~~', category: 'Format' },
+            
+            // Structure  
+            'list.toggle': { title: 'Toggle List', icon: '• List', category: 'Structure' },
+            'task.toggle': { title: 'Task List', icon: '☐ Task', category: 'Structure' },
+            'header.cycle': { title: 'Headers', icon: '# H', category: 'Structure' },
+            'blockquote': { title: 'Quote', icon: '> Quote', category: 'Structure' },
+            
+            // Code
+            'code.inline': { title: 'Inline Code', icon: '`C`', category: 'Code' },
+            'code.block': { title: 'Code Block', icon: '```', category: 'Code' },
+            
+            // Media
+            'link.insert': { title: 'Insert Link', icon: '🔗', category: 'Media' },
+            'image.insert': { title: 'Insert Image', icon: '🖼️', category: 'Media' },
+            'image.paste': { title: 'Paste Image', icon: '📷', category: 'Media' },
+            
+            // Tables
+            'table.menu': { title: 'Table Tools', icon: '📋', category: 'Tables' },
+            'table.insert': { title: 'Insert Table', icon: '⊞', category: 'Tables' },
+            'table.format': { title: 'Format Table', icon: '▦', category: 'Tables' },
+            
+            // TOC
+            'toc.create': { title: 'Create TOC', icon: '📑', category: 'TOC' },
+            'toc.update': { title: 'Update TOC', icon: '🔄', category: 'TOC' },
+            'toc.addNumbers': { title: 'Number TOC', icon: '🔢', category: 'TOC' },
+            'toc.removeNumbers': { title: 'Remove Numbers', icon: '➖', category: 'TOC' },
+            
+            // Quality
+            'lint.fix': { title: 'Fix Issues', icon: '🔧', category: 'Quality' },
+            'lint.workspace': { title: 'Lint All', icon: '🔍', category: 'Quality' },
+            'spell.check': { title: 'Spell Check', icon: '📝', category: 'Quality' },
+            
+            // Advanced
+            'math.inline': { title: 'Inline Math', icon: '𝑥²', category: 'Advanced' },
+            'math.block': { title: 'Math Block', icon: '∫', category: 'Advanced' },
+            'diagram.mermaid': { title: 'Mermaid', icon: '📊', category: 'Advanced' },
+            'footnote': { title: 'Footnote', icon: '¹', category: 'Advanced' },
+            'emoji.picker': { title: 'Emoji', icon: '😊', category: 'Advanced' }
+        };
+
+        // Preset definitions
+        const PRESETS = {
+            core: {
+                name: 'Core',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'list.toggle', 'code.inline', 'link.insert', 'image.insert']
+            },
+            writer: {
+                name: 'Writer', 
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'header.cycle', 'blockquote', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'image.paste', 'table.menu', 'toc.create']
+            },
+            pro: {
+                name: 'Pro',
+                buttons: ['preview.side', 'preview.mpe.side', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'header.cycle', 'blockquote', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'image.paste', 'table.menu', 'table.insert', 'toc.create', 'toc.update', 'lint.fix', 'math.inline', 'diagram.mermaid', 'emoji.picker']
+            },
+            custom: {
+                name: 'Custom',
+                buttons: []
+            }
+        };
+
+        let currentConfig = {
+            preset: 'core',
+            customButtons: PRESETS.core.buttons.slice(),
+            compact: false,
+            statusBarEnabled: true,
+            position: 'right',
+            contextBehavior: 'smart'
+        };
+
+        // Initialize the interface
+        function init() {
+            renderButtonCategories();
+            updateUI();
+            
+            // Event listeners
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.addEventListener('click', () => selectPreset(card.dataset.preset));
+            });
+            
+            document.getElementById('compactMode').addEventListener('change', updateConfig);
+            document.getElementById('statusBarEnabled').addEventListener('change', updateConfig);
+            document.getElementById('position').addEventListener('change', updateConfig);
+            document.getElementById('contextBehavior').addEventListener('change', updateConfig);
+        }
+
+        function renderButtonCategories() {
+            const container = document.getElementById('buttonCategories');
+            const categories = {};
+            
+            // Group buttons by category
+            Object.entries(BUTTON_DEFINITIONS).forEach(([id, button]) => {
+                if (!categories[button.category]) {
+                    categories[button.category] = [];
+                }
+                categories[button.category].push({ id, ...button });
+            });
+
+            container.innerHTML = '';
+            Object.entries(categories).forEach(([category, buttons]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = category;
+                categoryDiv.appendChild(header);
+                
+                const buttonGrid = document.createElement('div');
+                buttonGrid.className = 'button-grid';
+                
+                buttons.forEach(button => {
+                    const buttonDiv = document.createElement('div');
+                    buttonDiv.className = 'button-item';
+                    buttonDiv.dataset.buttonId = button.id;
+                    buttonDiv.innerHTML = `
+                        <div class="icon">${button.icon}</div>
+                        <div>${button.title}</div>
+                    `;
+                    buttonDiv.addEventListener('click', () => toggleButton(button.id));
+                    buttonGrid.appendChild(buttonDiv);
+                });
+                
+                categoryDiv.appendChild(buttonGrid);
+                container.appendChild(categoryDiv);
+            });
+        }
+
+        function selectPreset(presetId) {
+            currentConfig.preset = presetId;
+            if (presetId !== 'custom') {
+                currentConfig.customButtons = PRESETS[presetId].buttons.slice();
+            }
+            updateUI();
+        }
+
+        function toggleButton(buttonId) {
+            const index = currentConfig.customButtons.indexOf(buttonId);
+            if (index >= 0) {
+                currentConfig.customButtons.splice(index, 1);
+            } else {
+                currentConfig.customButtons.push(buttonId);
+            }
+            
+            // Switch to custom preset when modifying
+            if (currentConfig.preset !== 'custom') {
+                currentConfig.preset = 'custom';
+            }
+            
+            updateUI();
+        }
+
+        function updateConfig() {
+            currentConfig.compact = document.getElementById('compactMode').checked;
+            currentConfig.statusBarEnabled = document.getElementById('statusBarEnabled').checked;
+            currentConfig.position = document.getElementById('position').value;
+            currentConfig.contextBehavior = document.getElementById('contextBehavior').value;
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update preset selection
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.preset === currentConfig.preset);
+            });
+
+            // Update button selection
+            document.querySelectorAll('.button-item').forEach(item => {
+                const buttonId = item.dataset.buttonId;
+                item.classList.toggle('selected', currentConfig.customButtons.includes(buttonId));
+            });
+
+            // Update stats
+            document.getElementById('selectedCount').textContent = currentConfig.customButtons.length;
+            
+            // Update preview
+            updatePreview();
+            
+            // Update config output
+            updateConfigOutput();
+        }
+
+        function updatePreview() {
+            const previewButtons = currentConfig.customButtons.slice(0, 8).map(buttonId => {
+                const button = BUTTON_DEFINITIONS[buttonId];
+                return button ? `[${button.icon}]` : '[?]';
+            });
+            
+            const moreCount = Math.max(0, currentConfig.customButtons.length - 8);
+            const moreText = moreCount > 0 ? ` +${moreCount} more` : '';
+            
+            document.getElementById('toolbarPreview').textContent = 
+                `$(markdown) ${currentConfig.preset.toUpperCase()} ${previewButtons.join(' ')}${moreText}`;
+            
+            document.getElementById('previewStatus').textContent = 
+                `${currentConfig.customButtons.length} buttons active • ${currentConfig.preset} preset`;
+        }
+
+        function updateConfigOutput() {
+            const config = {
+                "markdownToolbar.preset": currentConfig.preset,
+                "markdownToolbar.custom.visibleButtons": currentConfig.preset === 'custom' ? currentConfig.customButtons : [],
+                "markdownToolbar.compact": currentConfig.compact,
+                "markdownToolbar.statusBar.enabled": currentConfig.statusBarEnabled,
+                "markdownToolbar.position": currentConfig.position
+            };
+
+            document.getElementById('configOutput').textContent = 
+                '// Paste this in your VS Code settings.json\n' + 
+                JSON.stringify(config, null, 2);
+        }
+
+        function copyConfig() {
+            const configText = document.getElementById('configOutput').textContent;
+            navigator.clipboard.writeText(configText).then(() => {
+                alert('Configuration copied to clipboard! 📋');
+            });
+        }
+
+        function downloadConfig() {
+            const configText = document.getElementById('configOutput').textContent;
+            const blob = new Blob([configText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'markdown-toolbar-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function shareConfig() {
+            const config = btoa(JSON.stringify(currentConfig));
+            const shareUrl = `${window.location.origin}${window.location.pathname}?config=${config}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Shareable URL copied to clipboard! 🔗');
+            });
+        }
+
+        function resetToCore() {
+            if (confirm('Reset to Core preset? This will lose your current selection.')) {
+                selectPreset('core');
+            }
+        }
+
+        function loadTemplate() {
+            const templates = [
+                { name: 'Blogger', buttons: ['fmt.bold', 'fmt.italic', 'link.insert', 'image.insert', 'preview.side'] },
+                { name: 'Developer', buttons: ['code.inline', 'code.block', 'link.insert', 'table.menu', 'lint.fix'] },
+                { name: 'Academic', buttons: ['fmt.bold', 'fmt.italic', 'blockquote', 'footnote', 'math.inline', 'math.block'] }
+            ];
+            
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            currentConfig.customButtons = template.buttons;
+            currentConfig.preset = 'custom';
+            updateUI();
+            alert(`Loaded "${template.name}" template! 📄`);
+        }
+
+        // Load config from URL if shared
+        function loadSharedConfig() {
+            const params = new URLSearchParams(window.location.search);
+            const configParam = params.get('config');
+            if (configParam) {
+                try {
+                    const sharedConfig = JSON.parse(atob(configParam));
+                    currentConfig = { ...currentConfig, ...sharedConfig };
+                    updateUI();
+                    alert('Loaded shared configuration! 🎉');
+                } catch (e) {
+                    console.error('Invalid shared config');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            loadSharedConfig();
+        });
+    </script>
+</body>
+</html>

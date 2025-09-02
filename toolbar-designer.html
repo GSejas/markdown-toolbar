@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Toolbar Designer - Drag & Drop Editor</title>
+    <!-- VS Code Codicons Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.35/dist/codicon.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .designer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .designer-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            height: 80vh;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .panel h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* LEFT PANEL - Button Library */
+        .button-library {
+            border: 3px dashed #cbd5e0;
+            border-radius: 8px;
+            min-height: 120px;
+            padding: 15px;
+        }
+
+        .category-section {
+            margin-bottom: 25px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .available-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .button-item {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            font-size: 11px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+        }
+
+        .button-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(66, 153, 225, 0.4);
+            border-color: #63b3ed;
+        }
+
+        .button-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .button-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .button-icon {
+            font-size: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-icon i {
+            font-size: 18px;
+        }
+
+        /* Ensure Codicons render properly */
+        .codicon {
+            font-family: "codicon";
+            font-style: normal;
+            font-weight: normal;
+            line-height: 1;
+            text-decoration: none;
+            vertical-align: baseline;
+        }
+
+        .toolbar-btn i {
+            font-size: 14px;
+        }
+
+        /* CENTER PANEL - Toolbar Builder */
+        .toolbar-builder {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vscode-simulation {
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .vscode-titlebar {
+            background: #323233;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+            color: #cccccc;
+        }
+
+        .vscode-editor {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 120px;
+            border-bottom: 1px solid #2d2d30;
+        }
+
+        .vscode-statusbar {
+            background: #007acc;
+            color: white;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .statusbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .statusbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .statusbar-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .statusbar-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .markdown-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .toolbar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .markdown-icon {
+            color: #4ec9b0;
+        }
+
+        .drop-zone {
+            background: rgba(237, 242, 247, 0.8);
+            border: 3px dashed #a0aec0;
+            border-radius: 12px;
+            min-height: 200px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #4299e1;
+            background: rgba(66, 153, 225, 0.1);
+            transform: scale(1.02);
+        }
+
+        .drop-zone-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #718096;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .drop-zone-placeholder.hidden {
+            display: none;
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 60px;
+            padding: 10px;
+        }
+
+        .toolbar-button {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 2px solid transparent;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+        }
+
+        .toolbar-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(72, 187, 120, 0.4);
+        }
+
+        .toolbar-button:active {
+            cursor: grabbing;
+        }
+
+        .toolbar-button .remove-btn {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        .toolbar-button .remove-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sort-indicator {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            height: 4px;
+            background: #4299e1;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .sort-indicator.show {
+            opacity: 1;
+        }
+
+        /* RIGHT PANEL - Settings & Export */
+        .settings-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .settings-section h3 {
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .setting-item {
+            margin-bottom: 15px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .setting-item input, .setting-item select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .setting-item input:focus, .setting-item select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        .setting-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .preset-btn {
+            padding: 8px 12px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #cbd5e0;
+        }
+
+        .preset-btn.active {
+            background: #4299e1;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .config-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 2px solid #2d3748;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .designer-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+            }
+            
+            .panel {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Animation Effects */
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0,0,0);
+            }
+            40%, 43% {
+                transform: translate3d(0, -8px, 0);
+            }
+            70% {
+                transform: translate3d(0, -4px, 0);
+            }
+            90% {
+                transform: translate3d(0, -2px, 0);
+            }
+        }
+
+        .bounce {
+            animation: bounce 1s ease-in-out;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(66, 153, 225, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="designer-container">
+        <div class="header">
+            <h1>🎨 Markdown Toolbar Designer</h1>
+            <p>Drag & drop to build your perfect markdown toolbar</p>
+        </div>
+
+        <div class="designer-layout">
+            <!-- LEFT PANEL: Button Library -->
+            <div class="panel">
+                <h2>🧰 Button Library</h2>
+                <div class="button-library" id="buttonLibrary">
+                    <!-- Buttons will be populated here -->
+                </div>
+            </div>
+
+            <!-- CENTER PANEL: Toolbar Builder -->
+            <div class="panel toolbar-builder">
+                <h2>🔧 Your Toolbar</h2>
+                
+                <div class="vscode-simulation">
+                    <div class="vscode-titlebar">
+                        📄 README.md - Visual Studio Code
+                    </div>
+                    <div class="vscode-editor">
+# My Markdown Document
+
+This is **bold text** and *italic text*.
+
+- List item 1
+- List item 2
+
+```javascript
+console.log("Hello World!");
+```</div>
+                    <div class="vscode-statusbar">
+                        <div class="statusbar-left">
+                            <div class="statusbar-item">
+                                <span class="codicon codicon-source-control"></span>
+                                <span>main</span>
+                            </div>
+                            <div class="statusbar-item">
+                                <span class="codicon codicon-sync"></span>
+                                <span>Synced</span>
+                            </div>
+                        </div>
+                        <div class="statusbar-right">
+                            <div class="statusbar-item">Ln 5, Col 12</div>
+                            <div class="statusbar-item">Markdown</div>
+                            <div class="markdown-toolbar" id="simulatedToolbar">
+                                <span class="codicon codicon-markdown markdown-icon"></span>
+                                <span>CUSTOM</span>
+                                <span id="toolbarButtonsPreview">[Drag buttons here...]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone-placeholder" id="placeholder">
+                        <div style="font-size: 24px; margin-bottom: 10px;">👆</div>
+                        <div><strong>Drag buttons here to build your toolbar</strong></div>
+                        <div style="margin-top: 8px; opacity: 0.7;">Drag from the library on the left</div>
+                    </div>
+                    <div class="toolbar-buttons" id="toolbarButtons">
+                        <!-- Dropped buttons will appear here -->
+                    </div>
+                </div>
+
+                <div style="text-align: center; color: #718096; font-size: 14px;">
+                    <div id="buttonCount">0 buttons in toolbar</div>
+                    <div style="margin-top: 5px;">💡 Drag to reorder • Click ❌ to remove</div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Settings & Export -->
+            <div class="panel">
+                <h2>⚙️ Settings</h2>
+                
+                <div class="settings-section">
+                    <h3>📋 Quick Presets</h3>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="loadPreset('core', event)">📝 Core</button>
+                        <button class="preset-btn" onclick="loadPreset('writer', event)">✍️ Writer</button>
+                        <button class="preset-btn" onclick="loadPreset('pro', event)">🔧 Pro</button>
+                        <button class="preset-btn active" onclick="loadPreset('custom', event)">⚙️ Custom</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🎛️ Appearance</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="compactMode"> Compact mode
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>Position:</label>
+                        <select id="position">
+                            <option value="left">Left side</option>
+                            <option value="right" selected>Right side</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🎯 Behavior</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="contextAware" checked> Smart context-aware hiding
+                        </label>
+                        <small style="color: #718096;">Hide irrelevant buttons automatically</small>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="copyConfig(event)">
+                        📋 Copy Config
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadConfig()">
+                        💾 Download JSON
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                    <button class="btn btn-secondary" onclick="shuffleButtons()">
+                        🎲 Shuffle
+                    </button>
+                </div>
+
+                <div class="config-output" id="configOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Button definitions using VS Code Codicons for authentic look
+        const BUTTONS = {
+            // Format buttons
+            'fmt.bold': { name: 'Bold', icon: '$(bold)', category: 'Format', color: '#e53e3e' },
+            'fmt.italic': { name: 'Italic', icon: '$(italic)', category: 'Format', color: '#dd6b20' },
+            'fmt.strike': { name: 'Strike', icon: '$(text-size)', category: 'Format', color: '#718096' },
+            
+            // Structure
+            'list.toggle': { name: 'List', icon: '$(list-unordered)', category: 'Structure', color: '#38a169' },
+            'task.toggle': { name: 'Tasks', icon: '$(checklist)', category: 'Structure', color: '#319795' },
+            'header.cycle': { name: 'Headers', icon: '$(symbol-string)', category: 'Structure', color: '#3182ce' },
+            'blockquote': { name: 'Quote', icon: '$(comment)', category: 'Structure', color: '#805ad5' },
+            
+            // Code
+            'code.inline': { name: 'Code', icon: '$(code)', category: 'Code', color: '#2d3748' },
+            'code.block': { name: 'Block', icon: '$(terminal)', category: 'Code', color: '#1a202c' },
+            
+            // Media
+            'link.insert': { name: 'Link', icon: '$(link)', category: 'Media', color: '#2b6cb0' },
+            'image.insert': { name: 'Image', icon: '$(file-media)', category: 'Media', color: '#0078d4' },
+            'image.paste': { name: 'Paste', icon: '$(clippy)', category: 'Media', color: '#0086f0' },
+            
+            // Preview
+            'preview.side': { name: 'Preview', icon: '$(preview)', category: 'Preview', color: '#553c9a' },
+            'preview.mpe': { name: 'Enhanced', icon: '$(eye)', category: 'Preview', color: '#6b46c1' },
+            
+            // Tables
+            'table.menu': { name: 'Table', icon: '$(table)', category: 'Tables', color: '#059669' },
+            'table.insert': { name: 'Insert', icon: '$(add)', category: 'Tables', color: '#047857' },
+            'table.format': { name: 'Format', icon: '$(organization)', category: 'Tables', color: '#065f46' },
+            
+            // Quality
+            'lint.fix': { name: 'Fix', icon: '$(wrench)', category: 'Quality', color: '#dc2626' },
+            'spell.check': { name: 'Spell', icon: '$(pencil)', category: 'Quality', color: '#ea580c' },
+            
+            // Advanced
+            'math.inline': { name: 'Math', icon: '$(symbol-numeric)', category: 'Advanced', color: '#7c3aed' },
+            'diagram.mermaid': { name: 'Diagram', icon: '$(graph-line)', category: 'Advanced', color: '#8b5cf6' },
+            'emoji.picker': { name: 'Emoji', icon: '$(heart)', category: 'Advanced', color: '#ec4899' },
+            'toc.create': { name: 'TOC', icon: '$(list-ordered)', category: 'Advanced', color: '#0ea5e9' }
+        };
+
+        const PRESETS = {
+            core: ['fmt.bold', 'fmt.italic', 'code.inline', 'link.insert', 'list.toggle', 'preview.side'],
+            writer: ['fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'blockquote', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'table.menu'],
+            pro: ['fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'table.menu', 'lint.fix', 'math.inline', 'diagram.mermaid', 'preview.side']
+        };
+
+        let currentToolbar = [];
+        let draggedElement = null;
+        let draggedFromLibrary = false;
+
+        // Initialize the designer
+        function init() {
+            renderButtonLibrary();
+            updateToolbarPreview();
+            updateConfigOutput();
+            
+            // Set up drag and drop for the drop zone
+            const dropZone = document.getElementById('dropZone');
+            dropZone.addEventListener('dragover', handleDragOver);
+            dropZone.addEventListener('drop', handleDrop);
+            dropZone.addEventListener('dragenter', handleDragEnter);
+            dropZone.addEventListener('dragleave', handleDragLeave);
+            
+            // Settings event listeners
+            document.getElementById('compactMode').addEventListener('change', updateConfigOutput);
+            document.getElementById('position').addEventListener('change', updateConfigOutput);
+            document.getElementById('contextAware').addEventListener('change', updateConfigOutput);
+        }
+
+        function renderButtonLibrary() {
+            const library = document.getElementById('buttonLibrary');
+            const categories = {};
+            
+            // Group by category
+            Object.entries(BUTTONS).forEach(([id, button]) => {
+                if (!categories[button.category]) categories[button.category] = [];
+                categories[button.category].push({ id, ...button });
+            });
+
+            library.innerHTML = '';
+            Object.entries(categories).forEach(([category, buttons]) => {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+                
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.textContent = category;
+                section.appendChild(title);
+                
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'available-buttons';
+                
+                buttons.forEach(button => {
+                    const buttonEl = createLibraryButton(button);
+                    buttonsContainer.appendChild(buttonEl);
+                });
+                
+                section.appendChild(buttonsContainer);
+                library.appendChild(section);
+            });
+        }
+
+        function createLibraryButton(button) {
+            const buttonEl = document.createElement('div');
+            buttonEl.className = 'button-item';
+            buttonEl.draggable = true;
+            buttonEl.dataset.buttonId = button.id;
+            buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
+            
+            // Convert $(icon-name) to proper codicon class
+            const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+            
+            buttonEl.innerHTML = `
+                <div class="button-icon">
+                    <i class="${iconClass}"></i>
+                </div>
+                <div>${button.name}</div>
+            `;
+
+            // Drag events
+            buttonEl.addEventListener('dragstart', (e) => {
+                draggedElement = button;
+                draggedFromLibrary = true;
+                buttonEl.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'copy';
+            });
+
+            buttonEl.addEventListener('dragend', () => {
+                buttonEl.classList.remove('dragging');
+            });
+
+            // Fun hover effects
+            buttonEl.addEventListener('mouseenter', () => {
+                buttonEl.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+
+            buttonEl.addEventListener('mouseleave', () => {
+                buttonEl.style.transform = '';
+            });
+
+            return buttonEl;
+        }
+
+        function createToolbarButton(button) {
+            const buttonEl = document.createElement('div');
+            buttonEl.className = 'toolbar-button';
+            buttonEl.draggable = true;
+            buttonEl.dataset.buttonId = button.id;
+            buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
+            
+            // Convert $(icon-name) to proper codicon class
+            const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+            
+            buttonEl.innerHTML = `
+                <span class="button-icon">
+                    <i class="${iconClass}"></i>
+                </span>
+                <span>${button.name}</span>
+                <span class="remove-btn" onclick="removeButton('${button.id}')">✕</span>
+                <div class="sort-indicator"></div>
+            `;
+
+            // Drag events for reordering
+            buttonEl.addEventListener('dragstart', (e) => {
+                draggedElement = button;
+                draggedFromLibrary = false;
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            return buttonEl;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = draggedFromLibrary ? 'copy' : 'move';
+            
+            // Show drop indicator
+            const afterElement = getDragAfterElement(e.clientX);
+            const toolbarButtons = document.getElementById('toolbarButtons');
+            
+            // Remove existing indicators
+            toolbarButtons.querySelectorAll('.sort-indicator').forEach(ind => {
+                ind.classList.remove('show');
+            });
+
+            if (afterElement) {
+                afterElement.querySelector('.sort-indicator').classList.add('show');
+            }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.remove('drag-over');
+
+            if (draggedElement) {
+                if (draggedFromLibrary) {
+                    // Add new button
+                    if (!currentToolbar.includes(draggedElement.id)) {
+                        const afterElement = getDragAfterElement(e.clientX);
+                        const insertIndex = afterElement ? 
+                            Array.from(document.getElementById('toolbarButtons').children).indexOf(afterElement) :
+                            currentToolbar.length;
+                        
+                        currentToolbar.splice(insertIndex, 0, draggedElement.id);
+                        renderToolbar();
+                        
+                        // Fun animation
+                        setTimeout(() => {
+                            const newButton = document.querySelector(`[data-button-id="${draggedElement.id}"]`);
+                            if (newButton && newButton.parentElement.id === 'toolbarButtons') {
+                                newButton.classList.add('bounce');
+                            }
+                        }, 50);
+                    }
+                } else {
+                    // Reorder existing button
+                    const afterElement = getDragAfterElement(e.clientX);
+                    const currentIndex = currentToolbar.indexOf(draggedElement.id);
+                    const newIndex = afterElement ? 
+                        Array.from(document.getElementById('toolbarButtons').children).indexOf(afterElement) :
+                        currentToolbar.length - 1;
+
+                    if (currentIndex !== newIndex) {
+                        currentToolbar.splice(currentIndex, 1);
+                        currentToolbar.splice(newIndex, 0, draggedElement.id);
+                        renderToolbar();
+                    }
+                }
+            }
+
+            draggedElement = null;
+            draggedFromLibrary = false;
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            document.getElementById('dropZone').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+                document.getElementById('dropZone').classList.remove('drag-over');
+            }
+        }
+
+        function getDragAfterElement(x) {
+            const toolbarButtons = document.getElementById('toolbarButtons');
+            const draggableElements = [...toolbarButtons.querySelectorAll('.toolbar-button:not(.dragging)')];
+            
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function renderToolbar() {
+            const container = document.getElementById('toolbarButtons');
+            container.innerHTML = '';
+            
+            currentToolbar.forEach(buttonId => {
+                const button = { id: buttonId, ...BUTTONS[buttonId] };
+                container.appendChild(createToolbarButton(button));
+            });
+
+            updatePlaceholder();
+            updateToolbarPreview();
+            updateConfigOutput();
+            updateButtonCount();
+        }
+
+        function updatePlaceholder() {
+            const placeholder = document.getElementById('placeholder');
+            placeholder.classList.toggle('hidden', currentToolbar.length > 0);
+        }
+
+        function updateToolbarPreview() {
+            const preview = document.getElementById('toolbarButtonsPreview');
+            if (currentToolbar.length === 0) {
+                preview.innerHTML = '[Drag buttons here...]';
+                return;
+            }
+
+            const buttonPreviews = currentToolbar.slice(0, 8).map(id => {
+                const button = BUTTONS[id];
+                const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+                return `<span class="toolbar-btn" title="${button.name}"><i class="${iconClass}"></i></span>`;
+            });
+
+            const moreCount = currentToolbar.length > 8 ? 
+                `<span class="toolbar-btn" title="${currentToolbar.length - 8} more buttons">+${currentToolbar.length - 8}</span>` : '';
+            
+            preview.innerHTML = buttonPreviews.join('') + moreCount;
+        }
+
+        function updateButtonCount() {
+            const count = document.getElementById('buttonCount');
+            count.textContent = `${currentToolbar.length} button${currentToolbar.length !== 1 ? 's' : ''} in toolbar`;
+        }
+
+        function updateConfigOutput() {
+            const config = {
+                "markdownToolbar.preset": "custom",
+                "markdownToolbar.custom.visibleButtons": currentToolbar,
+                "markdownToolbar.compact": document.getElementById('compactMode').checked,
+                "markdownToolbar.statusBar.enabled": true,
+                "markdownToolbar.position": document.getElementById('position').value,
+                "markdownToolbar.contextAware": document.getElementById('contextAware').checked
+            };
+
+            document.getElementById('configOutput').textContent = JSON.stringify(config, null, 2);
+        }
+
+        function removeButton(buttonId) {
+            const index = currentToolbar.indexOf(buttonId);
+            if (index >= 0) {
+                currentToolbar.splice(index, 1);
+                renderToolbar();
+                
+                // Fun removal animation
+                const button = document.querySelector(`[data-button-id="${buttonId}"]`);
+                if (button) {
+                    button.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => renderToolbar(), 300);
+                }
+            }
+        }
+
+        function loadPreset(presetId, event) {
+            // Update active preset button
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            if (presetId === 'custom') {
+                return;
+            }
+
+            currentToolbar = [...PRESETS[presetId]];
+            renderToolbar();
+            
+            // Fun loading animation
+            const dropZone = document.getElementById('dropZone');
+            dropZone.classList.add('pulse');
+            setTimeout(() => dropZone.classList.remove('pulse'), 1000);
+        }
+
+        function copyConfig(event) {
+            const config = document.getElementById('configOutput').textContent;
+            navigator.clipboard.writeText(config).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copied!';
+                btn.style.background = '#38a169';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(() => {
+                // Fallback if clipboard API fails
+                alert('Config copied to clipboard! (Please paste manually if needed)');
+            });
+        }
+
+        function downloadConfig() {
+            const config = document.getElementById('configOutput').textContent;
+            const blob = new Blob([config], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `markdown-toolbar-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            if (confirm('Clear all buttons? This cannot be undone.')) {
+                currentToolbar = [];
+                renderToolbar();
+                
+                // Fun clear animation
+                const container = document.getElementById('toolbarButtons');
+                container.style.animation = 'fadeOut 0.5s ease-out';
+                setTimeout(() => {
+                    container.style.animation = '';
+                    renderToolbar();
+                }, 500);
+            }
+        }
+
+        function shuffleButtons() {
+            for (let i = currentToolbar.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentToolbar[i], currentToolbar[j]] = [currentToolbar[j], currentToolbar[i]];
+            }
+            renderToolbar();
+            
+            // Fun shuffle animation
+            const buttons = document.querySelectorAll('.toolbar-button');
+            buttons.forEach((btn, i) => {
+                btn.style.animation = `bounce ${0.5 + i * 0.1}s ease-out`;
+            });
+        }
+
+        // Utility function to adjust color brightness
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.slice(1), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        // Add some CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

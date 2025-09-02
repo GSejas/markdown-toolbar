@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Toolbar Extension - Smart Toolbar for VS Code</title>
+    <!-- VS Code Codicons Font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.35/dist/codicon.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --primary-light: #8b5cf6;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.7;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ec4899 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Modern Hero Section */
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 80px 20px 100px;
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.2), transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 400;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        /* Floating elements */
+        .floating-icons {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .floating-icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .floating-icon:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 2s; }
+        .floating-icon:nth-child(4) { bottom: 20%; right: 20%; animation-delay: 3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        /* Modern Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Modern Navigation */
+        .nav {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 8px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--gray-100);
+            border-radius: var(--radius);
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.5);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            background: white;
+            box-shadow: var(--shadow);
+            font-weight: 600;
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 1px;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 48px 40px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.025em;
+        }
+
+        .section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        /* Pinterest-inspired Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 32px 28px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--gray-300);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-card h3 i {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Demo Section */
+        .demo-container {
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .vscode-titlebar {
+            background: #323233;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+            color: #cccccc;
+        }
+
+        .vscode-editor {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 120px;
+        }
+
+        .vscode-statusbar {
+            background: #007acc;
+            color: white;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 12px;
+        }
+
+        .statusbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .markdown-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .toolbar-btn {
+            padding: 2px 4px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Mini Designer */
+        .mini-designer {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .button-library-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button-item-mini {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .button-item-mini:hover {
+            transform: translateY(-1px);
+        }
+
+        .toolbar-preview-mini {
+            background: #2d3748;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* Installation */
+        .install-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .install-step {
+            background: #f0f8ff;
+            border: 2px solid #4299e1;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .install-step .step-number {
+            background: #4299e1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .features-grid,
+            .install-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Codicons */
+        .codicon {
+            font-family: "codicon";
+            font-style: normal;
+            font-weight: normal;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="floating-icons">
+                <div class="floating-icon"><i class="codicon codicon-markdown"></i></div>
+                <div class="floating-icon"><i class="codicon codicon-edit"></i></div>
+                <div class="floating-icon"><i class="codicon codicon-tools"></i></div>
+                <div class="floating-icon"><i class="codicon codicon-extensions"></i></div>
+            </div>
+            <div class="hero-content">
+                <h1><i class="codicon codicon-markdown"></i> Markdown Toolbar</h1>
+                <p class="hero-subtitle">The smart, context-aware markdown toolbar that makes writing in VS Code effortless. Drag, drop, and customize your perfect writing experience with delightful interactions.</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary" onclick="showSection('designer')">
+                        <i class="codicon codicon-tools"></i> Try Designer
+                    </a>
+                    <a href="#" class="btn btn-secondary" onclick="showSection('installation')">
+                        <i class="codicon codicon-cloud-download"></i> Install Now
+                    </a>
+                    <a href="https://github.com/your-repo" class="btn btn-secondary" target="_blank">
+                        <i class="codicon codicon-github"></i> View Source
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('overview')" data-section="overview">
+                    <i class="codicon codicon-home"></i> Overview
+                </button>
+                <button class="nav-tab" onclick="showSection('demo')" data-section="demo">
+                    <i class="codicon codicon-play"></i> Live Demo
+                </button>
+                <button class="nav-tab" onclick="showSection('designer')" data-section="designer">
+                    <i class="codicon codicon-tools"></i> Toolbar Designer
+                </button>
+                <button class="nav-tab" onclick="showSection('installation')" data-section="installation">
+                    <i class="codicon codicon-package"></i> Installation
+                </button>
+                <button class="nav-tab" onclick="showSection('docs')" data-section="docs">
+                    <i class="codicon codicon-book"></i> Documentation
+                </button>
+            </div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="section active">
+            <h2><i class="codicon codicon-info"></i> Smart Markdown Toolbar</h2>
+            <p>Transform your markdown editing experience with a toolbar that adapts to your context and workflow.</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-zap"></i> Context-Aware</h3>
+                    <p>Buttons appear and hide based on your cursor position. Table tools when you're in tables, task toggles on task lines.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-settings-gear"></i> Fully Customizable</h3>
+                    <p>Drag and drop to build your perfect toolbar. Choose from 20+ markdown tools or use smart presets.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-extensions"></i> Extension Integration</h3>
+                    <p>Works seamlessly with Markdown All in One, markdownlint, and other popular extensions.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-rocket"></i> Performance Optimized</h3>
+                    <p>Smart caching and debouncing ensure smooth performance even in large documents.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-heart"></i> Fallback Support</h3>
+                    <p>Built-in formatting commands work even without external extensions installed.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-symbol-color"></i> Theme Adaptive</h3>
+                    <p>Uses VS Code's native Codicons and theming for a consistent, professional look.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Section -->
+        <div id="demo" class="section">
+            <h2><i class="codicon codicon-play"></i> See It In Action</h2>
+            <p>Watch the toolbar adapt to your markdown editing in real-time:</p>
+            
+            <!-- Video Demo -->
+            <div style="position: relative; width: 100%; max-width: 800px; margin: 30px auto; background: #000; border-radius: 8px; overflow: hidden;">
+                <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%;"> <!-- 16:9 aspect ratio -->
+                    <!-- Placeholder for actual video -->
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a202c, #2d3748); color: white;">
+                        <div style="text-align: center;">
+                            <i class="codicon codicon-play-circle" style="font-size: 4em; margin-bottom: 15px; display: block;"></i>
+                            <h3 style="margin-bottom: 10px;">Context-Aware Toolbar Demo</h3>
+                            <p style="opacity: 0.8; margin-bottom: 20px;">See buttons appear/hide based on cursor position</p>
+                            <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-size: 0.9em;">
+                                📹 Video coming soon - <a href="#" style="color: #4299e1;">Subscribe for updates</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Uncomment when you have the actual video -->
+                    <!-- 
+                    <iframe 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                        src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+                        title="Markdown Toolbar Demo" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                    -->
+                </div>
+            </div>
+            
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                <strong>Coming Soon:</strong> Full walkthrough showing context awareness, customization, and all features
+            </p>
+            
+            <div class="demo-container">
+                <div class="vscode-titlebar">
+                    <i class="codicon codicon-file"></i> README.md - Visual Studio Code
+                </div>
+                <div class="vscode-editor">
+# My Awesome Project
+
+This is **bold text** and *italic text*.
+
+## Features
+- [x] Smart toolbar
+- [x] Context awareness
+- [ ] More awesome features
+
+```javascript
+console.log("Hello World!");
+```</div>
+                <div class="vscode-statusbar">
+                    <div>Ln 12, Col 15</div>
+                    <div class="statusbar-right">
+                        <div>Markdown</div>
+                        <div class="markdown-toolbar">
+                            <i class="codicon codicon-markdown"></i>
+                            <span>WRITER</span>
+                            <span class="toolbar-btn"><i class="codicon codicon-bold"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-italic"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-code"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-link"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-list-unordered"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-checklist"></i></span>
+                            <span class="toolbar-btn"><i class="codicon codicon-preview"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0; color: #666;">
+                <strong>🎯 Context-Aware:</strong> Task toggle (☑) only shows when cursor is on task lines<br>
+                <strong>🎨 Customizable:</strong> This is the "Writer" preset - you can build your own!
+            </div>
+        </div>
+
+        <!-- Designer Section -->
+        <div id="designer" class="section">
+            <h2><i class="codicon codicon-tools"></i> Toolbar Designer</h2>
+            <p>Build your perfect toolbar by selecting the buttons you need:</p>
+            
+            <div class="mini-designer">
+                <h3>Available Buttons (Click to add):</h3>
+                <div class="button-library-mini" id="buttonLibrary">
+                    <!-- Buttons populated by JS -->
+                </div>
+                
+                <h3>Your Toolbar Preview:</h3>
+                <div class="toolbar-preview-mini" id="toolbarPreview">
+                    $(markdown) CUSTOM [Click buttons above to add them here]
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="copyMiniConfig()" style="background: #4299e1; color: white; border: none;">
+                        <i class="codicon codicon-clippy"></i> Copy Configuration
+                    </button>
+                    <button class="btn" onclick="resetMini()" style="background: #e2e8f0; color: #4a5568; border: none; margin-left: 10px;">
+                        <i class="codicon codicon-refresh"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="code-block" id="miniConfigOutput">
+// Your configuration will appear here
+{
+  "markdownToolbar.preset": "custom",
+  "markdownToolbar.custom.visibleButtons": [],
+  "markdownToolbar.statusBar.enabled": true
+}
+            </div>
+
+            <p><strong>Want more control?</strong> Check out the <a href="toolbar-designer.html" target="_blank" style="color: #4299e1;">full designer tool</a> for advanced features like drag-and-drop reordering!</p>
+        </div>
+
+        <!-- Installation Section -->
+        <div id="installation" class="section">
+            <h2><i class="codicon codicon-package"></i> Installation</h2>
+            
+            <div class="install-steps">
+                <div class="install-step">
+                    <div class="step-number">1</div>
+                    <h3>Open VS Code</h3>
+                    <p>Launch Visual Studio Code on your system</p>
+                </div>
+                
+                <div class="install-step">
+                    <div class="step-number">2</div>
+                    <h3>Extensions Panel</h3>
+                    <p>Press <code>Ctrl+Shift+X</code> to open extensions</p>
+                </div>
+                
+                <div class="install-step">
+                    <div class="step-number">3</div>
+                    <h3>Search & Install</h3>
+                    <p>Search "Markdown Toolbar" and click Install</p>
+                </div>
+                
+                <div class="install-step">
+                    <div class="step-number">4</div>
+                    <h3>Start Writing!</h3>
+                    <p>Open any .md file and see the toolbar in your status bar</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 30px;">Alternative Installation Methods:</h3>
+            
+            <div style="margin: 20px 0;">
+                <h4><i class="codicon codicon-terminal"></i> Command Line:</h4>
+                <div class="code-block">code --install-extension your-publisher.markdown-toolbar</div>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <h4><i class="codicon codicon-file-zip"></i> Manual Installation:</h4>
+                <ol style="margin-left: 20px; color: #4a5568;">
+                    <li>Download the .vsix file from <a href="#" style="color: #4299e1;">releases page</a></li>
+                    <li>In VS Code: <code>Ctrl+Shift+P</code> → "Extensions: Install from VSIX"</li>
+                    <li>Select the downloaded .vsix file</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Documentation Section -->
+        <div id="docs" class="section">
+            <h2><i class="codicon codicon-book"></i> Documentation</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-settings"></i> Configuration</h3>
+                    <p>Learn how to customize presets, button visibility, and behavior settings.</p>
+                    <a href="#" style="color: #4299e1;">View Config Guide →</a>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-extensions"></i> Integrations</h3>
+                    <p>Discover how to integrate with Markdown All in One, markdownlint, and more.</p>
+                    <a href="#" style="color: #4299e1;">View Integrations →</a>
+                </div>
+                
+                <div class="feature-card">
+                    <h3><i class="codicon codicon-question"></i> Troubleshooting</h3>
+                    <p>Common issues and solutions for the markdown toolbar extension.</p>
+                    <a href="#" style="color: #4299e1;">View FAQ →</a>
+                </div>
+            </div>
+
+            <h3>Quick Reference:</h3>
+            <div class="code-block">
+// Complete configuration example
+{
+  // Preset selection
+  "markdownToolbar.preset": "writer", // core, writer, pro, custom
+  
+  // Custom toolbar (when preset is 'custom')
+  "markdownToolbar.custom.visibleButtons": [
+    "fmt.bold", "fmt.italic", "code.inline", 
+    "link.insert", "list.toggle", "preview.side"
+  ],
+  
+  // Appearance
+  "markdownToolbar.compact": false,
+  "markdownToolbar.statusBar.enabled": true,
+  "markdownToolbar.position": "right",
+  
+  // Behavior
+  "markdownToolbar.contextAware": true,
+  "markdownToolbar.autoDetectDependencies": true
+}
+            </div>
+
+            <h3>Available Commands:</h3>
+            <ul style="margin-left: 20px; color: #4a5568;">
+                <li><code>Markdown Toolbar: Switch Preset</code> - Quick preset switcher</li>
+                <li><code>Markdown Toolbar: Toggle Toolbar</code> - Show/hide toolbar</li>
+                <li><code>Markdown Toolbar: Open Designer</code> - Launch toolbar designer</li>
+                <li><code>Markdown Toolbar: Reset to Defaults</code> - Reset all settings</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simple button definitions for mini designer
+        const MINI_BUTTONS = {
+            'fmt.bold': { name: 'Bold', icon: 'bold' },
+            'fmt.italic': { name: 'Italic', icon: 'italic' },
+            'fmt.strike': { name: 'Strike', icon: 'text-size' },
+            'code.inline': { name: 'Code', icon: 'code' },
+            'list.toggle': { name: 'List', icon: 'list-unordered' },
+            'task.toggle': { name: 'Tasks', icon: 'checklist' },
+            'link.insert': { name: 'Link', icon: 'link' },
+            'image.insert': { name: 'Image', icon: 'file-media' },
+            'preview.side': { name: 'Preview', icon: 'preview' },
+            'table.menu': { name: 'Table', icon: 'table' }
+        };
+
+        let selectedButtons = [];
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Activate tab
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        // Mini designer functionality
+        function initMiniDesigner() {
+            const library = document.getElementById('buttonLibrary');
+            library.innerHTML = '';
+            
+            Object.entries(MINI_BUTTONS).forEach(([id, button]) => {
+                const buttonEl = document.createElement('div');
+                buttonEl.className = 'button-item-mini';
+                buttonEl.innerHTML = `
+                    <i class="codicon codicon-${button.icon}"></i>
+                    <div>${button.name}</div>
+                `;
+                buttonEl.onclick = () => toggleMiniButton(id);
+                buttonEl.dataset.buttonId = id;
+                library.appendChild(buttonEl);
+            });
+            
+            updateMiniPreview();
+        }
+
+        function toggleMiniButton(buttonId) {
+            const index = selectedButtons.indexOf(buttonId);
+            if (index >= 0) {
+                selectedButtons.splice(index, 1);
+            } else {
+                selectedButtons.push(buttonId);
+            }
+            
+            // Update button appearance
+            document.querySelectorAll('.button-item-mini').forEach(btn => {
+                const id = btn.dataset.buttonId;
+                if (selectedButtons.includes(id)) {
+                    btn.style.background = 'linear-gradient(135deg, #38a169, #2f855a)';
+                } else {
+                    btn.style.background = 'linear-gradient(135deg, #4299e1, #3182ce)';
+                }
+            });
+            
+            updateMiniPreview();
+        }
+
+        function updateMiniPreview() {
+            const preview = document.getElementById('toolbarPreview');
+            if (selectedButtons.length === 0) {
+                preview.textContent = '$(markdown) CUSTOM [Click buttons above to add them here]';
+                return;
+            }
+
+            const buttonPreviews = selectedButtons.map(id => {
+                const button = MINI_BUTTONS[id];
+                return `[${button.name}]`;
+            });
+
+            preview.textContent = `$(markdown) CUSTOM ${buttonPreviews.join(' ')}`;
+            
+            // Update config output
+            const config = {
+                "markdownToolbar.preset": "custom",
+                "markdownToolbar.custom.visibleButtons": selectedButtons,
+                "markdownToolbar.statusBar.enabled": true,
+                "markdownToolbar.compact": false,
+                "markdownToolbar.position": "right"
+            };
+            
+            document.getElementById('miniConfigOutput').textContent = 
+                '// Paste this in your VS Code settings.json\n' + 
+                JSON.stringify(config, null, 2);
+        }
+
+        function copyMiniConfig() {
+            const config = document.getElementById('miniConfigOutput').textContent;
+            navigator.clipboard.writeText(config).then(() => {
+                const btn = event.target;
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="codicon codicon-check"></i> Copied!';
+                btn.style.background = '#38a169';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '#4299e1';
+                }, 2000);
+            });
+        }
+
+        function resetMini() {
+            selectedButtons = [];
+            document.querySelectorAll('.button-item-mini').forEach(btn => {
+                btn.style.background = 'linear-gradient(135deg, #4299e1, #3182ce)';
+            });
+            updateMiniPreview();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initMiniDesigner();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+{
+  "name": "markdown-toolbar",
+  "displayName": "Markdown Toolbar",
+  "description": "Context-aware markdown formatting toolbar in VS Code status bar",
+  "version": "0.1.0",
+  "publisher": "your-publisher",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Markdown Toolbar",
+      "properties": {
+        "markdownToolbar.preset": {
+          "type": "string",
+          "enum": ["core", "writer", "pro", "custom"],
+          "default": "core",
+          "description": "Active toolbar preset",
+          "enumDescriptions": [
+            "Essential formatting tools",
+            "Writing-focused with TOC and advanced formatting",
+            "Professional suite with linting and enhanced previews",
+            "Custom button selection"
+          ]
+        },
+        "markdownToolbar.custom.visibleButtons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Visible buttons in custom preset (determines order)"
+        },
+        "markdownToolbar.compact": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use compact toolbar mode"
+        },
+        "markdownToolbar.statusBar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show preset switcher in status bar"
+        },
+        "markdownToolbar.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable markdown toolbar"
+        },
+        "markdownToolbar.position": {
+          "type": "string",
+          "enum": ["left", "right"],
+          "default": "right",
+          "description": "Status bar position"
+        },
+        "markdownToolbar.buttons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["bold", "italic", "code", "link", "list"],
+          "description": "Legacy button configuration"
+        },
+        "markdownToolbar.autoDetectDependencies": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect extension dependencies"
+        },
+        "markdownToolbar.showMissingExtensionNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications for missing extensions"
+        },
+        "markdownToolbar.fallbackBehavior": {
+          "type": "string",
+          "enum": ["internal", "cta", "hide"],
+          "default": "internal",
+          "description": "Behavior when delegated commands are not available",
+          "enumDescriptions": [
+            "Use internal implementation",
+            "Show call-to-action to install extension",
+            "Hide button completely"
+          ]
+        },
+        "markdownToolbar.contextUpdateDebounce": {
+          "type": "number",
+          "minimum": 50,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Debounce delay for context updates (ms)"
+        },
+        "markdownToolbar.dependencyCacheTimeout": {
+          "type": "number",
+          "minimum": 5000,
+          "maximum": 300000,
+          "default": 30000,
+          "description": "Cache timeout for dependency detection (ms)"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "mdToolbar.switchPreset",
+        "title": "Switch Preset",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.customizeButtons",
+        "title": "Customize Buttons",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.debug.analyzeDependencies",
+        "title": "Analyze Dependencies",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.preview.side",
+        "title": "Preview (Side)",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.preview.current",
+        "title": "Preview",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.preview.mpe.side",
+        "title": "Preview (MPE Side)",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.fmt.bold",
+        "title": "Bold",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.fmt.italic",
+        "title": "Italic",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.fmt.strike",
+        "title": "Strikethrough",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.list.toggle",
+        "title": "Toggle List",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.task.toggle",
+        "title": "Toggle Task List",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.code.inline",
+        "title": "Inline Code",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.code.block",
+        "title": "Code Block",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.link.insert",
+        "title": "Insert Link",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.image.insert",
+        "title": "Insert Image",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.image.paste",
+        "title": "Paste Image",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.toc.create",
+        "title": "Create TOC",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.toc.update",
+        "title": "Update TOC",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.toc.addNumbers",
+        "title": "Add TOC Numbers",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.toc.removeNumbers",
+        "title": "Remove TOC Numbers",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.table.menu",
+        "title": "Table Menu",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.lint.fix",
+        "title": "Fix Lint Issues",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.lint.workspace",
+        "title": "Lint Workspace",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.internal.bold",
+        "title": "Bold (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.italic",
+        "title": "Italic (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.strike",
+        "title": "Strikethrough (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.list",
+        "title": "List (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.task",
+        "title": "Task List (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.code.inline",
+        "title": "Inline Code (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.code.block",
+        "title": "Code Block (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.link",
+        "title": "Insert Link (Internal)"
+      },
+      {
+        "command": "mdToolbar.internal.image",
+        "title": "Insert Image (Internal)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "mdToolbar.fmt.bold",
+        "key": "ctrl+b",
+        "mac": "cmd+b",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "mdToolbar.fmt.italic",
+        "key": "ctrl+i",
+        "mac": "cmd+i",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "mdToolbar.code.inline",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "mdToolbar.link.insert",
+        "key": "ctrl+k",
+        "mac": "cmd+k",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "mdToolbar.list.toggle",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l",
+        "when": "editorTextFocus && editorLangId == markdown"
+      },
+      {
+        "command": "mdToolbar.switchPreset",
+        "key": "ctrl+shift+p",
+        "mac": "cmd+shift+p",
+        "when": "editorTextFocus && editorLangId == markdown"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "mdToolbar.switchPreset",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.customizeButtons",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.debug.analyzeDependencies"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "mdToolbar.format",
+          "group": "1_modification",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "mdToolbar.format": [
+        {
+          "command": "mdToolbar.fmt.bold",
+          "group": "1_format@1",
+          "when": "editorLangId == markdown && mdToolbar.preset == 'core' || mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+        },
+        {
+          "command": "mdToolbar.fmt.italic",
+          "group": "1_format@2",
+          "when": "editorLangId == markdown && mdToolbar.preset == 'core' || mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+        },
+        {
+          "command": "mdToolbar.fmt.strike",
+          "group": "1_format@3",
+          "when": "editorLangId == markdown && mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+        },
+        {
+          "command": "mdToolbar.toc.create",
+          "group": "2_toc@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO && (mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro')"
+        },
+        {
+          "command": "mdToolbar.toc.update",
+          "group": "2_toc@2",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO && (mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro')"
+        },
+        {
+          "command": "mdToolbar.lint.fix",
+          "group": "3_lint@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMarkdownlint && mdToolbar.preset == 'pro'"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "mdToolbar.format",
+        "label": "Markdown Toolbar"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:integration": "node ./dist/test/runTest.js",
+    "test:cov": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.102.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.25.8",
+    "eslint": "^9.32.0",
+    "mocha": "^11.7.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
