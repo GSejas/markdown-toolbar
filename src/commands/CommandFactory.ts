@@ -26,6 +26,7 @@ import { ButtonId, IButtonDefinition, BUTTON_DEFINITIONS } from '../types/Button
 import { IDependencyDetector } from '../types/Dependencies';
 import { IPresetManager } from '../presets/PresetManager';
 import { ContextService } from '../services/ContextService';
+import { logger } from '../services/Logger';
 
 /**
  * Command execution context
@@ -107,7 +108,7 @@ export class CommandFactory {
           await vscode.commands.executeCommand(buttonDef.delegatesTo, ...args);
           return { success: true };
         } catch (error) {
-          console.warn(`Failed to execute delegated command ${buttonDef.delegatesTo}:`, error instanceof Error ? error.message : String(error));
+          logger.warn(`Failed to execute delegated command ${buttonDef.delegatesTo}:`, error instanceof Error ? error.message : String(error));
 
           // Fall back to internal implementation if available
           if (buttonDef.fallbackCommand) {
@@ -115,7 +116,7 @@ export class CommandFactory {
               await vscode.commands.executeCommand(buttonDef.fallbackCommand, ...args);
               return { success: true, fallbackUsed: true };
             } catch (fallbackError) {
-              console.error(`Failed to execute fallback command ${buttonDef.fallbackCommand}:`, fallbackError);
+              logger.error(`Failed to execute fallback command ${buttonDef.fallbackCommand}:`, fallbackError);
               return {
                 success: false,
                 message: `Both primary and fallback commands failed: ${error instanceof Error ? error.message : String(error)}`
@@ -130,7 +131,7 @@ export class CommandFactory {
       return { success: true };
 
     } catch (error) {
-      console.error(`Error executing command for button ${buttonDef.id}:`, error);
+      logger.error(`Error executing command for button ${buttonDef.id}:`, error);
       return {
         success: false,
         message: error instanceof Error ? error.message : 'Unknown error'

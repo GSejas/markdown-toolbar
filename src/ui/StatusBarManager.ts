@@ -23,8 +23,11 @@
  */
 
 import * as vscode from 'vscode';
-import { SettingsAdapter, IMarkdownToolbarConfig } from '../settings/SettingsAdapter';
+import { SettingsAdapter } from '../settings/SettingsAdapter';
 import { ContextDetector } from '../engine/ContextDetector';
+import { logger } from '../services/Logger';
+import { ButtonId, BUTTON_DEFINITIONS } from '../types/Buttons';
+import { IPresetManager } from '../presets/PresetManager';
 
 /**
  * Button configuration for status bar items
@@ -44,50 +47,14 @@ export class StatusBarManager {
     private statusBarItems: Map<string, vscode.StatusBarItem> = new Map();
     private settings: SettingsAdapter;
     private contextDetector: ContextDetector;
+    private presetManager: IPresetManager;
     private disposables: vscode.Disposable[] = [];
     private isVisible: boolean = false;
 
-    private readonly buttonConfigs: IButtonConfig[] = [
-        {
-            id: 'bold',
-            command: 'markdownToolbar.bold',
-            text: '$(bold)',
-            tooltip: 'Bold (Ctrl+B)',
-            priority: 100
-        },
-        {
-            id: 'italic',
-            command: 'markdownToolbar.italic',
-            text: '$(italic)',
-            tooltip: 'Italic (Ctrl+I)',
-            priority: 99
-        },
-        {
-            id: 'code',
-            command: 'markdownToolbar.code',
-            text: '$(code)',
-            tooltip: 'Inline Code',
-            priority: 98
-        },
-        {
-            id: 'link',
-            command: 'markdownToolbar.link',
-            text: '$(link)',
-            tooltip: 'Insert Link (Ctrl+K)',
-            priority: 97
-        },
-        {
-            id: 'list',
-            command: 'markdownToolbar.list',
-            text: '$(list-unordered)',
-            tooltip: 'Bullet/Numbered List',
-            priority: 96
-        }
-    ];
-
-    constructor() {
+    constructor(presetManager: IPresetManager) {
         this.settings = new SettingsAdapter();
         this.contextDetector = new ContextDetector();
+        this.presetManager = presetManager;
         this.initialize();
     }
 
@@ -113,8 +80,8 @@ export class StatusBarManager {
 
         // Listen for configuration changes
         this.disposables.push(
-            this.settings.onConfigurationChanged((config) => {
-                this.onConfigurationChanged(config);
+            this.settings.onConfigurationChanged(() => {
+                this.onConfigurationChanged();
             })
         );
 
@@ -124,7 +91,7 @@ export class StatusBarManager {
     }
 
     /**
-     * Creates status bar items based on configuration
+     * Creates status bar items based on current preset
      */
     private createStatusBarItems(): void {
         const config = this.settings.getConfiguration();
@@ -138,17 +105,21 @@ export class StatusBarManager {
             return;
         }
 
-        // Create items for active buttons
-        this.buttonConfigs
-            .filter(buttonConfig => config.buttons.includes(buttonConfig.id))
-            .forEach(buttonConfig => {
-                const item = vscode.window.createStatusBarItem(alignment, buttonConfig.priority);
-                item.command = buttonConfig.command;
-                item.text = buttonConfig.text;
-                item.tooltip = buttonConfig.tooltip;
+        // Get effective buttons from preset manager
+        const effectiveButtons = this.presetManager.getEffectiveButtons();
+        
+        // Create items for each effective button
+        effectiveButtons.forEach((buttonId, index) => {
+            const buttonDef = BUTTON_DEFINITIONS[buttonId];
+            if (buttonDef) {
+                const item = vscode.window.createStatusBarItem(alignment, 100 - index);
+                item.command = buttonDef.commandId;
+                item.text = buttonDef.icon;
+                item.tooltip = buttonDef.tooltip;
 
-                this.statusBarItems.set(buttonConfig.id, item);
-            });
+                this.statusBarItems.set(buttonId, item);
+            }
+        });
     }
 
     /**
@@ -202,7 +173,7 @@ export class StatusBarManager {
             const context = this.contextDetector.detectContext(text, selectionStart, selectionEnd);
 
             // Update bold button
-            const boldItem = this.statusBarItems.get('bold');
+            const boldItem = this.statusBarItems.get('fmt.bold');
             if (boldItem) {
                 if (context.isBold) {
                     boldItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
@@ -214,7 +185,7 @@ export class StatusBarManager {
             }
 
             // Update italic button
-            const italicItem = this.statusBarItems.get('italic');
+            const italicItem = this.statusBarItems.get('fmt.italic');
             if (italicItem) {
                 if (context.isItalic) {
                     italicItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
@@ -226,7 +197,7 @@ export class StatusBarManager {
             }
 
             // Update code button
-            const codeItem = this.statusBarItems.get('code');
+            const codeItem = this.statusBarItems.get('code.inline');
             if (codeItem) {
                 if (context.isCode) {
                     codeItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
@@ -238,7 +209,7 @@ export class StatusBarManager {
             }
 
             // Update link button
-            const linkItem = this.statusBarItems.get('link');
+            const linkItem = this.statusBarItems.get('link.insert');
             if (linkItem) {
                 if (context.isLink) {
                     linkItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
@@ -250,7 +221,7 @@ export class StatusBarManager {
             }
 
             // Update list button
-            const listItem = this.statusBarItems.get('list');
+            const listItem = this.statusBarItems.get('list.toggle');
             if (listItem) {
                 if (context.isList) {
                     listItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
@@ -263,15 +234,14 @@ export class StatusBarManager {
             }
 
         } catch (error) {
-            console.error('Error updating button states:', error);
+            logger.error('Error updating button states:', error);
         }
     }
 
     /**
      * Handles configuration changes
-     * @param config New configuration
      */
-    private onConfigurationChanged(config: IMarkdownToolbarConfig): void {
+    private onConfigurationChanged(): void {
         this.createStatusBarItems();
         this.updateVisibility(vscode.window.activeTextEditor);
     }
@@ -313,7 +283,7 @@ export class StatusBarManager {
             try {
                 disposable.dispose();
             } catch (error) {
-                console.error('Error disposing status bar manager resource:', error);
+                logger.error('Error disposing status bar manager resource:', error);
             }
         });
         this.disposables = [];

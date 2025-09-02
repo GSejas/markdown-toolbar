@@ -23,6 +23,7 @@
  */
 
 import * as vscode from 'vscode';
+import { logger } from './services/Logger';
 
 // Core services
 import { DependencyDetector } from './deps/DependencyDetector';
@@ -41,6 +42,7 @@ import { CONFIG_KEYS } from './constants/configKeys';
 
 // UI Components
 import { StatusBarToolbar } from './ui/StatusBarToolbar';
+import { StatusBarManager } from './ui/StatusBarManager';
 import { ConfigurationGenerator } from './ui/ConfigurationGenerator';
 
 /**
@@ -59,6 +61,7 @@ class ExtensionState {
 
 	// UI Components
 	private toolbar: StatusBarToolbar | undefined;
+	private statusBarManager: StatusBarManager | undefined;
 	private configGenerator: ConfigurationGenerator | undefined;
 
 	// Disposables
@@ -66,7 +69,7 @@ class ExtensionState {
 
 	public async activate(context: vscode.ExtensionContext): Promise<void> {
 		try {
-			console.log('Activating Markdown Toolbar extension v2.0...');
+			logger.info('Activating Markdown Toolbar extension v2.0...');
 
 			// Initialize core services
 			await this.initializeCoreServices();
@@ -84,42 +87,41 @@ class ExtensionState {
 				}
 			);
 
-			console.log('Markdown Toolbar extension activated successfully!');
+			logger.info('Markdown Toolbar extension activated successfully!');
 
 			// Show welcome message for first-time users
 			await this.showWelcomeMessage();
 
 		} catch (error) {
-			console.error('Failed to activate Markdown Toolbar extension:', error);
+			logger.error('Failed to activate Markdown Toolbar extension:', error);
 			vscode.window.showErrorMessage(`Failed to activate Markdown Toolbar: ${error instanceof Error ? error.message : 'Unknown error'}`);
 		}
 	}
 
 	public deactivate(): void {
 		try {
-			console.log('Deactivating Markdown Toolbar extension...');
+			logger.info('Deactivating Markdown Toolbar extension...');
 
 			// Dispose all services
 			this.contextService?.dispose();
 			this.presetManager?.dispose();
 			this.dependencyDetector?.dispose();
 			this.contextKeyManager?.dispose();
-
-			// Dispose all event listeners
+			this.statusBarManager?.dispose();			// Dispose all event listeners
 			this.disposables.forEach(disposable => {
 				try {
 					disposable.dispose();
 				} catch (error) {
-					console.warn('Error disposing resource:', error);
+					logger.warn('Error disposing resource:', error);
 				}
 			});
 
 			this.disposables = [];
 
-			console.log('Markdown Toolbar extension deactivated successfully!');
+			logger.info('Markdown Toolbar extension deactivated successfully!');
 
 		} catch (error) {
-			console.error('Error during extension deactivation:', error);
+			logger.error('Error during extension deactivation:', error);
 		}
 	}
 
@@ -169,7 +171,10 @@ class ExtensionState {
 		// Force initial dependency detection
 		await this.dependencyDetector.refresh();
 
-		console.log('Core services initialized');
+		// Initialize status bar UI
+		this.statusBarManager = new StatusBarManager(this.presetManager);
+
+		logger.debug('Core services initialized');
 	}
 
 	/**
@@ -189,7 +194,7 @@ class ExtensionState {
 			if (handler) {
 				const disposable = vscode.commands.registerCommand(button.commandId, async (...args) => {
 					if (!this.commandContext) {
-						console.error('Command context not initialized');
+						logger.warn('Command context not initialized');
 						return;
 					}
 
@@ -216,10 +221,10 @@ class ExtensionState {
 						}
 
 						if (result.fallbackUsed) {
-							console.log(`Used fallback for command ${button.commandId}`);
+							logger.info(`Used fallback for command ${button.commandId}`);
 						}
 					} catch (error) {
-						console.error(`Error executing command ${button.commandId}:`, error);
+						logger.error(`Error executing command ${button.commandId}:`, error);
 						vscode.window.showErrorMessage(`Command failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
 					}
 				});
@@ -240,7 +245,7 @@ class ExtensionState {
 			if (handler) {
 				const disposable = vscode.commands.registerCommand(commandId, async (...args) => {
 					if (!this.commandContext) {
-						console.error('Command context not initialized');
+						logger.warn('Command context not initialized');
 						return;
 					}
 
@@ -253,7 +258,7 @@ class ExtensionState {
 							vscode.window.showErrorMessage(result.message);
 						}
 					} catch (error) {
-						console.error(`Error executing command ${commandId}:`, error);
+						logger.error(`Error executing command ${commandId}:`, error);
 						vscode.window.showErrorMessage(`Command failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
 					}
 				});
@@ -262,7 +267,7 @@ class ExtensionState {
 			}
 		});
 
-		console.log(`Registered ${this.disposables.length} commands`);
+		logger.info(`Registered ${this.disposables.length} commands`);
 	}
 
 	/**
@@ -275,7 +280,7 @@ class ExtensionState {
 
 		// Listen for preset changes
 		const presetDisposable = this.presetManager.onDidChangePreset(async (event) => {
-			console.log(`Preset changed from ${event.previousPreset} to ${event.currentPreset}`);
+			logger.info(`Preset changed from ${event.previousPreset} to ${event.currentPreset}`);
 
 			if (event.suggestedPreset) {
 				// Auto-switching suggestion
@@ -293,12 +298,12 @@ class ExtensionState {
 
 		// Listen for dependency changes
 		const depDisposable = this.dependencyDetector.onDidChangeExtensions((event) => {
-			console.log(`Extension ${event.extensionId} was ${event.changeType}`);
+			logger.debug(`Extension ${event.extensionId} was ${event.changeType}`);
 		});
 
 		// Listen for context changes
 		const contextDisposable = this.contextService.onDidChangeContext((event) => {
-			console.log(`Document context changed: ${event.changedProperties.join(', ')}`);
+			logger.debug(`Document context changed: ${event.changedProperties.join(', ')}`);
 		});
 
 		this.disposables.push(presetDisposable, depDisposable, contextDisposable);

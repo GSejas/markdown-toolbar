@@ -31,6 +31,7 @@ import {
 } from '../types/Dependencies';
 import { CONTEXT_KEYS } from '../constants/contextKeys';
 import { ContextKeyManager } from '../services/ContextKeyManager';
+import { logger } from '../services/Logger';
 
 /**
  * Configuration for dependency detection
@@ -139,7 +140,7 @@ export class DependencyDetector implements IDependencyDetector {
         canUseAPI: isActive // Can only use ext.exports if active
       };
     } catch (error) {
-      console.warn(`Failed to detect extension ${extensionId}:`, error);
+      logger.warn(`Failed to detect extension ${extensionId}:`, error);
       return this.createMissingExtensionInfo(extensionId);
     }
   }
@@ -179,7 +180,7 @@ export class DependencyDetector implements IDependencyDetector {
 
       return extension.isActive;
     } catch (error) {
-      console.warn(`Failed to activate extension ${extensionId}:`, error);
+      logger.warn(`Failed to activate extension ${extensionId}:`, error);
       return false;
     }
   }
@@ -243,7 +244,7 @@ export class DependencyDetector implements IDependencyDetector {
    */
   private startListening(): void {
     if (!this.vscode.extensions?.onDidChange) {
-      console.warn('VS Code extensions.onDidChange not available');
+      logger.warn('VS Code extensions.onDidChange not available');
       return;
     }
 
@@ -261,7 +262,7 @@ export class DependencyDetector implements IDependencyDetector {
     try {
       await this.refresh();
     } catch (error) {
-      console.error('Error handling extension change:', error);
+      logger.error('Error handling extension change:', error);
     }
   }
 
@@ -280,7 +281,7 @@ export class DependencyDetector implements IDependencyDetector {
       // Use centralized context key manager for efficient batch updates
       await this.contextKeyManager.setContexts(contextUpdates);
     } catch (error) {
-      console.warn('Failed to update dependency context keys:', error);
+      logger.warn('Failed to update dependency context keys:', error);
     }
   }
 
@@ -295,7 +296,7 @@ export class DependencyDetector implements IDependencyDetector {
         try {
           callback(change);
         } catch (error) {
-          console.error('Error in dependency change callback:', error);
+          logger.error('Error in dependency change callback:', error);
         }
       });
     });

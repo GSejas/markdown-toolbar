@@ -25,160 +25,159 @@ import { CONFIG_KEYS, DEFAULT_CONFIG } from '../constants/configKeys';
  * Makes configuration approachable for non-technical users
  */
 export class ConfigurationGenerator {
-  private vscode: any;
-  private panel: any = null;
-  private currentConfig: any = {};
+    private vscode: any;
+    private panel: any = null;
+    private currentConfig: any = {};
 
-  constructor(vscodeImpl?: any) {
-    this.vscode = vscodeImpl || require('vscode');
-  }
-
-  /**
-   * Open the configuration generator interface
-   */
-  public async open(): Promise<void> {
-    // Create webview panel
-    this.panel = this.vscode.window.createWebviewPanel(
-      'mdToolbarConfig',
-      'Markdown Toolbar Configuration',
-      this.vscode.ViewColumn.One,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true
-      }
-    );
-
-    // Load current configuration
-    await this.loadCurrentConfig();
-
-    // Set webview content
-    this.panel.webview.html = this.getWebviewContent();
-
-    // Handle messages from webview
-    this.panel.webview.onDidReceiveMessage(async (message: any) => {
-      switch (message.command) {
-        case 'updateConfig':
-          await this.updateConfig(message.config);
-          break;
-        case 'previewConfig':
-          await this.previewConfig(message.config);
-          break;
-        case 'resetToPreset':
-          await this.resetToPreset(message.preset);
-          break;
-        case 'exportConfig':
-          await this.exportConfig();
-          break;
-      }
-    });
-
-    // Send initial data to webview
-    this.panel.webview.postMessage({
-      command: 'initialize',
-      currentConfig: this.currentConfig,
-      buttonDefinitions: BUTTON_DEFINITIONS,
-      presetDefinitions: PRESET_DEFINITIONS
-    });
-  }
-
-  /**
-   * Load current VS Code configuration
-   */
-  private async loadCurrentConfig(): Promise<void> {
-    const config = this.vscode.workspace.getConfiguration();
-    
-    this.currentConfig = {
-      preset: config.get(CONFIG_KEYS.preset, DEFAULT_CONFIG.preset),
-      customVisible: config.get(CONFIG_KEYS.customVisible, DEFAULT_CONFIG.customVisible),
-      compact: config.get(CONFIG_KEYS.compact, DEFAULT_CONFIG.compact),
-      statusBarEnabled: config.get(CONFIG_KEYS.statusBarEnabled, DEFAULT_CONFIG.statusBarEnabled),
-      position: config.get(CONFIG_KEYS.position, DEFAULT_CONFIG.position)
-    };
-  }
-
-  /**
-   * Update configuration and apply changes
-   */
-  private async updateConfig(newConfig: any): Promise<void> {
-    const config = this.vscode.workspace.getConfiguration();
-    
-    // Update each setting
-    for (const [key, value] of Object.entries(newConfig)) {
-      const configKey = (CONFIG_KEYS as any)[key];
-      if (configKey) {
-        await config.update(configKey, value, this.vscode.ConfigurationTarget.Global);
-      }
+    constructor(vscodeImpl?: any) {
+        this.vscode = vscodeImpl || require('vscode');
     }
 
-    this.currentConfig = { ...this.currentConfig, ...newConfig };
-    
-    // Show success message
-    this.vscode.window.showInformationMessage('Markdown toolbar configuration updated!');
-  }
+    /**
+     * Open the configuration generator interface
+     */
+    public async open(): Promise<void> {
+        // Create webview panel
+        this.panel = this.vscode.window.createWebviewPanel(
+            'mdToolbarConfig',
+            'Markdown Toolbar Configuration',
+            this.vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true
+            }
+        );
 
-  /**
-   * Preview configuration changes without applying
-   */
-  private async previewConfig(config: any): Promise<void> {
-    // Send preview command to main extension
-    await this.vscode.commands.executeCommand('mdToolbar.preview', config);
-  }
+        // Load current configuration
+        await this.loadCurrentConfig();
 
-  /**
-   * Reset to a preset configuration
-   */
-  private async resetToPreset(presetId: PresetId): Promise<void> {
-    const preset = PRESET_DEFINITIONS[presetId];
-    const newConfig = {
-      preset: presetId,
-      customVisible: preset.buttons,
-      compact: false,
-      statusBarEnabled: true
-    };
+        // Set webview content
+        this.panel.webview.html = this.getWebviewContent();
 
-    await this.updateConfig(newConfig);
-    
-    // Update webview
-    this.panel.webview.postMessage({
-      command: 'configUpdated',
-      config: newConfig
-    });
-  }
+        // Handle messages from webview
+        this.panel.webview.onDidReceiveMessage(async (message: any) => {
+            switch (message.command) {
+                case 'updateConfig':
+                    await this.updateConfig(message.config);
+                    break;
+                case 'previewConfig':
+                    await this.previewConfig(message.config);
+                    break;
+                case 'resetToPreset':
+                    await this.resetToPreset(message.preset);
+                    break;
+                case 'exportConfig':
+                    await this.exportConfig();
+                    break;
+            }
+        });
 
-  /**
-   * Export configuration as JSON for sharing
-   */
-  private async exportConfig(): Promise<void> {
-    const exportData = {
-      name: 'My Markdown Toolbar Config',
-      created: new Date().toISOString(),
-      config: this.currentConfig,
-      buttons: this.currentConfig.preset === 'custom' 
-        ? this.currentConfig.customVisible.map((id: ButtonId) => ({
-            id,
-            title: BUTTON_DEFINITIONS[id]?.title,
-            category: BUTTON_DEFINITIONS[id]?.category
-          }))
-        : PRESET_DEFINITIONS[this.currentConfig.preset]?.buttons
-    };
+        // Send initial data to webview
+        this.panel.webview.postMessage({
+            command: 'initialize',
+            currentConfig: this.currentConfig,
+            buttonDefinitions: BUTTON_DEFINITIONS,
+            presetDefinitions: PRESET_DEFINITIONS
+        });
+    }
 
-    const json = JSON.stringify(exportData, null, 2);
-    
-    // Show in new editor
-    const doc = await this.vscode.workspace.openTextDocument({
-      content: json,
-      language: 'json'
-    });
-    
-    await this.vscode.window.showTextDocument(doc);
-    this.vscode.window.showInformationMessage('Configuration exported! Save this file to share your setup.');
-  }
+    /**
+     * Load current VS Code configuration
+     */
+    private async loadCurrentConfig(): Promise<void> {
+        const config = this.vscode.workspace.getConfiguration();
 
-  /**
-   * Generate the webview HTML content
-   */
-  private getWebviewContent(): string {
-    return `<!DOCTYPE html>
+        this.currentConfig = {
+            preset: config.get(CONFIG_KEYS.preset, DEFAULT_CONFIG.preset),
+            customVisible: config.get(CONFIG_KEYS.customVisible, DEFAULT_CONFIG.customVisible),
+            compact: config.get(CONFIG_KEYS.compact, DEFAULT_CONFIG.compact),
+            statusBarEnabled: config.get(CONFIG_KEYS.statusBarEnabled, DEFAULT_CONFIG.statusBarEnabled)
+        };
+    }
+
+    /**
+     * Update configuration and apply changes
+     */
+    private async updateConfig(newConfig: any): Promise<void> {
+        const config = this.vscode.workspace.getConfiguration();
+
+        // Update each setting
+        for (const [key, value] of Object.entries(newConfig)) {
+            const configKey = (CONFIG_KEYS as any)[key];
+            if (configKey) {
+                await config.update(configKey, value, this.vscode.ConfigurationTarget.Global);
+            }
+        }
+
+        this.currentConfig = { ...this.currentConfig, ...newConfig };
+
+        // Show success message
+        this.vscode.window.showInformationMessage('Markdown toolbar configuration updated!');
+    }
+
+    /**
+     * Preview configuration changes without applying
+     */
+    private async previewConfig(config: any): Promise<void> {
+        // Send preview command to main extension
+        await this.vscode.commands.executeCommand('mdToolbar.preview', config);
+    }
+
+    /**
+     * Reset to a preset configuration
+     */
+    private async resetToPreset(presetId: PresetId): Promise<void> {
+        const preset = PRESET_DEFINITIONS[presetId];
+        const newConfig = {
+            preset: presetId,
+            customVisible: preset.buttons,
+            compact: false,
+            statusBarEnabled: true
+        };
+
+        await this.updateConfig(newConfig);
+
+        // Update webview
+        this.panel.webview.postMessage({
+            command: 'configUpdated',
+            config: newConfig
+        });
+    }
+
+    /**
+     * Export configuration as JSON for sharing
+     */
+    private async exportConfig(): Promise<void> {
+        const exportData = {
+            name: 'My Markdown Toolbar Config',
+            created: new Date().toISOString(),
+            config: this.currentConfig,
+            buttons: this.currentConfig.preset === 'custom'
+                ? this.currentConfig.customVisible.map((id: ButtonId) => ({
+                    id,
+                    title: BUTTON_DEFINITIONS[id]?.title,
+                    category: BUTTON_DEFINITIONS[id]?.category
+                }))
+                : PRESET_DEFINITIONS[this.currentConfig.preset as PresetId]?.buttons
+        };
+
+        const json = JSON.stringify(exportData, null, 2);
+
+        // Show in new editor
+        const doc = await this.vscode.workspace.openTextDocument({
+            content: json,
+            language: 'json'
+        });
+
+        await this.vscode.window.showTextDocument(doc);
+        this.vscode.window.showInformationMessage('Configuration exported! Save this file to share your setup.');
+    }
+
+    /**
+     * Generate the webview HTML content
+     */
+    private getWebviewContent(): string {
+        return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -461,7 +460,6 @@ export class ConfigurationGenerator {
             // Update advanced options
             document.getElementById('compactMode').checked = currentConfig.compact;
             document.getElementById('statusBarEnabled').checked = currentConfig.statusBarEnabled;
-            document.getElementById('position').value = currentConfig.position;
 
             // Update preview
             updatePreview();
@@ -540,12 +538,12 @@ export class ConfigurationGenerator {
     </script>
 </body>
 </html>`;
-  }
+    }
 
-  /**
-   * Dispose of the configuration generator
-   */
-  public dispose(): void {
-    this.panel?.dispose();
-  }
+    /**
+     * Dispose of the configuration generator
+     */
+    public dispose(): void {
+        this.panel?.dispose();
+    }
 }

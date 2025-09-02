@@ -23,6 +23,8 @@
  */
 
 import type * as vscode from 'vscode';
+import { CONFIG_KEYS, DEFAULT_CONFIG } from '../constants/configKeys';
+import { ButtonId } from '../types/Buttons';
 
 /**
  * Configuration interface for markdown toolbar settings
@@ -30,7 +32,8 @@ import type * as vscode from 'vscode';
 export interface IMarkdownToolbarConfig {
     enabled: boolean;
     position: 'left' | 'right';
-    buttons: string[];
+    preset: string;
+    customButtons: ButtonId[];
 }
 
 /**
@@ -55,32 +58,48 @@ export class SettingsAdapter {
      * @returns boolean indicating if toolbar is enabled
      */
     public isToolbarEnabled(): boolean {
-        const config = this.vscode.workspace.getConfiguration(SettingsAdapter.SECTION);
-        const enabled = config.get ? config.get('enabled', true) : undefined;
-        return typeof enabled === 'boolean' ? enabled : true;
+        // In the new system, toolbar is always enabled if a preset is selected
+        const preset = this.getPreset();
+        return preset !== null && preset !== undefined;
     }
 
     /**
      * Gets the toolbar position in status bar
-     * @returns 'left' or 'right' alignment
+     * @returns 'right' (fixed position for now)
      */
     public getToolbarPosition(): 'left' | 'right' {
+        // For now, always use right position
+        // This could be made configurable in the future
+        return 'right';
+    }
+
+    /**
+     * Gets the current preset
+     * @returns Active preset ID
+     */
+    public getPreset(): string {
         const config = this.vscode.workspace.getConfiguration(SettingsAdapter.SECTION);
-        const position = config.get ? config.get('position', 'right') : undefined;
-        return position === 'left' ? 'left' : 'right';
+        return config.get('preset', DEFAULT_CONFIG.preset);
     }
 
     /**
      * Gets the list of active toolbar buttons
-     * @returns Array of button identifiers
+     * @returns Array of button identifiers (ButtonId format)
      */
-    public getActiveButtons(): string[] {
+    public getActiveButtons(): ButtonId[] {
         const config = this.vscode.workspace.getConfiguration(SettingsAdapter.SECTION);
-        const buttons = config.get ? config.get('buttons', ['bold', 'italic', 'code', 'link', 'list']) : undefined;
-        return Array.isArray(buttons) ? buttons : ['bold', 'italic', 'code', 'link', 'list'];
-    }
 
-    /**
+        // If the user has selected the custom preset, use custom.visibleButtons setting
+        const preset = config.get('preset', DEFAULT_CONFIG.preset);
+        if (preset === 'custom') {
+            const customButtons = config.get('custom.visibleButtons', DEFAULT_CONFIG.customVisible);
+            return Array.isArray(customButtons) ? customButtons as ButtonId[] : [];
+        }
+
+        // For non-custom presets, we should let PresetManager handle button selection
+        // This method is mainly for legacy UI compatibility
+        return [];
+    }    /**
      * Gets complete configuration object
      * @returns Full configuration interface
      */
@@ -88,7 +107,8 @@ export class SettingsAdapter {
         return {
             enabled: this.isToolbarEnabled(),
             position: this.getToolbarPosition(),
-            buttons: this.getActiveButtons()
+            preset: this.getPreset(),
+            customButtons: this.getActiveButtons()
         };
     }
 
@@ -109,13 +129,24 @@ export class SettingsAdapter {
     }
 
     /**
-     * Validates if a button name is supported
-     * @param buttonName Button identifier to validate
+     * Validates if a button ID is supported
+     * @param buttonId Button identifier to validate
      * @returns boolean indicating if button is valid
      */
-    public isValidButton(buttonName: string): boolean {
-        const validButtons = ['bold', 'italic', 'code', 'link', 'list'];
-        return validButtons.includes(buttonName);
+    public isValidButton(buttonId: string): boolean {
+        // Import ButtonId type at runtime to avoid circular imports
+        const validButtons = [
+            'preview.side', 'preview.current',
+            'fmt.bold', 'fmt.italic', 'fmt.strike',
+            'list.toggle', 'task.toggle',
+            'code.inline', 'code.block',
+            'link.insert', 'image.insert', 'image.paste',
+            'toc.create', 'toc.update', 'toc.addNumbers', 'toc.removeNumbers',
+            'table.menu',
+            'lint.fix', 'lint.workspace',
+            'preview.mpe.side', 'preview.mpe.current'
+        ];
+        return validButtons.includes(buttonId);
     }
 
     /**

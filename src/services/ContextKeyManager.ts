@@ -22,6 +22,7 @@
  */
 
 import { IContextKeyManager, ContextKeyValue } from '../constants/contextKeys';
+import { logger } from './Logger';
 
 /**
  * Centralized context key management service
@@ -47,8 +48,9 @@ export class ContextKeyManager implements IContextKeyManager {
     try {
       await this.vscode.commands.executeCommand('setContext', key, value);
       this.currentKeys.set(key, value);
+      logger.debug(`Context key set: ${key} = ${String(value)}`);
     } catch (error) {
-      console.warn(`Failed to set context key '${key}' to '${value}':`, error);
+      logger.warn(`Failed to set context key '${key}' to '${value}':`, error);
       throw error;
     }
   }

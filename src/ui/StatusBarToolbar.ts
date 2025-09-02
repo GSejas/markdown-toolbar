@@ -29,7 +29,7 @@ export class StatusBarToolbar {
   private statusBarItem: any;
   private currentPreset: PresetId = 'core';
   private currentButtons: ButtonId[] = [];
-  private context: IMarkdownContext | null = null;
+  private context: IMarkdownContext | undefined = undefined;
 
   constructor(vscodeImpl?: any) {
     this.vscode = vscodeImpl || require('vscode');
@@ -55,14 +55,14 @@ export class StatusBarToolbar {
   public update(preset: PresetId, buttons: ButtonId[], context?: IMarkdownContext): void {
     this.currentPreset = preset;
     this.currentButtons = buttons;
-    this.context = context || null;
+    this.context = context;
 
     // Filter buttons based on context (this is what makes it "smart")
-    const visibleButtons = this.getVisibleButtons(buttons, context);
-    
+    const visibleButtons = this.getVisibleButtons(buttons, context ?? undefined);
+
     // Build the toolbar text
     const toolbarText = this.buildToolbarText(visibleButtons);
-    
+
     // Update status bar
     this.statusBarItem.text = `$(markdown) ${preset.toUpperCase()} ${toolbarText}`;
     this.statusBarItem.tooltip = `Markdown Toolbar (${preset}) - Click to switch presets\n${visibleButtons.length} buttons available`;
@@ -134,7 +134,9 @@ export class StatusBarToolbar {
   /**
    * Show a context-specific toolbar for current cursor position
    */
-  public showContextualOptions(context: IMarkdownContext): void {
+  public showContextualOptions(context?: IMarkdownContext): void {
+    if (!context) return;
+
     const contextButtons: string[] = [];
 
     // Smart contextual suggestions
@@ -168,7 +170,7 @@ export class StatusBarToolbar {
         preset: 'core' as PresetId
       },
       {
-        label: '$(pencil) Writer', 
+        label: '$(pencil) Writer',
         description: 'Tools for documentation',
         preset: 'writer' as PresetId
       },
@@ -209,7 +211,7 @@ export class StatusBarToolbar {
   public showStatus(): string {
     const visibleCount = this.getVisibleButtons(this.currentButtons, this.context).length;
     const totalCount = this.currentButtons.length;
-    
+
     return `${visibleCount}/${totalCount} buttons • ${this.currentPreset} preset`;
   }
 

@@ -24,6 +24,7 @@
  */
 
 import { ContextDetector, IMarkdownContext } from './ContextDetector';
+import { logger } from '../services/Logger';
 
 /**
  * Result of a formatting operation
@@ -55,6 +56,7 @@ export class MarkdownFormatter {
     public formatBold(text: string, selectionStart: number, selectionEnd: number): IFormattingResult {
         const selectedText = text.substring(selectionStart, selectionEnd);
         const context = this.contextDetector.detectContext(text, selectionStart, selectionEnd);
+        logger.debug('formatBold', { selectionStart, selectionEnd, isBold: context.isBold });
 
         // If already bold, remove bold formatting
         if (context.isBold && context.boldRange) {
@@ -102,7 +104,8 @@ export class MarkdownFormatter {
             const template = '**bold text**';
             const newText = text.substring(0, selectionStart) +
                 template +
-                text.substring(selectionEnd);
+                logger.debug('Applied bold formatting', { selectionStart, selectionEnd });
+            text.substring(selectionEnd);
 
             return {
                 text: newText,

@@ -31,6 +31,7 @@ import {
 } from '../types/Buttons';
 import { IDependencyDetector } from '../types/Dependencies';
 import { CONFIG_KEYS, DEFAULT_CONFIG } from '../constants/configKeys';
+import { logger } from '../services/Logger';
 import { CONTEXT_KEYS } from '../constants/contextKeys';
 
 /**
@@ -93,7 +94,7 @@ export class PresetManager implements IPresetManager {
 
     // Validate preset ID
     if (!this.isValidPresetId(presetId)) {
-      console.warn(`Invalid preset ID: ${presetId}, falling back to core`);
+      logger.warn(`Invalid preset ID: ${presetId}, falling back to core`);
       return PRESET_DEFINITIONS.core;
     }
 
@@ -119,7 +120,7 @@ export class PresetManager implements IPresetManager {
    */
   public async switchPreset(presetId: PresetId): Promise<void> {
     if (!this.isValidPresetId(presetId)) {
-      console.warn(`Cannot switch to invalid preset: ${presetId}`);
+      logger.warn(`Cannot switch to invalid preset: ${presetId}`);
       return;
     }
 
@@ -151,7 +152,7 @@ export class PresetManager implements IPresetManager {
       this.emitPresetChange(event);
 
     } catch (error) {
-      console.error(`Failed to switch preset to ${presetId}:`, error);
+      logger.error(`Failed to switch preset to ${presetId}:`, error);
       throw error;
     }
   }
@@ -202,7 +203,7 @@ export class PresetManager implements IPresetManager {
 
     if (validButtons.length !== buttons.length) {
       const invalidButtons = buttons.filter(buttonId => !this.isValidButtonId(buttonId));
-      console.warn(`Filtered out invalid button IDs: ${invalidButtons.join(', ')}`);
+      logger.warn(`Filtered out invalid button IDs: ${invalidButtons.join(', ')}`);
     }
 
     try {
@@ -250,7 +251,7 @@ export class PresetManager implements IPresetManager {
       try {
         disposable.dispose();
       } catch (error) {
-        console.warn('Error disposing preset manager resource:', error);
+        logger.warn('Error disposing preset manager resource:', error);
       }
     });
     this.disposables = [];
@@ -373,7 +374,7 @@ export class PresetManager implements IPresetManager {
     try {
       await this.vscode.commands.executeCommand('setContext', CONTEXT_KEYS.preset, preset.id);
     } catch (error) {
-      console.warn('Failed to update preset context key:', error);
+      logger.warn('Failed to update preset context key:', error);
     }
   }
 
@@ -385,7 +386,7 @@ export class PresetManager implements IPresetManager {
       try {
         callback(event);
       } catch (error) {
-        console.error('Error in preset change callback:', error);
+        logger.error('Error in preset change callback:', error);
       }
     });
   }

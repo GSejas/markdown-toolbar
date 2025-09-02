@@ -37,11 +37,6 @@ export const CONFIG_KEYS = {
   compact: 'markdownToolbar.compact',                       // boolean - compact toolbar mode
   statusBarEnabled: 'markdownToolbar.statusBar.enabled',    // boolean - show preset switcher in status bar
 
-  // Legacy settings (deprecated but supported for migration)
-  enabled: 'markdownToolbar.enabled',                       // boolean - overall enable/disable
-  position: 'markdownToolbar.position',                     // 'left'|'right' - status bar position  
-  buttons: 'markdownToolbar.buttons',                       // string[] - old button system
-
   // Advanced settings
   autoDetectDependencies: 'markdownToolbar.autoDetectDependencies',    // boolean
   showMissingExtensionNotifications: 'markdownToolbar.showMissingExtensionNotifications', // boolean
@@ -60,9 +55,6 @@ export const DEFAULT_CONFIG = {
   customVisible: [],
   compact: false,
   statusBarEnabled: true,
-  enabled: true,
-  position: 'right',
-  buttons: ['bold', 'italic', 'code', 'link', 'list'], // Legacy default
   autoDetectDependencies: true,
   showMissingExtensionNotifications: true,
   fallbackBehavior: 'internal',
@@ -98,26 +90,6 @@ export const CONFIG_SCHEMA = {
     type: 'boolean',
     default: DEFAULT_CONFIG.statusBarEnabled,
     description: 'Show preset switcher in status bar'
-  },
-
-  enabled: {
-    type: 'boolean',
-    default: DEFAULT_CONFIG.enabled,
-    description: 'Enable markdown toolbar'
-  },
-
-  position: {
-    type: 'string',
-    enum: ['left', 'right'],
-    default: DEFAULT_CONFIG.position,
-    description: 'Status bar position'
-  },
-
-  buttons: {
-    type: 'array',
-    items: { type: 'string' },
-    default: DEFAULT_CONFIG.buttons,
-    description: 'Legacy button configuration'
   },
 
   autoDetectDependencies: {

@@ -25,6 +25,7 @@
 import { ContextDetector } from '../engine/ContextDetector';
 import { IMarkdownContext } from '../types/Context';
 import { CONFIG_KEYS } from '../constants/configKeys';
+import { logger } from './Logger';
 
 /**
  * Document-level context information
@@ -137,7 +138,7 @@ export class ContextService {
 
       return context;
     } catch (error) {
-      console.error('Error detecting document context:', error);
+      logger.error('Error detecting document context:', error);
       return null;
     }
   }
@@ -210,7 +211,7 @@ export class ContextService {
       try {
         disposable.dispose();
       } catch (error) {
-        console.warn('Error disposing context service resource:', error);
+        logger.warn('Error disposing context service resource:', error);
       }
     });
 
@@ -320,7 +321,7 @@ export class ContextService {
         this.handleContextChange(event);
       }
     } catch (error) {
-      console.error('Error in debounced context refresh:', error);
+      logger.error('Error in debounced context refresh:', error);
     }
   }
 
@@ -376,7 +377,7 @@ export class ContextService {
       try {
         callback(event);
       } catch (error) {
-        console.error('Error in context change callback:', error);
+        logger.error('Error in context change callback:', error);
       }
     });
   }
