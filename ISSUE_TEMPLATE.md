@@ -2,7 +2,7 @@
 
 ## 🎯 Objective
 
-Modernize the markdown toolbar extension by integrating industry-standard libraries to improve performance, maintainability, and reliability. Replace custom implementations with proven, Microsoft-maintained solutions.
+Modernize the Markdown Extended Toolbar extension by integrating industry-standard libraries to improve performance, maintainability, and reliability. Replace custom implementations with proven, Microsoft-maintained solutions.
 
 ## 📊 Current State Analysis
 

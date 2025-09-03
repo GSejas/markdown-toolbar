@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the comprehensive testing strategy for the Markdown Toolbar VS Code extension. The testing approach covers unit testing, integration testing, end-to-end testing, and performance testing to ensure code quality, reliability, and security.
+This document outlines the comprehensive testing strategy for the Markdown Extended Toolbar VS Code extension. The testing approach covers unit testing, integration testing, end-to-end testing, and performance testing to ensure code quality, reliability, and security.
 
 ## 🎯 Testing Objectives
 

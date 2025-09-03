@@ -1,7 +1,7 @@
 # 🧪 Testing Documentation
 
 ## Overview
-This directory contains comprehensive testing documentation and tracking systems for the Markdown Toolbar VS Code extension. The documentation provides a complete testing strategy, implementation plans, and maintenance procedures.
+This directory contains comprehensive testing documentation and tracking systems for the Markdown Extended Toolbar VS Code extension. The documentation provides a complete testing strategy, implementation plans, and maintenance procedures.
 
 ## 📁 Directory Structure
 

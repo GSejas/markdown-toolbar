@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Markdown Toolbar Extension is a comprehensive VS Code extension that provides context-aware markdown formatting tools through an intelligent status bar interface. The system follows a modular, layered architecture with clear separation of concerns, dependency injection for testability, and graceful degradation when external extensions are unavailable.
+The Markdown Extended Toolbar Extension is a comprehensive VS Code extension that provides context-aware markdown formatting tools through an intelligent status bar interface. The system follows a modular, layered architecture with clear separation of concerns, dependency injection for testability, and graceful degradation when external extensions are unavailable.
 
 ## 🎯 System Purpose
 

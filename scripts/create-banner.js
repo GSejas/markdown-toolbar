@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Banner Generator for Markdown Toolbar Documentation
+ * Banner Generator for Markdown Extended Toolbar Documentation
  * 
  * Creates SVG banners with consistent styling and converts them to base64 data URLs
  * for use in markdown files.

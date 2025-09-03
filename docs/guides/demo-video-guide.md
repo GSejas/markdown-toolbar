@@ -1,6 +1,6 @@
 # 📹 Demo Video Creation Guide
 
-This guide will help you create a compelling demo video for the Markdown Toolbar extension using basic user journeys.
+This guide will help you create a compelling demo video for the Markdown Extended Toolbar extension using basic user journeys.
 
 ## 🎯 Video Goals
 
@@ -87,7 +87,7 @@ This guide will help you create a compelling demo video for the Markdown Toolbar
 2. Switch from "CORE" to "WRITER" preset
 3. Show toolbar expanding with more buttons
 4. Open VS Code settings (Ctrl+,)
-5. Search "markdown toolbar"
+5. Search "Markdown Extended Toolbar"
 6. Show preset setting: "markdownToolbar.preset": "writer"
 7. Briefly show custom buttons array setting
 8. Return to editor - show updated toolbar
@@ -142,7 +142,7 @@ This guide will help you create a compelling demo video for the Markdown Toolbar
 4. Fade to extension logo/title card
 ```
 
-**Voiceover**: *"Smart. Customizable. Context-aware. Install Markdown Toolbar today and transform your markdown editing experience."*
+**Voiceover**: *"Smart. Customizable. Context-aware. Install Markdown Extended Toolbar today and transform your markdown editing experience."*
 
 ## 🎨 Video Production Tips
 
@@ -194,7 +194,7 @@ This guide will help you create a compelling demo video for the Markdown Toolbar
 ## 🚀 Publishing Checklist
 
 ### YouTube Optimization
-- **Title**: "Smart Markdown Toolbar for VS Code - Context-Aware Formatting"
+- **Title**: "Smart Markdown Extended Toolbar for VS Code - Context-Aware Formatting"
 - **Description**: Include extension link, feature list, and timestamps
 - **Tags**: "vscode", "markdown", "toolbar", "extension", "productivity"
 - **Thumbnail**: Clean screenshot showing the toolbar in action

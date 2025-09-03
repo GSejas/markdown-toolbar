@@ -1,4 +1,4 @@
-# Building a Context-Aware Markdown Toolbar Extension: Architecture & Implementation
+# Building a Context-Aware Markdown Extended Toolbar Extension: Architecture & Implementation
 
 ## Executive Summary
 

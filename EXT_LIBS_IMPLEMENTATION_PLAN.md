@@ -1,7 +1,7 @@
 # Library Modernization & Architecture Enhancement Plan
 
 ## Overview
-Comprehensive modernization of the markdown toolbar extension using industry-standard libraries to improve performance, maintainability, and reliability.
+Comprehensive modernization of the Markdown Extended Toolbar extension using industry-standard libraries to improve performance, maintainability, and reliability.
 
 ## Phase 1: Core Library Integration (Priority: High)
 

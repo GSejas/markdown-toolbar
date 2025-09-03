@@ -1,6 +1,6 @@
-# 📖 Markdown Toolbar - User Guide & Test Plan
+# 📖 Markdown Extended Toolbar - User Guide & Test Plan
 
-> **Complete guide for using the Markdown Toolbar extension with step-by-step testing scenarios**
+> **Complete guide for using the Markdown Extended Toolbar extension with step-by-step testing scenarios**
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/GSejas/markdown-toolbar)
 [![VS Code](https://img.shields.io/badge/VS%20Code-^1.103.0-brightgreen.svg)](https://code.visualstudio.com/)
@@ -31,7 +31,7 @@ This guide serves dual purposes:
 3. **Check the status bar** (bottom of VS Code window)
 
 **Expected Results**:
-- ✅ Markdown toolbar appears in status bar
+- ✅ Markdown Extended Toolbar appears in status bar
 - ✅ Extension activates automatically
 - ✅ No error messages in console
 
@@ -287,7 +287,7 @@ Create checkboxes in markdown:
 
 #### Test Presets
 1. **Core Preset** (Default):
-   - Open settings: `Markdown Toolbar: Preset`
+   - Open settings: `Markdown Extended Toolbar: Preset`
    - Select "core"
    - ✅ Basic formatting buttons visible
 
@@ -352,7 +352,7 @@ Create checkboxes in markdown:
 
 #### Test Performance Diagnostics
 1. **Open Command Palette**: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
-2. **Run Command**: `Markdown Toolbar: Performance Diagnostics`
+2. **Run Command**: `Markdown Extended Toolbar: Performance Diagnostics`
 3. **Review Report**: New document opens with performance data
 
 **Expected Results in Report**:
@@ -584,7 +584,7 @@ Mark each test as complete when verified:
 
 ### 📹 DEMO: Extension Activation
 ```
-Script: "Let me show you how to get started with Markdown Toolbar. 
+Script: "Let me show you how to get started with Markdown Extended Toolbar. 
 First, open VS Code and create a new markdown file. 
 Notice how the toolbar automatically appears in the status bar..."
 ```

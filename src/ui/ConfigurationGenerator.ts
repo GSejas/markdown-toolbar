@@ -3,11 +3,11 @@
  * @version: 1.0.0
  * @since: 2025-08-01
  * @lastUpdated: 2025-09-01
- * @projectSummary: Interactive configuration generator for customizing the markdown toolbar
+ * @projectSummary: Interactive configuration generator for customizing the Markdown Extended Toolbar
  * @techStack: TypeScript, VS Code Extension API, Webview API
  * @dependency: vscode (VS Code Extension API)
  * @interModuleDependency: ../types/Buttons, ../constants/configKeys
- * @briefDescription: Provides an intuitive interface for users to customize their markdown toolbar with drag-and-drop, preset templates, and real-time preview
+ * @briefDescription: Provides an intuitive interface for users to customize their Markdown Extended Toolbar with drag-and-drop, preset templates, and real-time preview
  * @methods: open, generateConfig, previewChanges, exportConfig
  * @contributors: VS Code Extension Team
  * @examples:
@@ -21,7 +21,7 @@ import { ButtonId, IButtonDefinition, BUTTON_DEFINITIONS, ButtonCategory, PRESET
 import { CONFIG_KEYS, DEFAULT_CONFIG } from '../constants/configKeys';
 
 /**
- * Interactive configuration generator for the markdown toolbar
+ * Interactive configuration generator for the Markdown Extended Toolbar
  * Makes configuration approachable for non-technical users
  */
 export class ConfigurationGenerator {
@@ -40,7 +40,7 @@ export class ConfigurationGenerator {
         // Create webview panel
         this.panel = this.vscode.window.createWebviewPanel(
             'mdToolbarConfig',
-            'Markdown Toolbar Configuration',
+            'Markdown Extended Toolbar Configuration',
             this.vscode.ViewColumn.One,
             {
                 enableScripts: true,
@@ -112,7 +112,7 @@ export class ConfigurationGenerator {
         this.currentConfig = { ...this.currentConfig, ...newConfig };
 
         // Show success message
-        this.vscode.window.showInformationMessage('Markdown toolbar configuration updated!');
+        this.vscode.window.showInformationMessage('Markdown Extended Toolbar configuration updated!');
     }
 
     /**
@@ -149,7 +149,7 @@ export class ConfigurationGenerator {
      */
     private async exportConfig(): Promise<void> {
         const exportData = {
-            name: 'My Markdown Toolbar Config',
+            name: 'My Markdown Extended Toolbar Config',
             created: new Date().toISOString(),
             config: this.currentConfig,
             buttons: this.currentConfig.preset === 'custom'
@@ -182,7 +182,7 @@ export class ConfigurationGenerator {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markdown Toolbar Configuration</title>
+    <title>Markdown Extended Toolbar Configuration</title>
     <style>
         body {
             font-family: var(--vscode-font-family);
@@ -306,8 +306,8 @@ export class ConfigurationGenerator {
 </head>
 <body>
     <div class="header">
-        <h1>🛠️ Markdown Toolbar Configuration</h1>
-        <p>Customize your markdown toolbar with an intuitive interface</p>
+        <h1>🛠️ Markdown Extended Toolbar Configuration</h1>
+        <p>Customize your Markdown Extended Toolbar with an intuitive interface</p>
     </div>
 
     <div class="section">

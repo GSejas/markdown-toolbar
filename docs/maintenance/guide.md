@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive maintenance procedures for the Markdown Toolbar VS Code extension, ensuring long-term stability, performance, and user satisfaction.
+This document provides comprehensive maintenance procedures for the Markdown Extended Toolbar VS Code extension, ensuring long-term stability, performance, and user satisfaction.
 
 ## 📋 Maintenance Schedule
 

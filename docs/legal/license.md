@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the licensing terms and conditions for the Markdown Toolbar VS Code extension.
+This document outlines the licensing terms and conditions for the Markdown Extended Toolbar VS Code extension.
 
 ## 📄 License Terms
 
@@ -130,7 +130,7 @@ The MIT License is **not compatible** with:
 ### Intellectual Property
 
 - **Copyright**: © 2025 GSejas. All rights reserved.
-- **Trademarks**: "Markdown Toolbar" is a trademark of GSejas
+- **Trademarks**: "Markdown Extended Toolbar" is a trademark of GSejas
 - **Patents**: No patent claims made
 
 ### Warranties and Disclaimers

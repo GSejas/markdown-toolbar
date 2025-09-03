@@ -2,7 +2,7 @@
 
 ## Overview
 
-This article explores the design and implementation of context-aware status bar integration in VS Code extensions. The markdown toolbar extension demonstrates sophisticated UI patterns including real-time context detection, theme integration, and user experience optimizations.
+This article explores the design and implementation of context-aware status bar integration in VS Code extensions. The Markdown Extended Toolbar extension demonstrates sophisticated UI patterns including real-time context detection, theme integration, and user experience optimizations.
 
 ## Status Bar Architecture
 

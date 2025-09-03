@@ -1,8 +1,8 @@
-# 📚 Markdown Toolbar Extension - Documentation Hub
+# 📚 Markdown Extended Toolbar Extension - Documentation Hub
 
 ## 🏗️ Documentation Structure
 
-This documentation provides comprehensive coverage of the Markdown Toolbar VS Code extension, including architecture, design decisions, security analysis, testing strategies, and operational procedures.
+This documentation provides comprehensive coverage of the Markdown Extended Toolbar VS Code extension, including architecture, design decisions, security analysis, testing strategies, and operational procedures.
 
 ```
 docs/

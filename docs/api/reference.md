@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive API reference for the Markdown Toolbar VS Code extension, including public interfaces, types, and usage examples.
+This document provides comprehensive API reference for the Markdown Extended Toolbar VS Code extension, including public interfaces, types, and usage examples.
 
 ## 🏗️ Architecture
 

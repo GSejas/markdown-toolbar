@@ -2,7 +2,7 @@
 
 ## Overview
 
-The heart of the markdown toolbar extension lies in its smart formatting engine that can detect existing formatting contexts and intelligently toggle formatting on and off. This article explores the technical implementation of context detection and the complex logic required for seamless formatting experiences.
+The heart of the Markdown Extended Toolbar extension lies in its smart formatting engine that can detect existing formatting contexts and intelligently toggle formatting on and off. This article explores the technical implementation of context detection and the complex logic required for seamless formatting experiences.
 
 ## Context Detection Architecture
 

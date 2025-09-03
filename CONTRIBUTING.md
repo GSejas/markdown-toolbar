@@ -1,6 +1,6 @@
-# 🤝 Contributing to Markdown Toolbar Extension
+# 🤝 Contributing to Markdown Extended Toolbar Extension
 
-Thank you for your interest in contributing! This guide will help you get started with contributing to the Markdown Toolbar extension.
+Thank you for your interest in contributing! This guide will help you get started with contributing to the Markdown Extended Toolbar extension.
 
 ## 🚀 Quick Start
 
@@ -334,4 +334,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-**Thank you for making the Markdown Toolbar extension better! 🙌**
+**Thank you for making the Markdown Extended Toolbar extension better! 🙌**

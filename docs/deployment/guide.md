@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the deployment and release management processes for the Markdown Toolbar VS Code extension. It covers build automation, packaging, distribution, versioning, and operational procedures to ensure reliable and efficient software delivery.
+This document outlines the deployment and release management processes for the Markdown Extended Toolbar VS Code extension. It covers build automation, packaging, distribution, versioning, and operational procedures to ensure reliable and efficient software delivery.
 
 ## 🏗️ Build System Architecture
 

@@ -1,10 +1,10 @@
-# Markdown Toolbar Extension - Architecture Documentation
+# Markdown Extended Toolbar Extension - Architecture Documentation
 
 ## 🏗️ System Architecture Overview
 
 ### Design Philosophy
 
-The Markdown Toolbar Extension follows a **clean architecture** pattern with clear separation of concerns, dependency injection for testability, and a modular approach that allows easy extension and maintenance.
+The Markdown Extended Toolbar Extension follows a **clean architecture** pattern with clear separation of concerns, dependency injection for testability, and a modular approach that allows easy extension and maintenance.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -387,4 +387,4 @@ Settings Change
 - Multi-language markdown support
 - Real-time collaboration features
 
-This architecture provides a solid foundation for the Markdown Toolbar Extension while maintaining flexibility for future enhancements and ensuring excellent performance and user experience.
+This architecture provides a solid foundation for the Markdown Extended Toolbar Extension while maintaining flexibility for future enhancements and ensuring excellent performance and user experience.

@@ -1,6 +1,6 @@
 # Icon Set Documentation
 
-This directory contains SVG icons for all markdown toolbar commands in the VS Code extension.
+This directory contains SVG icons for all Markdown Extended Toolbar commands in the VS Code extension.
 
 ## Icon Categories
 

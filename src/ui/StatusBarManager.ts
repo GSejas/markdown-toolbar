@@ -41,7 +41,7 @@ interface IButtonConfig {
 }
 
 /**
- * Manages status bar items for markdown toolbar
+ * Manages status bar items for Markdown Extended Toolbar
  */
 export class StatusBarManager {
     private statusBarItems: Map<string, vscode.StatusBarItem> = new Map();

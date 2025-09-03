@@ -1,4 +1,4 @@
-# V1 Implementation Plan: Preset-Aware Context-Driven Markdown Toolbar
+# V1 Implementation Plan: Preset-Aware Context-Driven Markdown Extended Toolbar
 
 ## Implementation Strategy: TDD Feature-by-Feature
 

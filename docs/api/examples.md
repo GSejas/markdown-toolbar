@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides practical examples of using the Markdown Toolbar extension APIs for common use cases and integration scenarios.
+This document provides practical examples of using the Markdown Extended Toolbar extension APIs for common use cases and integration scenarios.
 
 ## 🎯 Basic Usage Examples
 
@@ -668,4 +668,4 @@ interface ThemeColors {
 }
 ```
 
-These examples demonstrate various integration patterns and advanced usage scenarios for the Markdown Toolbar extension APIs. Each example includes error handling, logging, and best practices for production use.
+These examples demonstrate various integration patterns and advanced usage scenarios for the Markdown Extended Toolbar extension APIs. Each example includes error handling, logging, and best practices for production use.

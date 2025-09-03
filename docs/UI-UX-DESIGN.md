@@ -1,10 +1,10 @@
-# Markdown Toolbar Extension - UI/UX Design Documentation
+# Markdown Extended Toolbar Extension - UI/UX Design Documentation
 
 ## 🎨 Design Philosophy
 
 ### User-Centered Design Principles
 
-The Markdown Toolbar Extension is designed with a **progressive disclosure** approach, revealing contextually relevant actions while maintaining a clean, unobtrusive interface that enhances rather than interrupts the writing flow.
+The Markdown Extended Toolbar Extension is designed with a **progressive disclosure** approach, revealing contextually relevant actions while maintaining a clean, unobtrusive interface that enhances rather than interrupts the writing flow.
 
 #### Core UX Principles
 
@@ -381,4 +381,4 @@ interface ThemeColors {
 - Minimal DOM manipulation
 - Resource cleanup on deactivation
 
-This UI/UX design ensures that the Markdown Toolbar Extension provides an intuitive, efficient, and enjoyable editing experience while maintaining the high standards expected in VS Code extensions.
+This UI/UX design ensures that the Markdown Extended Toolbar Extension provides an intuitive, efficient, and enjoyable editing experience while maintaining the high standards expected in VS Code extensions.

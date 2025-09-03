@@ -1,6 +1,6 @@
 # 🎨 Codicons Reference Guide
 
-This guide lists the validated VS Code Codicons used in the Markdown Toolbar extension to ensure all icons render properly.
+This guide lists the validated VS Code Codicons used in the Markdown Extended Toolbar extension to ensure all icons render properly.
 
 ## ✅ Verified Working Codicons
 

@@ -1,7 +1,7 @@
 # GitHub Pages Configuration
 theme: jekyll-theme-minimal
-title: "Markdown Toolbar Extension"
-description: "Smart, context-aware markdown toolbar for VS Code"
+title: "Markdown Extended Toolbar Extension"
+description: "Smart, context-aware Markdown Extended Toolbar for VS Code"
 url: "https://GSejas.github.io"
 baseurl: "/vscode-markdown-status-toolbar"
 

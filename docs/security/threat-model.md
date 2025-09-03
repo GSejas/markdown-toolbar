@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the security threat model for the Markdown Toolbar VS Code extension. The extension processes markdown content, executes commands, and integrates with external extensions, creating several security domains that require careful analysis.
+This document outlines the security threat model for the Markdown Extended Toolbar VS Code extension. The extension processes markdown content, executes commands, and integrates with external extensions, creating several security domains that require careful analysis.
 
 ## 🎯 Security Objectives
 

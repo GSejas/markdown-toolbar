@@ -7,7 +7,7 @@ Below is a **one-shot prompt** you can paste into Claude Code (or any code agent
 # ONE-SHOT PROMPT — PRINCIPAL ARCHITECT IMPLEMENTATION BRIEF
 
 **Role:** You are a principal VS Code extension architect and test-driven engineer.
-**Goal:** Implement a dependency-aware, context-aware Markdown toolbar with three presets (Core/Writer/Pro) + Custom mode, robust tests, and complete docs, while preserving the existing architecture in `CLAUDE.md`.
+**Goal:** Implement a dependency-aware, context-aware Markdown Extended Toolbar with three presets (Core/Writer/Pro) + Custom mode, robust tests, and complete docs, while preserving the existing architecture in `CLAUDE.md`.
 
 ## 0) Ground Rules
 
@@ -186,7 +186,7 @@ export type ButtonId =
 ```json
 "contributes": {
   "configuration": {
-    "title": "Markdown Toolbar",
+    "title": "Markdown Extended Toolbar",
     "properties": {
       "markdownToolbar.preset": {
         "type": "string",
@@ -248,8 +248,8 @@ export type ButtonId =
   { "command": "mdToolbar.preview.mpe.side", "title": "$(preview) Enhanced Preview (Side)" },
   { "command": "mdToolbar.preview.mpe.current", "title": "$(preview) Enhanced Preview" },
 
-  { "command": "mdToolbar.switchPreset", "title": "Markdown Toolbar: Switch Preset" },
-  { "command": "mdToolbar.customizeButtons", "title": "Markdown Toolbar: Customize Buttons…" }
+  { "command": "mdToolbar.switchPreset", "title": "Markdown Extended Toolbar: Switch Preset" },
+  { "command": "mdToolbar.customizeButtons", "title": "Markdown Extended Toolbar: Customize Buttons…" }
 ],
 ```
 
@@ -559,7 +559,7 @@ If you want, I can drop these into your `COMMANDS.md` matrix and the `package.js
 
 \[Unverified]
 
-Below are design proposals (not facts) for a VS Code Markdown toolbar extension. They include multi‑level wireframes from information architecture down to component specs. Adjust as needed during implementation.
+Below are design proposals (not facts) for a VS Code Markdown Extended Toolbar extension. They include multi‑level wireframes from information architecture down to component specs. Adjust as needed during implementation.
 
 ---
 
@@ -574,7 +574,7 @@ Below are design proposals (not facts) for a VS Code Markdown toolbar extension.
 # 1) Information Architecture & Journeys Map (Big Picture)
 
 ```
-Markdown Toolbar Extension
+Markdown Extended Toolbar Extension
 ├─ Presets (view modes)
 │  ├─ Core (Level 1)
 │  ├─ Writer (Level 2)
@@ -635,7 +635,7 @@ Status Bar:  $(check) Core preset   $(gear) Customize
 
 ```
 > Markdown: Toggle Preview     Markdown: Preview to the Side
-> Markdown Toolbar: Switch Preset   Markdown Toolbar: Customize Buttons
+> Markdown Extended Toolbar: Switch Preset   Markdown Extended Toolbar: Customize Buttons
 ```
 
 ---
@@ -720,7 +720,7 @@ Problems panel lists remaining issues, if any.
 ## D1. QuickPick: Switch Preset
 
 ```
-Markdown Toolbar: Switch Preset
+Markdown Extended Toolbar: Switch Preset
 ○ Core — Minimal essentials
 ○ Writer — TOC, images, tables, tasks
 ○ Pro — Lint, workspace ops, enhanced preview

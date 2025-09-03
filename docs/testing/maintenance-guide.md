@@ -1,7 +1,7 @@
 # 📚 Testing Documentation Maintenance Guide
 
 ## Overview
-This guide provides instructions for maintaining the testing documentation, tracking spreadsheets, and quality assurance processes for the markdown toolbar extension.
+This guide provides instructions for maintaining the testing documentation, tracking spreadsheets, and quality assurance processes for the Markdown Extended Toolbar extension.
 
 ## 📊 Tracking Spreadsheet Maintenance
 

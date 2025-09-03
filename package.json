@@ -4,7 +4,7 @@
   "description": "Context-aware markdown formatting toolbarin VS Code status bar",
   "version": "0.2.0",
   "publisher": "GSejas",
-  "icon": "assets/markdown statusbar logo (128 x 128 px) w bg.png",
+  "icon": "assets/logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/GSejas/markdown-toolbar.git"
@@ -26,7 +26,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Markdown Toolbar",
+      "title": "Markdown Extended Toolbar",
       "properties": {
         "markdownToolbar.preset": {
           "type": "string",
@@ -126,117 +126,117 @@
       {
         "command": "mdToolbar.switchPreset",
         "title": "Switch Preset",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.customizeButtons",
         "title": "Customize Buttons",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.debug.analyzeDependencies",
         "title": "Analyze Dependencies",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.preview.side",
         "title": "Preview (Side)",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.preview.current",
         "title": "Preview",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.preview.mpe.side",
         "title": "Preview (MPE Side)",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.fmt.bold",
         "title": "Bold",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.fmt.italic",
         "title": "Italic",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.fmt.strike",
         "title": "Strikethrough",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.list.toggle",
         "title": "Toggle List",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.task.toggle",
         "title": "Toggle Task List",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.code.inline",
         "title": "Inline Code",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.code.block",
         "title": "Code Block",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.link.insert",
         "title": "Insert Link",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.image.insert",
         "title": "Insert Image",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.image.paste",
         "title": "Paste Image",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.toc.create",
         "title": "Create TOC",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.toc.update",
         "title": "Update TOC",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.toc.addNumbers",
         "title": "Add TOC Numbers",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.toc.removeNumbers",
         "title": "Remove TOC Numbers",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.table.menu",
         "title": "Table Menu",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.lint.fix",
         "title": "Fix Lint Issues",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.lint.workspace",
         "title": "Lint Workspace",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.internal.bold",
@@ -277,142 +277,142 @@
       {
         "command": "mdToolbar.fmt.code",
         "title": "Code",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.fmt.highlight",
         "title": "Highlight",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h1",
         "title": "Heading 1",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h2",
         "title": "Heading 2",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h3",
         "title": "Heading 3",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h4",
         "title": "Heading 4",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h5",
         "title": "Heading 5",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.h6",
         "title": "Heading 6",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.heading.toggle",
         "title": "Toggle Heading",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.blockquote.toggle",
         "title": "Toggle Blockquote",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.hr.insert",
         "title": "Insert Horizontal Rule",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.footnote.insert",
         "title": "Insert Footnote",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.math.inline",
         "title": "Insert Inline Math",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.math.block",
         "title": "Insert Math Block",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.mermaid.insert",
         "title": "Insert Mermaid Diagram",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.break.line",
         "title": "Insert Line Break",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.preview.lock",
         "title": "Lock Preview",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.preview.mpe.current",
         "title": "Preview (MPE)",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.editor.wordWrap",
         "title": "Toggle Word Wrap",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.editor.lineNumbers",
         "title": "Toggle Line Numbers",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.editor.minimap",
         "title": "Toggle Minimap",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.nav.symbols",
         "title": "Go to Symbol",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.nav.outline",
         "title": "Document Outline",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.search.replace",
         "title": "Search & Replace",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.export.pdf",
         "title": "Export to PDF",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.git.status",
         "title": "Git Status",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.git.commit",
         "title": "Git Commit",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       },
       {
         "command": "mdToolbar.git.diff",
         "title": "Git Diff",
-        "category": "Markdown Toolbar"
+        "category": "Markdown Extended Toolbar"
       }
     ],
     "keybindings": [

@@ -12,7 +12,7 @@
  *   {@link Requirements.REQ_SETTINGS_002} (Type Safety)
  *   {@link Requirements.REQ_SETTINGS_003} (Dependency Injection)
  *   {@link Requirements.REQ_SETTINGS_004} (Reactive Updates)
- * @briefDescription: Manages VS Code workspace configuration for the markdown toolbar extension. Provides type-safe access to settings with validation, defaults, and reactive change notifications. Uses constructor injection for testability
+ * @briefDescription: Manages VS Code workspace configuration for the Markdown Extended Toolbar extension. Provides type-safe access to settings with validation, defaults, and reactive change notifications. Uses constructor injection for testability
  * @methods: constructor, getConfiguration, isToolbarEnabled, getToolbarPosition, getActiveButtons, onConfigurationChanged
  * @contributors: VS Code Extension Team
  * @examples:
@@ -27,7 +27,7 @@ import { CONFIG_KEYS, DEFAULT_CONFIG } from '../constants/configKeys';
 import { ButtonId } from '../types/Buttons';
 
 /**
- * Configuration interface for markdown toolbar settings
+ * Configuration interface for Markdown Extended Toolbar settings
  */
 export interface IMarkdownToolbarConfig {
     enabled: boolean;
@@ -38,7 +38,7 @@ export interface IMarkdownToolbarConfig {
 }
 
 /**
- * Type-safe settings adapter for markdown toolbar configuration
+ * Type-safe settings adapter for Markdown Extended Toolbar configuration
  */
 export class SettingsAdapter {
     private static readonly SECTION = 'markdownToolbar';

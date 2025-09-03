@@ -9,13 +9,13 @@ This manual test plan verifies the dependency detection system works correctly w
 
 ### 1. **Prepare Test Environment**
 - [ ] Fresh VS Code instance or workspace
-- [ ] Markdown Toolbar extension installed in development mode
+- [ ] Markdown Extended Toolbar extension installed in development mode
 - [ ] Access to VS Code Extension Marketplace
 - [ ] Markdown file open for testing context
 
 ### 2. **Enable Debug Mode**
 - [ ] Open VS Code Command Palette (`Cmd/Ctrl+Shift+P`)
-- [ ] Run: `Markdown Toolbar: Generate Extension Analysis`
+- [ ] Run: `Markdown Extended Toolbar: Generate Extension Analysis`
 - [ ] Note initial extension state in output
 
 ---
@@ -38,7 +38,7 @@ This manual test plan verifies the dependency detection system works correctly w
 
 4. [ ] Check status bar - should show only basic buttons
 
-5. [ ] Run debug command: `Markdown Toolbar: Generate Extension Analysis`
+5. [ ] Run debug command: `Markdown Extended Toolbar: Generate Extension Analysis`
 
 **Expected Results**:
 - [ ] All dependency flags should be `false`
@@ -74,7 +74,7 @@ This manual test plan verifies the dependency detection system works correctly w
 - [ ] No manual reload required
 
 **If Auto-Detection Fails**:
-- [ ] Run: `Markdown Toolbar: Refresh Dependencies`
+- [ ] Run: `Markdown Extended Toolbar: Refresh Dependencies`
 - [ ] Check if manual refresh fixes the issue
 
 ---
@@ -256,13 +256,13 @@ vscode.commands.executeCommand('getContext', 'mdToolbar.hasMAIO')
 ```
 
 ### **Extension Debug Commands**:
-- `Markdown Toolbar: Generate Extension Analysis` - Full status report
-- `Markdown Toolbar: Refresh Dependencies` - Force detection refresh
-- `Markdown Toolbar: Debug Context Keys` - Show all context key values
+- `Markdown Extended Toolbar: Generate Extension Analysis` - Full status report
+- `Markdown Extended Toolbar: Refresh Dependencies` - Force detection refresh
+- `Markdown Extended Toolbar: Debug Context Keys` - Show all context key values
 
 ### **Log Locations**:
 - VS Code Developer Tools Console
-- Output panel → "Markdown Toolbar" channel
+- Output panel → "Markdown Extended Toolbar" channel
 - Extension host logs (if enabled)
 
 ---

@@ -65,7 +65,7 @@ export class StatusBarToolbar {
 
     // Update status bar
     this.statusBarItem.text = `$(markdown) ${preset.toUpperCase()} ${toolbarText}`;
-    this.statusBarItem.tooltip = `Markdown Toolbar (${preset}) - Click to switch presets\n${visibleButtons.length} buttons available`;
+    this.statusBarItem.tooltip = `Markdown Extended Toolbar (${preset}) - Click to switch presets\n${visibleButtons.length} buttons available`;
   }
 
   /**
@@ -193,7 +193,7 @@ export class StatusBarToolbar {
 
     const selected = await this.vscode.window.showQuickPick(presetOptions, {
       placeHolder: `Current: ${this.currentPreset.toUpperCase()} | Select a preset or configure`,
-      title: 'Markdown Toolbar Preset'
+      title: 'Markdown Extended Toolbar Preset'
     });
 
     if (selected?.preset === 'configure') {

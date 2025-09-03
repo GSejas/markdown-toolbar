@@ -1,5 +1,5 @@
 /**
- * @moduleName: VS Code Markdown Toolbar Extension - Main Entry Point
+ * @moduleName: VS Code Markdown Extended Toolbar Extension - Main Entry Point
  * @version: 2.0.0
  * @since: 2025-08-01
  * @lastUpdated: 2025-09-01
@@ -12,7 +12,7 @@
  *   {@link Requirements.REQ_CORE_002} (Service Initialization)
  *   {@link Requirements.REQ_CORE_003} (Command Registration)
  *   {@link Requirements.REQ_CORE_004} (Event Handling)
- * @briefDescription: Main extension entry point managing the complete lifecycle of the markdown toolbar extension. Coordinates service initialization, command registration, and event handling while providing graceful error handling and user feedback
+ * @briefDescription: Main extension entry point managing the complete lifecycle of the Markdown Extended Toolbar extension. Coordinates service initialization, command registration, and event handling while providing graceful error handling and user feedback
  * @methods: activate, deactivate, initializeCoreServices, initializeCommands, setupEventListeners, showWelcomeMessage
  * @contributors: VS Code Extension Team
  * @examples:
@@ -104,7 +104,7 @@ class ExtensionState {
 
 	public async activate(context: vscode.ExtensionContext): Promise<void> {
 		try {
-			logger.info('Activating Markdown Toolbar extension v2.0...');
+			logger.info('Activating Markdown Extended Toolbar extension v2.0...');
 
 			// Initialize dependency injection container
 			ServiceContainer.initialize(context);
@@ -136,20 +136,20 @@ class ExtensionState {
 				}
 			);
 
-			logger.info('Markdown Toolbar extension activated successfully!');
+			logger.info('Markdown Extended Toolbar extension activated successfully!');
 
 			// Show welcome message for first-time users
 			await this.showWelcomeMessage();
 
 		} catch (error) {
-			logger.error('Failed to activate Markdown Toolbar extension:', error);
-			vscode.window.showErrorMessage(`Failed to activate Markdown Toolbar: ${error instanceof Error ? error.message : 'Unknown error'}`);
+			logger.error('Failed to activate Markdown Extended Toolbar extension:', error);
+			vscode.window.showErrorMessage(`Failed to activate Markdown Extended Toolbar: ${error instanceof Error ? error.message : 'Unknown error'}`);
 		}
 	}
 
 	public deactivate(): void {
 		try {
-			logger.info('Deactivating Markdown Toolbar extension...');
+			logger.info('Deactivating Markdown Extended Toolbar extension...');
 
 			// Dispose all services
 			this.contextService?.dispose();
@@ -168,7 +168,7 @@ class ExtensionState {
 
 			this.disposables = [];
 
-			logger.info('Markdown Toolbar extension deactivated successfully!');
+			logger.info('Markdown Extended Toolbar extension deactivated successfully!');
 
 		} catch (error) {
 			logger.error('Error during extension deactivation:', error);
@@ -477,7 +477,7 @@ class ExtensionState {
 
 		if (!hasShownWelcome) {
 			const action = await vscode.window.showInformationMessage(
-				'Welcome to Markdown Toolbar v2.0! Choose your preset to get started.',
+				'Welcome to Markdown Extended Toolbar v2.0! Choose your preset to get started.',
 				'Choose Preset',
 				'Later'
 			);

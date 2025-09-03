@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines the design patterns and architectural principles used in the Markdown Toolbar VS Code extension. The extension follows clean architecture principles with a focus on maintainability, testability, and extensibility.
+This document outlines the design patterns and architectural principles used in the Markdown Extended Toolbar VS Code extension. The extension follows clean architecture principles with a focus on maintainability, testability, and extensibility.
 
 ## 🏛️ Architectural Overview
 

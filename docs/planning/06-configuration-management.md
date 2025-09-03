@@ -2,7 +2,7 @@
 
 ## Overview
 
-This article explores the configuration management system for VS Code extensions, focusing on type safety, dependency injection, reactive updates, and testing strategies. The markdown toolbar extension demonstrates sophisticated configuration patterns that ensure maintainable, testable, and user-friendly settings management.
+This article explores the configuration management system for VS Code extensions, focusing on type safety, dependency injection, reactive updates, and testing strategies. The Markdown Extended Toolbar extension demonstrates sophisticated configuration patterns that ensure maintainable, testable, and user-friendly settings management.
 
 ## Settings Architecture Foundation
 
@@ -148,12 +148,12 @@ The extension defines its settings in `package.json`:
 {
   "contributes": {
     "configuration": {
-      "title": "Markdown Toolbar",
+      "title": "Markdown Extended Toolbar",
       "properties": {
         "markdownToolbar.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the markdown toolbar"
+          "description": "Enable or disable the Markdown Extended Toolbar"
         },
         "markdownToolbar.position": {
           "type": "string",
@@ -534,7 +534,7 @@ describe('Configuration Schema', () => {
     const packageJson = require('../../package.json');
     const config = packageJson.contributes.configuration;
     
-    expect(config.title).toBe('Markdown Toolbar');
+    expect(config.title).toBe('Markdown Extended Toolbar');
     expect(config.properties).toBeDefined();
     
     const enabledProp = config.properties['markdownToolbar.enabled'];
@@ -696,7 +696,7 @@ public getConfiguration(): IMarkdownToolbarConfig {
 
 private notifyConfigurationError(error: Error): void {
   vscode.window.showWarningMessage(
-    `Markdown Toolbar: Configuration error. Using defaults. ${error.message}`,
+    `Markdown Extended Toolbar: Configuration error. Using defaults. ${error.message}`,
     'Open Settings'
   ).then((action) => {
     if (action === 'Open Settings') {

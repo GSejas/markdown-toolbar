@@ -1,6 +1,6 @@
 # 🌐 GitHub Pages Setup Guide
 
-This guide walks you through setting up GitHub Pages for the Markdown Toolbar extension landing page.
+This guide walks you through setting up GitHub Pages for the Markdown Extended Toolbar extension landing page.
 
 ## 📋 Prerequisites
 
@@ -65,8 +65,8 @@ This guide walks you through setting up GitHub Pages for the Markdown Toolbar ex
 
 ```yaml
 # Site metadata
-title: "Markdown Toolbar Extension"
-description: "Smart, context-aware markdown toolbar for VS Code"
+title: "Markdown Extended Toolbar Extension"
+description: "Smart, context-aware Markdown Extended Toolbar for VS Code"
 url: "https://your-username.github.io"
 baseurl: "/your-repo-name"
 
@@ -220,8 +220,8 @@ baseurl: "/your-repo-name"
 
 Add to `index.html` `<head>` section:
 ```html
-<meta property="og:title" content="Markdown Toolbar Extension">
-<meta property="og:description" content="Smart, context-aware markdown toolbar for VS Code">
+<meta property="og:title" content="Markdown Extended Toolbar Extension">
+<meta property="og:description" content="Smart, context-aware Markdown Extended Toolbar for VS Code">
 <meta property="og:image" content="https://your-username.github.io/your-repo/preview.png">
 <meta property="og:url" content="https://your-username.github.io/your-repo">
 <meta name="twitter:card" content="summary_large_image">

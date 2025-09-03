@@ -3,7 +3,7 @@
 ## Executive Summary
 
 **Date:** September 2, 2025
-**Extension:** Markdown Toolbar for VS Code
+**Extension:** Markdown Extended Toolbar for VS Code
 **Version:** 1.0.0
 **Test Coverage:** ~75% (estimated)
 **Status:** ⚠️ Partially Implemented - Critical Gaps Identified

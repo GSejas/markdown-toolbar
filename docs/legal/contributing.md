@@ -2,7 +2,7 @@
 
 ## Welcome Contributors
 
-Thank you for your interest in contributing to the Markdown Toolbar VS Code extension! This document provides guidelines and best practices for contributing to the project.
+Thank you for your interest in contributing to the Markdown Extended Toolbar VS Code extension! This document provides guidelines and best practices for contributing to the project.
 
 ## 📋 Quick Start
 

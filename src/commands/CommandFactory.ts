@@ -290,7 +290,7 @@ export class PresetSwitchHandler implements ICommandHandler {
 
         const selected = await vscode.window.showQuickPick(presets, {
           placeHolder: 'Select a preset',
-          title: 'Markdown Toolbar Preset'
+          title: 'Markdown Extended Toolbar Preset'
         });
 
         if (!selected) {
@@ -375,7 +375,7 @@ export class AnalyzeDependenciesHandler implements ICommandHandler {
       const cacheStats = contextService.getCacheStats();
 
       const report = [
-        '# Markdown Toolbar Dependency Analysis',
+        '# Markdown Extended Toolbar Dependency Analysis',
         '',
         '## Extension Dependencies',
         `- Markdown All in One: ${dependencyState.hasMAIO ? '✅ Active' : '❌ Not available'}`,

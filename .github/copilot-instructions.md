@@ -1,4 +1,4 @@
-# Copilot Instructions: Markdown Toolbar Extension
+# Copilot Instructions: Markdown Extended Toolbar Extension
 
 ## JSDoc Header Format
 

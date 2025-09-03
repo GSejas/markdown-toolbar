@@ -1,7 +1,7 @@
 # Markdown Extended Toolbar
 
 <p align="center">
-<img src="assets/markdown statusbar logo (128 x 128 px) w bg.png">
+<img src="assets/logo.png">
 </p>
 
 
@@ -70,7 +70,7 @@ graph TD
 
 1. $(code) Open VS Code
 2. $(search) Go to Extensions (`Ctrl+Shift+X`)
-3. $(magnify) Search for "Markdown Toolbar"
+3. $(magnify) Search for "Markdown Extended Toolbar"
 4. $(cloud-download) Click **Install**
 
 ### $(file-text) First Use
@@ -82,22 +82,22 @@ graph TD
 ### $(zap) Performance Features
 
 Access new performance diagnostics:
-- **Command Palette** → `Markdown Toolbar: Performance Diagnostics`
+- **Command Palette** → `Markdown Extended Toolbar: Performance Diagnostics`
 - **$(graph) Real-time metrics**: Cache hit rates, memory usage, operation timing
 - **$(pulse) 50%+ faster** document processing with LRU caching
 - **$(shield) Zero crashes** with comprehensive error boundaries
 
 ```bash
 # Quick commands
-Ctrl+Shift+P → "Markdown Toolbar: Switch Preset"
-Ctrl+Shift+P → "Markdown Toolbar: Analyze Dependencies"
+Ctrl+Shift+P → "Markdown Extended Toolbar: Switch Preset"
+Ctrl+Shift+P → "Markdown Extended Toolbar: Analyze Dependencies"
 ```
 
 ### � User Journey
 
 ```mermaid
 journey
-    title Markdown Toolbar User Experience
+    title Markdown Extended Toolbar User Experience
     section Discovery
       Find Extension: 5: User
       Install: 5: User
@@ -227,7 +227,7 @@ stateDiagram-v2
 
 ```mermaid
 graph LR
-    A[VS Code Extension Host] --> B[Markdown Toolbar]
+    A[VS Code Extension Host] --> B[Markdown Extended Toolbar]
     B --> C{Extension Available?}
 
     C -->|Markdown All in One| D[TOC Generation]
@@ -268,7 +268,7 @@ graph LR
         │   ├── Export options
         │   └── Diagram support
         │
-        └── 📝 Markdown Toolbar (This!)
+        └── 📝 Markdown Extended Toolbar (This!)
             ├── Context-aware UI
             ├── Extension integration
             └── Smart fallbacks
@@ -436,7 +436,7 @@ Ctrl+Shift+L   # Toggle list
 sequenceDiagram
     participant U as User
     participant VS as VS Code
-    participant MT as Markdown Toolbar
+    participant MT as Markdown Extended Toolbar
     participant EX as Extensions
 
     U->>VS: Open .md file

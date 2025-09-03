@@ -276,7 +276,7 @@ export class PerformanceMonitor {
   }
 
   private static generatePerformanceReport(stats: PerformanceStats): string {
-    let report = '# Markdown Toolbar Performance Report\n\n';
+    let report = '# Markdown Extended Toolbar Performance Report\n\n';
     report += `Generated: ${new Date().toLocaleString()}\n\n`;
     
     // Memory usage

@@ -11,7 +11,7 @@
  *   {@link Requirements.REQ_TESTING_001} (Extension Test Suite)
  *   {@link Requirements.REQ_TESTING_002} (Integration Testing)
  *   {@link Requirements.REQ_TESTING_003} (VS Code API Testing)
- * @briefDescription: Comprehensive test suite for the markdown toolbar extension including unit tests, integration tests, and VS Code API interaction validation
+ * @briefDescription: Comprehensive test suite for the Markdown Extended Toolbar extension including unit tests, integration tests, and VS Code API interaction validation
  * @methods: Test suite definitions and test cases
  * @contributors: VS Code Extension Team
  * @examples:

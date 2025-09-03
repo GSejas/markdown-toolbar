@@ -2,7 +2,7 @@
 
 ## Overview
 
-This article documents the complete development workflow, build system, and tooling setup for the markdown toolbar extension. It covers everything from initial setup through production deployment, providing a blueprint for modern VS Code extension development.
+This article documents the complete development workflow, build system, and tooling setup for the Markdown Extended Toolbar extension. It covers everything from initial setup through production deployment, providing a blueprint for modern VS Code extension development.
 
 ## Development Environment Setup
 

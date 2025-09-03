@@ -2,7 +2,7 @@
 
 ## Overview
 
-Building a robust VS Code extension requires a comprehensive testing strategy that balances speed, reliability, and maintainability. This article explores the testing approach used in the markdown toolbar extension, including unit testing with Vitest, mocking strategies, and quality assurance practices.
+Building a robust VS Code extension requires a comprehensive testing strategy that balances speed, reliability, and maintainability. This article explores the testing approach used in the Markdown Extended Toolbar extension, including unit testing with Vitest, mocking strategies, and quality assurance practices.
 
 ## Testing Architecture
 

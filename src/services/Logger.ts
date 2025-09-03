@@ -6,7 +6,7 @@
  * @projectSummary: Small logging utility that writes structured messages to a VS Code OutputChannel and console
  * @techStack: TypeScript, VS Code Extension API
  * @dependency: vscode (optional - injected for tests)
- * @briefDescription: Provides leveled logging (debug/info/warn/error) and an output channel named "Markdown Toolbar". Safe to use when `vscode` isn't available by falling back to console.
+ * @briefDescription: Provides leveled logging (debug/info/warn/error) and an output channel named "Markdown Extended Toolbar". Safe to use when `vscode` isn't available by falling back to console.
  */
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
@@ -27,7 +27,7 @@ export class Logger {
         try {
             this.vscode = vscodeImpl || require('vscode');
             if (this.vscode && this.vscode.window && typeof this.vscode.window.createOutputChannel === 'function') {
-                this.outputChannel = this.vscode.window.createOutputChannel('Markdown Toolbar');
+                this.outputChannel = this.vscode.window.createOutputChannel('Markdown Extended Toolbar');
             }
         } catch (e) {
             // Not running inside VS Code environment (e.g., unit tests). We'll fallback to console.

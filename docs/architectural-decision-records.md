@@ -1,7 +1,7 @@
 # Architectural Decision Records (ADRs)
 
 ## Overview
-This document tracks all significant architectural decisions made during the development and evolution of the VS Code Markdown Toolbar Extension.
+This document tracks all significant architectural decisions made during the development and evolution of the VS Code Markdown Extended Toolbar Extension.
 
 ---
 

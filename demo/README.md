@@ -1,4 +1,4 @@
-# Markdown Toolbar Demo Documents
+# Markdown Extended Toolbar Demo Documents
 
 This folder contains demo documents designed to test different preset configurations and user journeys. Each document showcases specific features and use cases.
 
