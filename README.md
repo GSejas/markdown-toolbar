@@ -1,3 +1,4 @@
+# Markdown Extended Toolbar
 
 <p align="center">
 <img src="assets/markdown statusbar logo (128 x 128 px) w bg.png">
