@@ -23,14 +23,77 @@ describe('HeaderCodeLensProvider', () => {
   let provider: HeaderCodeLensProvider;
   let mockDocument: vscode.TextDocument;
 
+  // Helper function to create proper mock TextDocument
+  function createMockTextDocument(content: string, uri: string = 'file:///test.md'): vscode.TextDocument {
+    const lines = content.split('\n');
+    return {
+      uri: vscode.Uri.parse(uri),
+      fileName: uri,
+      isUntitled: false,
+      languageId: 'markdown',
+      version: 1,
+      isDirty: false,
+      isClosed: false,
+      encoding: 'utf8',
+      eol: vscode.EndOfLine.LF,
+      lineCount: lines.length,
+      getText: (range?: vscode.Range) => {
+        if (!range) return content;
+        const startOffset = getOffset(range.start);
+        const endOffset = getOffset(range.end);
+        return content.substring(startOffset, endOffset);
+      },
+      getWordRangeAtPosition: () => undefined,
+      lineAt: (line: number) => ({
+        lineNumber: line,
+        text: lines[line] || '',
+        range: new vscode.Range(line, 0, line, lines[line]?.length || 0),
+        rangeIncludingLineBreak: new vscode.Range(line, 0, line, lines[line]?.length || 0),
+        firstNonWhitespaceCharacterIndex: lines[line]?.match(/^\s*/)?.[0].length || 0,
+        isEmptyOrWhitespace: !lines[line] || lines[line].trim() === ''
+      }),
+      offsetAt: (position: vscode.Position) => {
+        let offset = 0;
+        for (let i = 0; i < position.line; i++) {
+          offset += (lines[i] || '').length + 1; // +1 for newline
+        }
+        offset += position.character;
+        return offset;
+      },
+      positionAt: (offset: number) => {
+        let currentOffset = 0;
+        for (let line = 0; line < lines.length; line++) {
+          const lineLength = (lines[line] || '').length + 1; // +1 for newline
+          if (currentOffset + lineLength > offset) {
+            return new vscode.Position(line, offset - currentOffset);
+          }
+          currentOffset += lineLength;
+        }
+        return new vscode.Position(lines.length - 1, (lines[lines.length - 1] || '').length);
+      },
+      save: () => Promise.resolve(false),
+      validateRange: (range: vscode.Range) => range,
+      validatePosition: (position: vscode.Position) => position
+    } as unknown as vscode.TextDocument;
+
+    function getOffset(position: vscode.Position): number {
+      let offset = 0;
+      for (let i = 0; i < position.line; i++) {
+        offset += (lines[i] || '').length + 1;
+      }
+      offset += position.character;
+      return offset;
+    }
+  }
+
   beforeEach(() => {
     provider = new HeaderCodeLensProvider();
-    mockDocument = new (vscode as any).TextDocument();
+    mockDocument = createMockTextDocument('No headers here\nJust plain text\nMore content');
   });
 
   describe('provideCodeLenses', () => {
     it('should return empty array when no headers found', async () => {
-      mockDocument = new (vscode as any).TextDocument('No headers here\nJust plain text\nMore content');
+      mockDocument = createMockTextDocument('No headers here\nJust plain text\nMore content');
 
       const result = await provider.provideCodeLenses(mockDocument, {} as any);
 
@@ -39,7 +102,7 @@ describe('HeaderCodeLensProvider', () => {
 
     it('should provide code lenses for headers', async () => {
       const markdownText = `# Main Title\n\nSome content\n\n## Subsection\n\nMore content\n\n### Sub-subsection`;
-      mockDocument = new (vscode as any).TextDocument(markdownText);
+      mockDocument = createMockTextDocument(markdownText);
 
       const result = await provider.provideCodeLenses(mockDocument, {} as any);
 
@@ -58,7 +121,7 @@ describe('HeaderCodeLensProvider', () => {
 
     it('should handle headers with different levels and content', async () => {
       const markdownText = `# Title with content\n\nThis is content under H1\n\n## Empty Header\n\n### Header with content\n\nThis is content\n\n#### Another Header`;
-      mockDocument = new (vscode as any).TextDocument(markdownText);
+      mockDocument = createMockTextDocument(markdownText);
 
       const result = await provider.provideCodeLenses(mockDocument, {} as any);
 
@@ -79,7 +142,7 @@ describe('HeaderCodeLensProvider', () => {
   describe('analyzeDocumentStructure', () => {
     it('should analyze document with multiple headers', () => {
       const markdownText = `# Main Title\n\nContent here\n\n## Section 1\n\nMore content\n\n## Section 2\n\n### Subsection\n\nContent`;
-      mockDocument = new (vscode as any).TextDocument(markdownText);
+      mockDocument = createMockTextDocument(markdownText);
 
       const structure = (provider as any).analyzeDocumentStructure(mockDocument);
 
@@ -99,7 +162,7 @@ describe('HeaderCodeLensProvider', () => {
     });
 
     it('should handle document with no headers', () => {
-      mockDocument = new (vscode as any).TextDocument('Just plain text\nNo headers here\nMore content');
+      mockDocument = createMockTextDocument('Just plain text\nNo headers here\nMore content');
 
       const structure = (provider as any).analyzeDocumentStructure(mockDocument);
 
@@ -110,7 +173,7 @@ describe('HeaderCodeLensProvider', () => {
 
     it('should calculate word counts correctly', () => {
       const markdownText = `# Header\n\nThis has five words here.\n\n## Another Header\n\nDifferent content`;
-      mockDocument = new (vscode as any).TextDocument(markdownText);
+      mockDocument = createMockTextDocument(markdownText);
 
       const structure = (provider as any).analyzeDocumentStructure(mockDocument);
 

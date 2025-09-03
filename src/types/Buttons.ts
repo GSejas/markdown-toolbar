@@ -67,6 +67,18 @@ export type ButtonId =
   // Enhanced preview (requires MPE)
   | 'preview.mpe.side' | 'preview.mpe.current'
 
+  // NEW: Word Wrap & Editor Features
+  | 'editor.wordWrap' | 'editor.lineNumbers' | 'editor.minimap'
+
+  // NEW: PDF Export (requires yzane.markdown-pdf)
+  | 'export.pdf'
+
+  // NEW: Navigation & Search
+  | 'nav.symbols' | 'nav.outline' | 'search.replace'
+
+  // NEW: Git & Version Control
+  | 'git.status' | 'git.commit' | 'git.diff'
+
   // Debug utilities
   | 'debug.presetCycle';
 
@@ -149,7 +161,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'fmt.strike': {
     id: 'fmt.strike',
     title: 'Strikethrough',
-    icon: '$(text-size)',
+    icon: '$(md-strikethrough)',
     category: 'format',
     commandId: 'mdToolbar.fmt.strike',
     delegatesTo: 'markdown.extension.editing.toggleStrikethrough',
@@ -180,7 +192,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h1': {
     id: 'heading.h1',
     title: 'Heading 1',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-one)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h1',
     fallbackCommand: 'mdToolbar.internal.heading1',
@@ -189,7 +201,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h2': {
     id: 'heading.h2',
     title: 'Heading 2',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-two)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h2',
     fallbackCommand: 'mdToolbar.internal.heading2',
@@ -198,7 +210,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h3': {
     id: 'heading.h3',
     title: 'Heading 3',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-three)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h3',
     fallbackCommand: 'mdToolbar.internal.heading3',
@@ -207,7 +219,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h4': {
     id: 'heading.h4',
     title: 'Heading 4',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-four)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h4',
     fallbackCommand: 'mdToolbar.internal.heading4',
@@ -216,7 +228,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h5': {
     id: 'heading.h5',
     title: 'Heading 5',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-five)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h5',
     fallbackCommand: 'mdToolbar.internal.heading5',
@@ -225,7 +237,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.h6': {
     id: 'heading.h6',
     title: 'Heading 6',
-    icon: '$(symbol-text)',
+    icon: '$(md-header-six)',
     category: 'heading',
     commandId: 'mdToolbar.heading.h6',
     fallbackCommand: 'mdToolbar.internal.heading6',
@@ -234,7 +246,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'heading.toggle': {
     id: 'heading.toggle',
     title: 'Cycle Heading',
-    icon: '$(symbol-text)',
+    icon: '$(arrow-both)',
     category: 'heading',
     commandId: 'mdToolbar.heading.toggle',
     fallbackCommand: 'mdToolbar.internal.headingToggle',
@@ -297,7 +309,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'code.block': {
     id: 'code.block',
     title: 'Code Block',
-    icon: '$(terminal)',
+    icon: '$(code)',
     category: 'code',
     commandId: 'mdToolbar.code.block',
     delegatesTo: 'markdown.extension.editing.toggleCodeBlock',
@@ -359,7 +371,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'math.block': {
     id: 'math.block',
     title: 'Math Block',
-    icon: '$(symbol-math)',
+    icon: '$(variable-group)',
     category: 'extended',
     commandId: 'mdToolbar.math.block',
     fallbackCommand: 'mdToolbar.internal.mathBlock',
@@ -390,7 +402,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'toc.create': {
     id: 'toc.create',
     title: 'Create TOC',
-    icon: '$(list-ordered)',
+    icon: '$(list-tree)',
     category: 'toc',
     commandId: 'mdToolbar.toc.create',
     delegatesTo: 'markdown.extension.toc.create',
@@ -412,7 +424,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'toc.addNumbers': {
     id: 'toc.addNumbers',
     title: 'Add TOC Numbers',
-    icon: '$(list-ordered)',
+    icon: '+$(list-ordered)',
     category: 'toc',
     commandId: 'mdToolbar.toc.addNumbers',
     delegatesTo: 'markdown.extension.toc.addSecNumbers',
@@ -423,7 +435,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'toc.removeNumbers': {
     id: 'toc.removeNumbers',
     title: 'Remove TOC Numbers',
-    icon: '$(list-ordered)',
+    icon: '-$(list-ordered)',
     category: 'toc',
     commandId: 'mdToolbar.toc.removeNumbers',
     delegatesTo: 'markdown.extension.toc.removeSecNumbers',
@@ -448,7 +460,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'lint.fix': {
     id: 'lint.fix',
     title: 'Fix All Issues',
-    icon: '$(wrench)',
+    icon: '$(lightbulb-autofix)',
     category: 'quality',
     commandId: 'mdToolbar.lint.fix',
     delegatesTo: 'markdownlint.fixAll',
@@ -459,7 +471,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'lint.workspace': {
     id: 'lint.workspace',
     title: 'Lint Workspace',
-    icon: '$(wrench)',
+    icon: '$(github-action)',
     category: 'quality',
     commandId: 'mdToolbar.lint.workspace',
     delegatesTo: 'markdownlint.lintWorkspace',
@@ -501,6 +513,106 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
     commandId: 'mdToolbar.debug.cyclePreset',
     tooltip: 'Cycle through test presets (debug mode only)',
     when: 'mdToolbar.debugMode'
+  },
+
+  // NEW: Word Wrap & Editor Features
+  'editor.wordWrap': {
+    id: 'editor.wordWrap',
+    title: 'Toggle Word Wrap',
+    icon: '$(word-wrap)',
+    category: 'extended',
+    commandId: 'mdToolbar.editor.wordWrap',
+    delegatesTo: 'editor.action.toggleWordWrap',
+    tooltip: 'Toggle word wrapping in editor'
+  },
+  'editor.lineNumbers': {
+    id: 'editor.lineNumbers',
+    title: 'Toggle Line Numbers',
+    icon: '$(list-ordered)',
+    category: 'extended',
+    commandId: 'mdToolbar.editor.lineNumbers',
+    delegatesTo: 'editor.action.toggleRenderLineHighlight',
+    tooltip: 'Toggle line number display'
+  },
+  'editor.minimap': {
+    id: 'editor.minimap',
+    title: 'Toggle Minimap',
+    icon: '$(map)',
+    category: 'extended',
+    commandId: 'mdToolbar.editor.minimap',
+    delegatesTo: 'editor.action.toggleMinimap',
+    tooltip: 'Toggle minimap display'
+  },
+
+  // NEW: PDF Export (requires yzane.markdown-pdf)
+  'export.pdf': {
+    id: 'export.pdf',
+    title: 'Export PDF',
+    icon: '$(file-pdf)',
+    category: 'extended',
+    commandId: 'mdToolbar.export.pdf',
+    delegatesTo: 'markdown-pdf.convertToPdf',
+    requiresExtension: 'yzane.markdown-pdf',
+    tooltip: 'Export document as PDF',
+    when: 'mdToolbar.hasMarkdownPdf'
+  },
+
+  // NEW: Navigation & Search
+  'nav.symbols': {
+    id: 'nav.symbols',
+    title: 'Document Symbols',
+    icon: '$(symbol-class)',
+    category: 'extended',
+    commandId: 'mdToolbar.nav.symbols',
+    delegatesTo: 'workbench.action.gotoSymbol',
+    tooltip: 'Navigate to document symbols'
+  },
+  'nav.outline': {
+    id: 'nav.outline',
+    title: 'Document Outline',
+    icon: '$(list-tree)',
+    category: 'extended',
+    commandId: 'mdToolbar.nav.outline',
+    delegatesTo: 'outline.focus',
+    tooltip: 'Show document outline'
+  },
+  'search.replace': {
+    id: 'search.replace',
+    title: 'Find & Replace',
+    icon: '$(search-replace)',
+    category: 'extended',
+    commandId: 'mdToolbar.search.replace',
+    delegatesTo: 'editor.action.startFindReplaceAction',
+    tooltip: 'Open find and replace'
+  },
+
+  // NEW: Git & Version Control
+  'git.status': {
+    id: 'git.status',
+    title: 'Git Status',
+    icon: '$(source-control)',
+    category: 'extended',
+    commandId: 'mdToolbar.git.status',
+    delegatesTo: 'workbench.view.scm',
+    tooltip: 'Open source control view'
+  },
+  'git.commit': {
+    id: 'git.commit',
+    title: 'Git Commit',
+    icon: '$(check)',
+    category: 'extended',
+    commandId: 'mdToolbar.git.commit',
+    delegatesTo: 'git.commit',
+    tooltip: 'Commit changes'
+  },
+  'git.diff': {
+    id: 'git.diff',
+    title: 'Git Diff',
+    icon: '$(diff)',
+    category: 'extended',
+    commandId: 'mdToolbar.git.diff',
+    delegatesTo: 'git.diff',
+    tooltip: 'Show diff of changes'
   }
 };
 

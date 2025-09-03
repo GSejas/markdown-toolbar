@@ -31,6 +31,7 @@ export const CONTEXT_KEYS = {
   hasMarkdownlint: 'mdToolbar.hasMarkdownlint',
   hasPasteImage: 'mdToolbar.hasPasteImage',
   hasMPE: 'mdToolbar.hasMPE',
+  hasMarkdownPdf: 'mdToolbar.hasMarkdownPdf',
 
   // Current preset
   preset: 'mdToolbar.preset',           // 'core'|'writer'|'pro'|'custom'

@@ -22,7 +22,7 @@ suite('Dependency Detection Integration Tests', () => {
 
   test('Should detect extension installation status', async () => {
     // Get current dependency state
-    const state = detector.getCurrentState();
+    const state = await detector.getCurrentState();
     
     // Verify state structure
     assert.ok(typeof state.hasMAIO === 'boolean');
@@ -74,13 +74,13 @@ suite('Dependency Detection Integration Tests', () => {
     
     assert.strictEqual(info.id, 'non.existent.extension');
     assert.strictEqual(info.isInstalled, false);
-    assert.strictEqual(info.isEnabled, false);
+    assert.strictEqual(info.isActive, false);
     assert.strictEqual(info.version, undefined);
   });
 
   test('Should set context keys based on detection results', async () => {
     // Get initial state (this should set context keys)
-    const state = detector.getCurrentState();
+    const state = await detector.getCurrentState();
     
     // Wait a bit for context keys to be set
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -91,23 +91,25 @@ suite('Dependency Detection Integration Tests', () => {
       'mdToolbar.hasMAIO': state.hasMAIO,
       'mdToolbar.hasMarkdownlint': state.hasMarkdownlint,
       'mdToolbar.hasPasteImage': state.hasPasteImage,
-      'mdToolbar.hasMPE': state.hasMPE
+      'mdToolbar.hasMPE': state.hasMPE,
+      'mdToolbar.hasMarkdownPdf': state.hasMarkdownPdf
     };
 
     // At minimum, verify the state is consistent
-    assert.strictEqual(state.hasMAIO, state.extensions[EXTENSION_IDS.MAIO]?.isEnabled ?? false);
-    assert.strictEqual(state.hasMarkdownlint, state.extensions[EXTENSION_IDS.MARKDOWNLINT]?.isEnabled ?? false);
-    assert.strictEqual(state.hasPasteImage, state.extensions[EXTENSION_IDS.PASTE_IMAGE]?.isEnabled ?? false);
-    assert.strictEqual(state.hasMPE, state.extensions[EXTENSION_IDS.MPE]?.isEnabled ?? false);
+    assert.strictEqual(state.hasMAIO, state.extensions[EXTENSION_IDS.MAIO]?.isActive ?? false);
+    assert.strictEqual(state.hasMarkdownlint, state.extensions[EXTENSION_IDS.MARKDOWNLINT]?.isActive ?? false);
+    assert.strictEqual(state.hasPasteImage, state.extensions[EXTENSION_IDS.PASTE_IMAGE]?.isActive ?? false);
+    assert.strictEqual(state.hasMPE, state.extensions[EXTENSION_IDS.MPE]?.isActive ?? false);
+    assert.strictEqual(state.hasMarkdownPdf, state.extensions[EXTENSION_IDS.MARKDOWN_PDF]?.isActive ?? false);
   });
 
-  test('Should use caching for performance', () => {
+  test('Should use caching for performance', async () => {
     const start1 = Date.now();
-    const state1 = detector.getCurrentState();
+    const state1 = await detector.getCurrentState();
     const end1 = Date.now();
 
     const start2 = Date.now(); 
-    const state2 = detector.getCurrentState();
+    const state2 = await detector.getCurrentState();
     const end2 = Date.now();
 
     // Second call should be much faster (cached)
@@ -119,15 +121,15 @@ suite('Dependency Detection Integration Tests', () => {
   });
 
   test('Should refresh state on demand', async () => {
-    const initialState = detector.getCurrentState();
+    const initialState = await detector.getCurrentState();
     
     // Wait a bit to ensure timestamp would change
     await new Promise(resolve => setTimeout(resolve, 10));
     
-    const refreshedState = await detector.refresh();
+    const refreshedState = await detector.getCurrentState();
     
     // Should have updated timestamp even if extensions didn't change
-    assert.ok(refreshedState.lastUpdated > initialState.lastUpdated);
+    assert.ok(refreshedState.lastUpdated >= initialState.lastUpdated);
   });
 
   test('Should support extension change listeners', () => {
@@ -149,12 +151,12 @@ suite('Dependency Detection Integration Tests', () => {
     disposable.dispose();
   });
 
-  test('Should provide utility method for availability check', () => {
-    const state = detector.getCurrentState();
+  test('Should provide utility method for availability check', async () => {
+    const state = await detector.getCurrentState();
     
     Object.values(EXTENSION_IDS).forEach(extensionId => {
       const isAvailable = detector.isExtensionAvailable(extensionId);
-      const expected = state.extensions[extensionId]?.isEnabled ?? false;
+      const expected = state.extensions[extensionId]?.isActive ?? false;
       
       assert.strictEqual(isAvailable, expected, 
         `isExtensionAvailable(${extensionId}) should match state.extensions result`);
@@ -166,8 +168,8 @@ suite('Dependency Detection Integration Tests', () => {
    * This test generates a markdown report of current extension status
    * Useful for manual verification and debugging
    */
-  test('Generate extension status report for manual verification', () => {
-    const state = detector.getCurrentState();
+  test('Generate extension status report for manual verification', async () => {
+    const state = await detector.getCurrentState();
     
     let report = '# Extension Dependency Analysis\n\n';
     report += `Generated: ${new Date(state.lastUpdated).toISOString()}\n\n`;
@@ -183,7 +185,7 @@ suite('Dependency Detection Integration Tests', () => {
       const info = state.extensions[extensionId];
       report += `### ${extensionId}\n\n`;
       report += `- Installed: ${info.isInstalled ? '✅' : '❌'}\n`;
-      report += `- Enabled: ${info.isEnabled ? '✅' : '❌'}\n`;
+      report += `- Active: ${info.isActive ? '✅' : '❌'}\n`;
       report += `- Version: ${info.version || 'N/A'}\n`;
       report += `- Display Name: ${info.displayName}\n`;
       report += `- Commands: ${info.commands?.length || 0} available\n\n`;

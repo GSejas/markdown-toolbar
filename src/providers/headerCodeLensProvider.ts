@@ -22,6 +22,11 @@
 import * as vscode from 'vscode';
 import { ContextDetector } from '../engine/ContextDetector';
 import { logger } from '../services/Logger';
+import { MarkdownLanguageServiceWrapper } from '../engine/MarkdownLanguageServiceWrapper';
+import { DocumentCache } from '../engine/DocumentCache';
+import { withProviderErrorBoundary } from '../utils/ErrorBoundary';
+import { PerformanceMonitor } from '../utils/PerformanceMonitor';
+import { service } from '../di/ServiceContainer';
 
 interface HeaderInfo {
   level: number;
@@ -40,14 +45,33 @@ interface DocumentStructure {
   sectionsCount: number;
 }
 
+@service()
 export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   private contextDetector = new ContextDetector();
+  private markdownService = new MarkdownLanguageServiceWrapper();
 
-  constructor() {
-    logger.info('HeaderCodeLensProvider initialized');
+  constructor(
+    private cache: DocumentCache = new DocumentCache()
+  ) {
+    logger.info('HeaderCodeLensProvider initialized with DI and caching support');
   }
 
   async provideCodeLenses(
+    document: vscode.TextDocument,
+    token: vscode.CancellationToken
+  ): Promise<vscode.CodeLens[]> {
+    return PerformanceMonitor.withTiming(
+      () => withProviderErrorBoundary(
+        () => this.doProvideCodeLenses(document, token),
+        [], // fallback to empty array on error
+        'HeaderCodeLensProvider'
+      ),
+      'HeaderCodeLensProvider.provideCodeLenses',
+      200 // Log if takes more than 200ms
+    );
+  }
+
+  private async doProvideCodeLenses(
     document: vscode.TextDocument,
     token: vscode.CancellationToken
   ): Promise<vscode.CodeLens[]> {
@@ -68,7 +92,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     const codeLenses: vscode.CodeLens[] = [];
 
     try {
-      const structure = this.analyzeDocumentStructure(document);
+  const structure = await this.analyzeDocumentStructureAsync(document);
       logger.info(`[HeaderCodeLens] Found ${structure.headers.length} headers in document`);
       logger.info(`[HeaderCodeLens] Document has ${document.lineCount} lines`);
 
@@ -126,14 +150,18 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
           }));
         }
 
-        // Fold section (if has content) - rightmost position
+        // Fold/Unfold section (if has content) - rightmost position
         if (header.hasContent) {
-          logger.info(`[HeaderCodeLens] Adding "Fold" for header "${header.title}"`);
+          const isFolded = await this.isSectionFolded(document, header.line);
+          const foldTitle = isFolded ? "$(unfold) Unfold" : "$(fold) Fold";
+          const foldTooltip = isFolded ? "Unfold this section" : "Fold this section";
+          
+          logger.info(`[HeaderCodeLens] Adding "${foldTitle}" for header "${header.title}" (currently ${isFolded ? 'folded' : 'unfolded'})`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "$(fold) Fold",
+            title: foldTitle,
             command: 'mdToolbar.header.foldSection',
             arguments: [document.uri, header.line],
-            tooltip: 'Fold this section'
+            tooltip: foldTooltip
           }));
         }
       }
@@ -156,68 +184,62 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     return codeLenses;
   }
 
+  // Synchronous structure analysis used by unit tests
+  // Returns quick regex-based structure without language service
   private analyzeDocumentStructure(document: vscode.TextDocument): DocumentStructure {
-    const text = document.getText();
-    const lines = text.split('\n');
-    const headers: HeaderInfo[] = [];
-    let totalWords = 0;
+    return this.fallbackAnalyzeDocumentStructure(document);
+  }
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
-      // Debug: Check if line looks like a header
-      if (line.trim().startsWith('#')) {
-        logger.info(`[HeaderCodeLens] Line ${i} starts with #: "${line}"`);
-        logger.info(`[HeaderCodeLens] Line length: ${line.length}, char codes: [${line.split('').map(c => c.charCodeAt(0)).slice(0, 10).join(', ')}]`);
-        
-        // Test the regex step by step
-        const testRegex = /^(#{1,6})\s+(.+)$/;
-        const testMatch = line.match(testRegex);
-        logger.info(`[HeaderCodeLens] Regex test result: ${!!testMatch}`);
-        if (testMatch) {
-          logger.info(`[HeaderCodeLens] Match groups:`, testMatch);
-        }
-      }
-      
-      const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
-      if (i < 20) { // Only log first 20 lines to avoid spam
-        logger.info(`[HeaderCodeLens] Line ${i} header match: ${!!headerMatch} | "${line}"`);
-      }
-
-      if (headerMatch) {
-        const level = headerMatch[1].length;
-        const title = headerMatch[2].trim();
-        const anchor = this.createAnchor(title);
-        
-        logger.info(`[HeaderCodeLens] Found header level ${level}: "${title}"`);
-        logger.info(`[HeaderCodeLens] Header match groups:`, headerMatch);
-
-        // Calculate content for this section
-        const sectionInfo = this.analyzeSectionContent(lines, i);
-
-        headers.push({
-          level,
-          title,
-          line: i,
-          range: new vscode.Range(i, 0, i, line.length),
-          anchor,
-          hasContent: sectionInfo.hasContent,
-          wordCount: sectionInfo.wordCount
-        });
-
-        totalWords += sectionInfo.wordCount;
-      } else {
-        // Count words in non-header lines
-        totalWords += this.countWords(line);
-      }
+  // Async structure analysis used by the provider at runtime
+  private async analyzeDocumentStructureAsync(document: vscode.TextDocument): Promise<DocumentStructure> {
+    const startTime = Date.now();
+    
+    // Try to get cached result first
+    const cachedHeaders = this.cache.getCachedHeaders(document);
+    if (cachedHeaders) {
+      const cacheTime = Date.now() - startTime;
+      logger.info(`[HeaderCodeLens] Using cached headers (${cacheTime}ms): ${cachedHeaders.length} headers`);
+      return {
+        headers: cachedHeaders,
+        totalWords: cachedHeaders.reduce((sum, h) => sum + (h.wordCount || 0), 0),
+        totalLines: document.lineCount,
+        sectionsCount: cachedHeaders.length
+      };
     }
 
-    return {
-      headers,
-      totalWords,
-      totalLines: lines.length,
-      sectionsCount: headers.length
-    };
+    try {
+      logger.info(`[HeaderCodeLens] Using MarkdownLanguageServiceWrapper to analyze document structure`);
+
+      // Use the new language service wrapper for robust header extraction
+      let structure = await PerformanceMonitor.withTiming(
+        () => this.markdownService.parseDocumentStructure(document),
+        'MarkdownLanguageService.parseDocumentStructure',
+        100
+      );
+
+      // If the language service returns no headers, fall back to internal regex logic
+      if (!structure.headers || structure.headers.length === 0) {
+        logger.info('[HeaderCodeLens] Language service returned no headers, using fallback parsing');
+        structure = this.fallbackAnalyzeDocumentStructure(document);
+      }
+
+      // Cache the parsed headers
+      const parseTime = Date.now() - startTime;
+      this.cache.setCachedHeaders(document, structure.headers, parseTime);
+
+      logger.info(`[HeaderCodeLens] Language service found ${structure.headers.length} headers (${parseTime}ms)`);
+      logger.info(`[HeaderCodeLens] Total words: ${structure.totalWords}, Total lines: ${structure.totalLines}`);
+
+      return structure;
+    } catch (error) {
+      logger.error('[HeaderCodeLens] Error using language service, falling back to regex parsing:', error);
+
+      // Fallback to the original regex-based parsing if language service fails
+      const structure = this.fallbackAnalyzeDocumentStructure(document);
+      const parseTime = Date.now() - startTime;
+      this.cache.setCachedHeaders(document, structure.headers, parseTime);
+      return structure;
+    }
   }
 
   private analyzeSectionContent(lines: string[], headerLineIndex: number): { hasContent: boolean; wordCount: number } {
@@ -314,7 +336,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
       return;
     }
 
-    const structure = this.analyzeDocumentStructure(document);
+  const structure = await this.analyzeDocumentStructureAsync(document);
     const tocLines = ['', '## Table of Contents', ''];
 
     // Generate TOC entries
@@ -349,8 +371,8 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
       return;
     }
 
-    const structure = this.analyzeDocumentStructure(document);
-    const currentHeader = structure.headers.find(h => h.line === headerLineNumber);
+  const structure = await this.analyzeDocumentStructureAsync(document);
+    const currentHeader = structure.headers.find((h: HeaderInfo) => h.line === headerLineNumber);
 
     if (!currentHeader) {
       return;
@@ -368,14 +390,14 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
 
     // Get section content
     const sectionStart = currentHeader.line;
-    const nextHeaderIndex = structure.headers.findIndex((h, i) => i > currentIndex && h.level <= currentHeader.level);
+    const nextHeaderIndex = structure.headers.findIndex((h: HeaderInfo, i: number) => i > currentIndex && h.level <= currentHeader.level);
     const sectionEnd = nextHeaderIndex >= 0 ? structure.headers[nextHeaderIndex].line - 1 : lines.length - 1;
 
     const sectionLines = lines.slice(sectionStart, sectionEnd + 1);
 
     // Get target section
     const targetSectionStart = targetHeader.line;
-    const targetNextHeaderIndex = structure.headers.findIndex((h, i) => i > targetIndex && h.level <= targetHeader.level);
+    const targetNextHeaderIndex = structure.headers.findIndex((h: HeaderInfo, i: number) => i > targetIndex && h.level <= targetHeader.level);
     const targetSectionEnd = targetNextHeaderIndex >= 0 ? structure.headers[targetNextHeaderIndex].line - 1 : lines.length - 1;
 
     // Complex operation - would need careful implementation to avoid conflicts
@@ -401,7 +423,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   public async copyHeaderSection(document: vscode.TextDocument, lineNumber: number): Promise<void> {
-    const structure = this.analyzeDocumentStructure(document);
+  const structure = await this.analyzeDocumentStructureAsync(document);
     const header = structure.headers.find(h => h.line === lineNumber);
 
     if (!header) {
@@ -425,7 +447,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   public async showHeaderStats(document: vscode.TextDocument, lineNumber: number): Promise<void> {
-    const structure = this.analyzeDocumentStructure(document);
+  const structure = await this.analyzeDocumentStructureAsync(document);
     const header = structure.headers.find(h => h.line === lineNumber);
 
     if (!header) {
@@ -449,17 +471,87 @@ Anchor: #${header.anchor}
       return;
     }
 
-    // Use VS Code's built-in folding
-    await vscode.commands.executeCommand('editor.fold', {
+    // Check current fold state and toggle
+    const isCurrentlyFolded = await this.isSectionFolded(document, lineNumber);
+    const command = isCurrentlyFolded ? 'editor.unfold' : 'editor.fold';
+
+    logger.info(`[HeaderCodeLens] Section at line ${lineNumber} is ${isCurrentlyFolded ? 'folded' : 'unfolded'}, executing ${command}`);
+
+    await vscode.commands.executeCommand(command, {
       levels: 1,
       direction: 'down',
       selectionLines: [lineNumber]
     });
   }
 
+  private async isSectionFolded(document: vscode.TextDocument, lineNumber: number): Promise<boolean> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || editor.document.uri.toString() !== document.uri.toString()) {
+      return false;
+    }
+
+    try {
+      // Get the folding ranges for the document
+      const foldingRanges = await vscode.commands.executeCommand<vscode.FoldingRange[]>(
+        'vscode.executeFoldingRangeProvider',
+        document.uri
+      );
+
+      if (!foldingRanges) {
+        return false;
+      }
+
+      // Check if the line is within a folded range
+      for (const range of foldingRanges) {
+        if (lineNumber >= range.start && lineNumber <= range.end) {
+          // Check if this range is currently collapsed
+          const isCollapsed = await this.isFoldingRangeCollapsed(range);
+          if (isCollapsed) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    } catch (error) {
+      logger.warn(`[HeaderCodeLens] Error checking fold state for line ${lineNumber}:`, error);
+      return false;
+    }
+  }
+
+  private async isFoldingRangeCollapsed(range: vscode.FoldingRange): Promise<boolean> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return false;
+    }
+
+    try {
+      // Use VS Code's internal API to check if a range is collapsed
+      // This is a bit of a workaround since VS Code doesn't expose this directly
+      const startLine = editor.document.lineAt(range.start);
+      const endLine = editor.document.lineAt(range.end);
+
+      // Check if the end line is visible (if it's not visible, the range is collapsed)
+      const visibleRanges = editor.visibleRanges;
+
+      for (const visibleRange of visibleRanges) {
+        // If the end line of the folding range is within a visible range, it's not collapsed
+        if (visibleRange.start.line <= range.end && visibleRange.end.line >= range.end) {
+          return false;
+        }
+      }
+
+      // If we can't determine the state, assume it's not collapsed
+      return false;
+    } catch (error) {
+      logger.warn(`[HeaderCodeLens] Error checking if folding range is collapsed:`, error);
+      return false;
+    }
+  }
+
   public async deleteSection(document: vscode.TextDocument, lineNumber: number): Promise<void> {
-    const structure = this.analyzeDocumentStructure(document);
-    const header = structure.headers.find(h => h.line === lineNumber);
+    const structure = await this.analyzeDocumentStructure(document);
+    const header = structure.headers.find((h: HeaderInfo) => h.line === lineNumber);
 
     if (!header) {
       return;
@@ -483,7 +575,7 @@ Anchor: #${header.anchor}
 
     // Find section boundaries
     const currentIndex = structure.headers.indexOf(header);
-    const nextHeaderIndex = structure.headers.findIndex((h, i) => i > currentIndex && h.level <= header.level);
+    const nextHeaderIndex = structure.headers.findIndex((h: HeaderInfo, i: number) => i > currentIndex && h.level <= header.level);
 
     const startLine = header.line;
     const endLine = nextHeaderIndex >= 0 ? structure.headers[nextHeaderIndex].line - 1 : document.lineCount - 1;
@@ -496,7 +588,7 @@ Anchor: #${header.anchor}
   }
 
   public async showDocumentStats(document: vscode.TextDocument): Promise<void> {
-    const structure = this.analyzeDocumentStructure(document);
+    const structure = await this.analyzeDocumentStructure(document);
 
     const message = `
 Document Statistics:
@@ -519,5 +611,53 @@ ${this.getHeaderLevelStats(structure.headers)}
     return Object.entries(levelCounts)
       .map(([level, count]) => `  H${level}: ${count}`)
       .join('\n');
+  }
+
+  /**
+   * Fallback method using regex parsing when language service fails
+   */
+  private fallbackAnalyzeDocumentStructure(document: vscode.TextDocument): DocumentStructure {
+    const text = document.getText();
+    const lines = text.split('\n');
+    const headers: HeaderInfo[] = [];
+    let totalWords = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      if (headerMatch) {
+        const level = headerMatch[1].length;
+        const title = headerMatch[2].trim();
+        const anchor = this.createAnchor(title);
+
+        logger.info(`[HeaderCodeLens] Fallback found header level ${level}: "${title}"`);
+
+        // Calculate content for this section
+        const sectionInfo = this.analyzeSectionContent(lines, i);
+
+        headers.push({
+          level,
+          title,
+          line: i,
+          range: new vscode.Range(i, 0, i, line.length),
+          anchor,
+          hasContent: sectionInfo.hasContent,
+          wordCount: sectionInfo.wordCount
+        });
+
+        totalWords += sectionInfo.wordCount;
+      } else {
+        // Count words in non-header lines
+        totalWords += this.countWords(line);
+      }
+    }
+
+    return {
+      headers,
+      totalWords,
+      totalLines: lines.length,
+      sectionsCount: headers.length
+    };
   }
 }

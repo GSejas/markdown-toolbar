@@ -5,17 +5,79 @@ All notable changes to the Markdown Toolbar extension will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-09-XX
+
+### ✨ Added
+
+#### **Context Menu Integration**
+
+- **7 Organized Categories**: Complete right-click context menu with logical grouping
+  - 📝 **Format Text**: Bold, italic, strikethrough, code, highlight
+  - 🏗️ **Structure**: Headings, lists, blockquotes, code blocks, horizontal rules
+  - ➕ **Insert**: Links, images, footnotes, math, Mermaid diagrams, tables
+  - 👁️ **Preview**: Standard and enhanced preview options
+  - 🔧 **Tools & Quality**: TOC operations, linting
+  - ⚙️ **Editor Features**: Word wrap, line numbers, minimap, navigation, search
+  - 📤 **Export & Share**: PDF export, Git operations
+- **Smart Visibility**: Menu items only show when relevant extensions are available
+- **Context-Aware Options**: Dynamic menu based on cursor position and document context
+
+#### **New Button Types & Features**
+
+- **Editor Features**: Word wrap toggle, line numbers, minimap controls
+- **PDF Export**: Direct PDF export with markdown-pdf extension integration
+- **Navigation Tools**: Symbol navigation, document outline, search & replace
+- **Git Integration**: Status checking, commit, and diff operations
+- **Enhanced Extension Support**: Added markdown-pdf extension detection
+
+#### **Command System Expansion**
+
+- **25+ New Commands**: Complete command coverage for all toolbar features
+- **Command Organization**: Logical grouping with consistent naming (`mdToolbar.*`)
+- **Extension-Aware Commands**: Automatic fallback behavior when extensions unavailable
+
+### 🔄 Changed
+
+#### **Documentation Improvements**
+
+- **Visual Documentation**: Added diagrams, flowcharts, and visual aids
+- **Simplified Examples**: Cleaner code examples with better formatting
+- **Comprehensive README**: Complete rewrite with modern structure and visuals
+- **Architecture Documentation**: Enhanced with diagrams and implementation details
+
+#### **Code Quality**
+
+- **ESLint Fixes**: Resolved all linting warnings and errors
+- **Type Safety**: Enhanced TypeScript usage throughout codebase
+- **Performance**: Optimized context menu generation and command execution
+
+### 🐛 Bug Fixes
+
+- Fixed missing command definitions for context menu items
+- Resolved extension detection timing issues
+- Improved error handling for missing dependencies
+- Fixed context menu visibility conditions
+
+### 📖 Documentation
+
+- Complete README overhaul with modern design
+- Added visual diagrams and flowcharts
+- Simplified code examples and usage instructions
+- Enhanced architecture documentation
+- Updated CHANGELOG with recent changes
+
+---
+
 ## [2.0.0] - 2024-12-XX
 
 ### 🎉 Major Release - Complete Architecture Rewrite
 
 This release represents a complete rewrite of the Markdown Toolbar extension with modern architecture, intelligent preset management, and advanced dependency detection.
 
-  
-
-### ✨ Added
+### ✨ Features
 
 #### **Preset System**
+
 - **4 Built-in Presets**: Core, Writer, Pro, and Custom
   - **Core**: Essential formatting tools (bold, italic, code, links, lists)
   - **Writer**: Writing-focused with TOC and advanced formatting
@@ -25,6 +87,7 @@ This release represents a complete rewrite of the Markdown Toolbar extension wit
 - **Preset Switcher**: Quick preset switching via command palette or status bar
 
 #### **Intelligent Dependency Detection**
+
 - **Real-time Extension Monitoring**: Detects when markdown extensions are installed/removed
 - **Extension State Tracking**: Distinguishes between installed, active, and disabled extensions
 - **Supported Extensions**:
@@ -35,17 +98,20 @@ This release represents a complete rewrite of the Markdown Toolbar extension wit
 - **Dependency Analysis Tool**: Debug command to analyze current extension state
 
 #### **Advanced Context Detection**
+
 - **Document Context Awareness**: Detects tables, task lists, code blocks, and formatting context
 - **Performance Optimized**: Caching and debouncing for smooth editing experience
 - **Real-time Updates**: Context-sensitive button availability
 
 #### **Comprehensive Command System**
+
 - **25+ New Commands**: Complete `mdToolbar.*` command structure
 - **Command Delegation**: Intelligently delegates to extension commands when available
 - **Fallback System**: Internal implementations when extensions aren't available
 - **Context-Aware Menus**: Dynamic menu visibility based on current context and available extensions
 
 #### **Fallback Implementations**
+
 - **Internal Markdown Engine**: Complete formatting capabilities without dependencies
 - **Smart Fallback Behavior**: Configurable fallback strategies
   - `internal`: Use built-in implementations
@@ -54,12 +120,14 @@ This release represents a complete rewrite of the Markdown Toolbar extension wit
 - **Atomic Operations**: Undo-friendly single-operation edits
 
 #### **Enhanced Configuration**
+
 - **Rich Settings Schema**: 12 new configuration options with validation
 - **Performance Tuning**: Configurable debounce and cache timeouts
 - **Behavior Customization**: Fine-tune extension behavior
 - **Migration Support**: Automatic migration from v1.x settings
 
 #### **User Experience**
+
 - **Welcome Experience**: First-time user onboarding with preset selection
 - **Smart Notifications**: Context-aware suggestions and error messages
 - **Extension Integration**: One-click extension installation prompts
@@ -68,16 +136,19 @@ This release represents a complete rewrite of the Markdown Toolbar extension wit
 ### 🔄 Changed
 
 #### **Command Structure**
+
 - **BREAKING**: Migrated from `markdownToolbar.*` to `mdToolbar.*` commands
 - **Improved Naming**: More consistent and descriptive command names
 - **Better Organization**: Commands grouped by functionality
 
 #### **Settings Structure**
+
 - **BREAKING**: New configuration schema with `markdownToolbar.preset` as primary setting
 - **Enhanced Validation**: Strict validation with helpful error messages
 - **Better Defaults**: Intelligent default values based on available extensions
 
 #### **Performance**
+
 - **50% Faster Context Detection**: Optimized algorithms with caching
 - **Reduced Memory Usage**: Efficient resource management and cleanup
 - **Smoother UI**: Debounced updates prevent UI flicker

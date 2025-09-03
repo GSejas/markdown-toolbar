@@ -137,11 +137,19 @@ export class CommandFactory {
         }
       }
 
-      // Execute direct command
-      logger.info(`[CommandFactory] Executing direct command: ${buttonDef.commandId}`);
-      await vscode.commands.executeCommand(buttonDef.commandId, ...args);
-      logger.info(`[CommandFactory] Successfully executed direct command: ${buttonDef.commandId}`);
-      return { success: true };
+      // No delegate available. Prefer internal fallback instead of re-invoking the same command (avoids recursion).
+      if (buttonDef.fallbackCommand) {
+        logger.info(`[CommandFactory] No delegate found. Executing fallback command: ${buttonDef.fallbackCommand}`);
+        await vscode.commands.executeCommand(buttonDef.fallbackCommand, ...args);
+        logger.info(`[CommandFactory] Successfully executed fallback command: ${buttonDef.fallbackCommand}`);
+        return { success: true, fallbackUsed: true };
+      }
+
+      // As a safety, do NOT call the same commandId here; it would re-enter this handler and loop.
+      logger.warn(
+        `[CommandFactory] No delegate or fallback for ${buttonDef.id} (${buttonDef.commandId}). Skipping self-invocation to avoid recursion.`
+      );
+      return { success: false, message: `No delegate or fallback available for ${buttonDef.id}` };
 
     } catch (error) {
       logger.error(`Error executing command for button ${buttonDef.id}:`, error);
@@ -737,7 +745,7 @@ export class HeaderCopyLinkHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number, anchor: string): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider(new (await import('../engine/DocumentCache')).DocumentCache());
       await headerProvider.copyHeaderLink(document, lineNumber, anchor);
       return { success: true };
     } catch (error) {
@@ -807,7 +815,7 @@ export class HeaderMoveUpHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider(new (await import('../engine/DocumentCache')).DocumentCache());
       await headerProvider.moveHeaderUp(document, lineNumber);
       return { success: true };
     } catch (error) {
@@ -823,7 +831,7 @@ export class HeaderMoveDownHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider(new (await import('../engine/DocumentCache')).DocumentCache());
       await headerProvider.moveHeaderDown(document, lineNumber);
       return { success: true };
     } catch (error) {
@@ -839,7 +847,7 @@ export class HeaderFoldSectionHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider(new (await import('../engine/DocumentCache')).DocumentCache());
       await headerProvider.foldSection(document, lineNumber);
       return { success: true };
     } catch (error) {
@@ -855,7 +863,7 @@ export class HeaderCopySectionHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, lineNumber: number): Promise<ICommandResult> {
     try {
       const document = await context.vscode.workspace.openTextDocument(uri);
-      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider();
+      const headerProvider = new (await import('../providers/headerCodeLensProvider')).HeaderCodeLensProvider(new (await import('../engine/DocumentCache')).DocumentCache());
       await headerProvider.copyHeaderSection(document, lineNumber);
       return { success: true };
     } catch (error) {

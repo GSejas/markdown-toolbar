@@ -101,7 +101,7 @@ export class DependencyDetector implements IDependencyDetector {
         await this.ensureExtensionActive(extensionId);
       }
 
-      extensions[extensionId] = extension ? this.detectExtension(extensionId, extension) : this.detectExtension(extensionId);
+  extensions[extensionId] = this.detectExtension(extensionId, extension ?? null);
     }
 
     // Build dependency state - use isActive for availability
@@ -110,6 +110,7 @@ export class DependencyDetector implements IDependencyDetector {
       hasMarkdownlint: extensions[EXTENSION_IDS.MARKDOWNLINT]?.isActive ?? false,
       hasPasteImage: extensions[EXTENSION_IDS.PASTE_IMAGE]?.isActive ?? false,
       hasMPE: extensions[EXTENSION_IDS.MPE]?.isActive ?? false,
+      hasMarkdownPdf: extensions[EXTENSION_IDS.MARKDOWN_PDF]?.isActive ?? false,
       extensions,
       lastUpdated: now
     };
@@ -265,7 +266,7 @@ export class DependencyDetector implements IDependencyDetector {
     }
 
     const disposable = this.vscode.extensions.onDidChange(() => {
-      this.handleExtensionChange();
+      this.handleExtensionChangeSync();
     });
 
     this.disposables.push(disposable);
@@ -274,12 +275,37 @@ export class DependencyDetector implements IDependencyDetector {
   /**
    * Handle VS Code extension change event
    */
-  private async handleExtensionChange(): Promise<void> {
+  private handleExtensionChangeSync(): void {
     try {
-      await this.refresh();
+      const previousState = this.cachedState ?? this.computeCurrentStateSync();
+      const currentState = this.computeCurrentStateSync();
+      this.cachedState = currentState;
+      if (previousState) {
+        this.detectAndEmitChanges(previousState, currentState);
+      }
+      // Update context keys in background
+      this.updateContextKeys(currentState).catch(() => {});
     } catch (error) {
       logger.error('Error handling extension change:', error);
     }
+  }
+
+  private computeCurrentStateSync(): IDependencyState {
+    const now = Date.now();
+    const extensions: Record<string, IExtensionInfo> = {};
+    for (const extensionId of Object.values(EXTENSION_IDS)) {
+      const extension = this.vscode.extensions.getExtension(extensionId);
+      extensions[extensionId] = this.detectExtension(extensionId, extension ?? null);
+    }
+    return {
+      hasMAIO: extensions[EXTENSION_IDS.MAIO]?.isActive ?? false,
+      hasMarkdownlint: extensions[EXTENSION_IDS.MARKDOWNLINT]?.isActive ?? false,
+      hasPasteImage: extensions[EXTENSION_IDS.PASTE_IMAGE]?.isActive ?? false,
+      hasMPE: extensions[EXTENSION_IDS.MPE]?.isActive ?? false,
+      hasMarkdownPdf: extensions[EXTENSION_IDS.MARKDOWN_PDF]?.isActive ?? false,
+      extensions,
+      lastUpdated: now
+    };
   }
 
   /**
@@ -290,7 +316,8 @@ export class DependencyDetector implements IDependencyDetector {
       [CONTEXT_KEYS.hasMAIO]: state.hasMAIO,
       [CONTEXT_KEYS.hasMarkdownlint]: state.hasMarkdownlint,
       [CONTEXT_KEYS.hasPasteImage]: state.hasPasteImage,
-      [CONTEXT_KEYS.hasMPE]: state.hasMPE
+      [CONTEXT_KEYS.hasMPE]: state.hasMPE,
+      [CONTEXT_KEYS.hasMarkdownPdf]: state.hasMarkdownPdf
     };
 
     try {

@@ -108,6 +108,7 @@ describe('DependencyDetector', () => {
         hasMarkdownlint: false,
         hasPasteImage: true,
         hasMPE: false,
+        hasMarkdownPdf: false,
         extensions: expect.objectContaining({
           [EXTENSION_IDS.MAIO]: expect.objectContaining({
             isInstalled: true,
@@ -138,7 +139,7 @@ describe('DependencyDetector', () => {
       console.log('getExtension call count:', mockVscode.extensions.getExtension.mock.calls.length);
       expect(state1).toBe(state2);
       expect(state1.lastUpdated).toBe(state2.lastUpdated);
-      expect(mockVscode.extensions.getExtension).toHaveBeenCalledTimes(4); // Once for each extension
+      expect(mockVscode.extensions.getExtension).toHaveBeenCalledTimes(5); // Once for each extension
     });
 
     it('should refresh cache when timeout expires', async () => {

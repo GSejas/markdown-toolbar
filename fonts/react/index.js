@@ -44,6 +44,7 @@ export * from './PreviewMpeCurrent';
 export * from './PreviewMpeSide';
 export * from './PreviewSide';
 export * from './QuoteLeftSolidSvgrepoCom';
+export * from './StrikeSvgrepoCom';
 export * from './TableMenu';
 export * from './TableOfContentsSvgrepoCom';
 export * from './TableSvgrepoCom';

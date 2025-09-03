@@ -18,6 +18,7 @@ The Markdown Toolbar Extension is a comprehensive VS Code extension that provide
 ## 🏛️ Architectural Principles
 
 ### 1. **Clean Architecture Pattern**
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    VS Code Extension Host                    │

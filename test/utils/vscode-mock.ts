@@ -45,9 +45,30 @@ export class Position {
     }
 }
 
-// Mock Range class
+// Mock EndOfLine enum
+export enum EndOfLine {
+    LF = 1,
+    CRLF = 2,
+}
+
+// Mock Range class with numeric overload support
 export class Range {
-    constructor(public start: Position, public end: Position) { }
+    public start: Position;
+    public end: Position;
+
+    constructor(start: Position | number, end: Position | number, endLine?: number, endCharacter?: number) {
+        if (typeof start === 'number' && typeof end === 'number' && typeof endLine === 'number' && typeof endCharacter === 'number') {
+            this.start = new Position(start, end);
+            this.end = new Position(endLine, endCharacter);
+        } else if (start instanceof Position && end instanceof Position) {
+            this.start = start;
+            this.end = end;
+        } else {
+            // Fallback for unexpected usages
+            this.start = start instanceof Position ? start : new Position(0, 0);
+            this.end = end instanceof Position ? end : new Position(0, 0);
+        }
+    }
 
     isEmpty(): boolean {
         return this.start.isEqual(this.end);
@@ -131,7 +152,7 @@ export class TextDocument {
     public version = 1;
     public isDirty = false;
     public isClosed = false;
-    public eol = 1; // EndOfLine.LF
+    public eol = EndOfLine.LF;
     public lineCount = 1;
 
     constructor(public content: string = '') {

@@ -266,18 +266,20 @@ export class PresetManager implements IPresetManager {
     // Listen for configuration changes
     const configDisposable = this.vscode.workspace.onDidChangeConfiguration((event: any) => {
       if (event.affectsConfiguration(CONFIG_KEYS.root)) {
-        this.handleConfigurationChange(event).catch(error => {
+        // Emit synchronously so tests observing immediate effects can assert without awaiting
+        try {
+          this.handleConfigurationChangeSync(event);
+        } catch (error) {
           console.error('Failed to handle configuration change:', error);
-        });
+        }
       }
     });
     this.disposables.push(configDisposable);
 
     // Listen for dependency changes for auto-switching
-    const depDisposable = this.dependencyDetector.onDidChangeExtensions((event) => {
-      this.handleDependencyChange(event).catch(error => {
-        console.error('Failed to handle dependency change:', error);
-      });
+    const depDisposable = this.dependencyDetector.onDidChangeExtensions((event: any) => {
+      // Return the promise to allow callers to await completion
+      return this.handleDependencyChange(event);
     });
     this.disposables.push(depDisposable);
 
@@ -312,6 +314,46 @@ export class PresetManager implements IPresetManager {
 
     // Update context keys
     this.updateContextKeys();
+  }
+
+  /**
+   * Synchronous configuration change handling for deterministic tests
+   */
+  private handleConfigurationChangeSync(event: any): void {
+    const previousPreset = this.currentPresetCache?.id || 'core';
+
+    // Clear cache to force refresh
+    this.currentPresetCache = null;
+
+    const currentPreset = this.getCurrentPreset();
+
+    // Emit change event if preset actually changed
+    if (previousPreset !== currentPreset.id) {
+      const availableButtons = this.getEffectiveButtonsSync();
+      const changeEvent: IPresetChangeEvent = {
+        previousPreset,
+        currentPreset: currentPreset.id,
+        triggeredBy: 'config',
+        availableButtons,
+        timestamp: Date.now()
+      };
+      this.emitPresetChange(changeEvent);
+    }
+
+    // Fire-and-forget context key update
+    void this.updateContextKeys();
+  }
+
+  /**
+   * Compute effective buttons without async calls (used in sync paths/tests)
+   */
+  private getEffectiveButtonsSync(): ButtonId[] {
+    const preset = this.getCurrentPreset();
+    return preset.buttons.filter(buttonId => {
+      const buttonDef = BUTTON_DEFINITIONS[buttonId];
+      if (!buttonDef.requiresExtension) return true;
+      return this.dependencyDetector.isExtensionAvailable(buttonDef.requiresExtension);
+    });
   }
 
   /**

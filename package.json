@@ -251,6 +251,146 @@
       {
         "command": "mdToolbar.internal.image",
         "title": "Insert Image (Internal)"
+      },
+      {
+        "command": "mdToolbar.fmt.code",
+        "title": "Code",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.fmt.highlight",
+        "title": "Highlight",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h1",
+        "title": "Heading 1",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h2",
+        "title": "Heading 2",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h3",
+        "title": "Heading 3",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h4",
+        "title": "Heading 4",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h5",
+        "title": "Heading 5",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.h6",
+        "title": "Heading 6",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.heading.toggle",
+        "title": "Toggle Heading",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.blockquote.toggle",
+        "title": "Toggle Blockquote",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.hr.insert",
+        "title": "Insert Horizontal Rule",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.footnote.insert",
+        "title": "Insert Footnote",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.math.inline",
+        "title": "Insert Inline Math",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.math.block",
+        "title": "Insert Math Block",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.mermaid.insert",
+        "title": "Insert Mermaid Diagram",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.break.line",
+        "title": "Insert Line Break",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.preview.lock",
+        "title": "Lock Preview",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.preview.mpe.current",
+        "title": "Preview (MPE)",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.editor.wordWrap",
+        "title": "Toggle Word Wrap",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.editor.lineNumbers",
+        "title": "Toggle Line Numbers",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.editor.minimap",
+        "title": "Toggle Minimap",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.nav.symbols",
+        "title": "Go to Symbol",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.nav.outline",
+        "title": "Document Outline",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.search.replace",
+        "title": "Search & Replace",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.export.pdf",
+        "title": "Export to PDF",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.git.status",
+        "title": "Git Status",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.git.commit",
+        "title": "Git Commit",
+        "category": "Markdown Toolbar"
+      },
+      {
+        "command": "mdToolbar.git.diff",
+        "title": "Git Diff",
+        "category": "Markdown Toolbar"
       }
     ],
     "keybindings": [
@@ -310,38 +450,285 @@
           "submenu": "mdToolbar.format",
           "group": "1_modification",
           "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.structure",
+          "group": "1_modification",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.insert",
+          "group": "1_modification",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.preview",
+          "group": "2_preview",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.tools",
+          "group": "3_tools",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.editor",
+          "group": "4_editor",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "submenu": "mdToolbar.export",
+          "group": "5_export",
+          "when": "editorLangId == markdown"
         }
       ],
       "mdToolbar.format": [
         {
           "command": "mdToolbar.fmt.bold",
-          "group": "1_format@1",
-          "when": "editorLangId == markdown && mdToolbar.preset == 'core' || mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+          "group": "1_text@1",
+          "when": "editorLangId == markdown"
         },
         {
           "command": "mdToolbar.fmt.italic",
-          "group": "1_format@2",
-          "when": "editorLangId == markdown && mdToolbar.preset == 'core' || mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+          "group": "1_text@2",
+          "when": "editorLangId == markdown"
         },
         {
           "command": "mdToolbar.fmt.strike",
-          "group": "1_format@3",
-          "when": "editorLangId == markdown && mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro'"
+          "group": "1_text@3",
+          "when": "editorLangId == markdown"
         },
         {
+          "command": "mdToolbar.fmt.code",
+          "group": "1_text@4",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.fmt.highlight",
+          "group": "1_text@5",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "mdToolbar.structure": [
+        {
+          "command": "mdToolbar.heading.h1",
+          "group": "1_headings@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.h2",
+          "group": "1_headings@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.h3",
+          "group": "1_headings@3",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.h4",
+          "group": "1_headings@4",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.h5",
+          "group": "1_headings@5",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.h6",
+          "group": "1_headings@6",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.heading.toggle",
+          "group": "1_headings@7",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.list.toggle",
+          "group": "2_lists@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.task.toggle",
+          "group": "2_lists@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.blockquote.toggle",
+          "group": "3_blocks@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.code.block",
+          "group": "3_blocks@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.hr.insert",
+          "group": "3_blocks@3",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "mdToolbar.insert": [
+        {
+          "command": "mdToolbar.link.insert",
+          "group": "1_links@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.image.insert",
+          "group": "1_links@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.image.paste",
+          "group": "1_links@3",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.footnote.insert",
+          "group": "2_advanced@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.math.inline",
+          "group": "2_advanced@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.math.block",
+          "group": "2_advanced@3",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.mermaid.insert",
+          "group": "2_advanced@4",
+          "when": "editorLangId == markdown && mdToolbar.hasMermaid"
+        },
+        {
+          "command": "mdToolbar.table.menu",
+          "group": "3_tables@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.break.line",
+          "group": "4_misc@1",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "mdToolbar.preview": [
+        {
+          "command": "mdToolbar.preview.side",
+          "group": "1_standard@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.preview.current",
+          "group": "1_standard@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.preview.lock",
+          "group": "1_standard@3",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.preview.mpe.side",
+          "group": "2_enhanced@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMPE"
+        },
+        {
+          "command": "mdToolbar.preview.mpe.current",
+          "group": "2_enhanced@2",
+          "when": "editorLangId == markdown && mdToolbar.hasMPE"
+        }
+      ],
+      "mdToolbar.tools": [
+        {
           "command": "mdToolbar.toc.create",
-          "group": "2_toc@1",
-          "when": "editorLangId == markdown && mdToolbar.hasMAIO && (mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro')"
+          "group": "1_toc@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO"
         },
         {
           "command": "mdToolbar.toc.update",
-          "group": "2_toc@2",
-          "when": "editorLangId == markdown && mdToolbar.hasMAIO && (mdToolbar.preset == 'writer' || mdToolbar.preset == 'pro')"
+          "group": "1_toc@2",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO"
+        },
+        {
+          "command": "mdToolbar.toc.addNumbers",
+          "group": "1_toc@3",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO"
+        },
+        {
+          "command": "mdToolbar.toc.removeNumbers",
+          "group": "1_toc@4",
+          "when": "editorLangId == markdown && mdToolbar.hasMAIO"
         },
         {
           "command": "mdToolbar.lint.fix",
-          "group": "3_lint@1",
-          "when": "editorLangId == markdown && mdToolbar.hasMarkdownlint && mdToolbar.preset == 'pro'"
+          "group": "2_quality@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMarkdownlint"
+        },
+        {
+          "command": "mdToolbar.lint.workspace",
+          "group": "2_quality@2",
+          "when": "editorLangId == markdown && mdToolbar.hasMarkdownlint"
+        }
+      ],
+      "mdToolbar.editor": [
+        {
+          "command": "mdToolbar.editor.wordWrap",
+          "group": "1_view@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.editor.lineNumbers",
+          "group": "1_view@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.editor.minimap",
+          "group": "1_view@3",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.nav.symbols",
+          "group": "2_navigation@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.nav.outline",
+          "group": "2_navigation@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.search.replace",
+          "group": "3_search@1",
+          "when": "editorLangId == markdown"
+        }
+      ],
+      "mdToolbar.export": [
+        {
+          "command": "mdToolbar.export.pdf",
+          "group": "1_export@1",
+          "when": "editorLangId == markdown && mdToolbar.hasMarkdownPdf"
+        },
+        {
+          "command": "mdToolbar.git.status",
+          "group": "2_git@1",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.git.commit",
+          "group": "2_git@2",
+          "when": "editorLangId == markdown"
+        },
+        {
+          "command": "mdToolbar.git.diff",
+          "group": "2_git@3",
+          "when": "editorLangId == markdown"
         }
       ]
     },
@@ -366,12 +753,85 @@
           "fontPath": "./fonts/MyIcons.woff2",
           "fontCharacter": "\\ea27"
         }
+      },
+      "md-header-one": {
+        "description": "Header one icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea0f"
+        }
+      },
+      "md-header-two": {
+        "description": "header two icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea11"
+        }
+      },
+      "md-header-three": {
+        "description": "header three icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea13"
+        }
+      },
+      "md-header-four": {
+        "description": "header four icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea15"
+        }
+      },
+      "md-header-five": {
+        "description": "header five icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea16"
+        }
+      },
+      "md-header-six": {
+        "description": "header six icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea17"
+        }
+      },
+      "md-strikethrough": {
+        "description": "Strikethrough icon",
+        "default": {
+          "fontPath": "./fonts/MyIcons.woff2",
+          "fontCharacter": "\\ea2f"
+        }
       }
     },
     "submenus": [
       {
         "id": "mdToolbar.format",
-        "label": "Markdown Toolbar"
+        "label": "Format Text"
+      },
+      {
+        "id": "mdToolbar.structure",
+        "label": "Structure"
+      },
+      {
+        "id": "mdToolbar.insert",
+        "label": "Insert"
+      },
+      {
+        "id": "mdToolbar.preview",
+        "label": "Preview"
+      },
+      {
+        "id": "mdToolbar.tools",
+        "label": "Tools & Quality"
+      },
+      {
+        "id": "mdToolbar.editor",
+        "label": "Editor Features"
+      },
+      {
+        "id": "mdToolbar.export",
+        "label": "Export & Share"
       }
     ]
   },
@@ -410,9 +870,21 @@
     "csv-writer": "^1.6.0",
     "esbuild": "0.25.9",
     "eslint": "9.34.0",
+    "glob": "^11.0.3",
     "mocha": "11.7.2",
     "npm-run-all": "4.1.5",
     "typescript": "5.9.2",
     "vitest": "3.2.4"
+  },
+  "dependencies": {
+    "@types/quick-lru": "^2.0.0",
+    "@types/unist": "^3.0.3",
+    "quick-lru": "^7.1.0",
+    "reflect-metadata": "^0.2.2",
+    "remark": "^15.0.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "tsyringe": "^4.10.0",
+    "vscode-markdown-languageservice": "^0.5.0-alpha.11"
   }
 }

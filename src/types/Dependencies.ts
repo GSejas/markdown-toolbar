@@ -32,7 +32,8 @@ export const EXTENSION_IDS = {
   MAIO: 'yzhang.markdown-all-in-one',
   MARKDOWNLINT: 'DavidAnson.vscode-markdownlint',
   PASTE_IMAGE: 'mushan.vscode-paste-image',
-  MPE: 'shd101wyy.markdown-preview-enhanced'
+  MPE: 'shd101wyy.markdown-preview-enhanced',
+  MARKDOWN_PDF: 'yzane.markdown-pdf'
 } as const;
 
 /**
@@ -58,6 +59,7 @@ export interface IDependencyState {
   hasMarkdownlint: boolean;
   hasPasteImage: boolean;
   hasMPE: boolean;
+  hasMarkdownPdf: boolean;
 
   // Detailed extension info
   extensions: Record<string, IExtensionInfo>;

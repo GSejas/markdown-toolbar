@@ -76,6 +76,10 @@ import { StatusBarToolbar } from './ui/StatusBarToolbar';
 import { StatusBarManager } from './ui/StatusBarManager';
 import { ConfigurationGenerator } from './ui/ConfigurationGenerator';
 
+// Dependency Injection
+import { ServiceContainer } from './di/ServiceContainer';
+import { PerformanceMonitor } from './utils/PerformanceMonitor';
+
 /**
  * Extension state management with complete system integration
  */
@@ -102,6 +106,9 @@ class ExtensionState {
 		try {
 			logger.info('Activating Markdown Toolbar extension v2.0...');
 
+			// Initialize dependency injection container
+			ServiceContainer.initialize(context);
+
 			// Initialize core services
 			await this.initializeCoreServices();
 
@@ -115,6 +122,12 @@ class ExtensionState {
 			logger.info('About to call registerProviders...');
 			this.registerProviders(context);
 			logger.info('registerProviders call completed');
+
+			// Initialize performance monitoring
+			PerformanceMonitor.startMemoryTracking();
+			context.subscriptions.push(
+				PerformanceMonitor.createPerformanceDiagnosticsCommand()
+			);
 
 			// Add disposables to context
 			context.subscriptions.push(
@@ -402,8 +415,9 @@ class ExtensionState {
 		// Header providers - always register (navigation is essential)
 		logger.info('[Extension] Starting HeaderCodeLensProvider registration...');
 		import('./providers/headerCodeLensProvider').then(({ HeaderCodeLensProvider }) => {
-			logger.info('[Extension] HeaderCodeLensProvider import successful, creating instance...');
-			const headerProvider = new HeaderCodeLensProvider();
+			logger.info('[Extension] HeaderCodeLensProvider import successful, creating instance via DI...');
+			const container = ServiceContainer.getContainer();
+			const headerProvider = container.resolve(HeaderCodeLensProvider);
 			logger.info('[Extension] HeaderCodeLensProvider instance created, registering with VS Code...');
 			const providerDisposable = vscode.languages.registerCodeLensProvider({ language: 'markdown' }, headerProvider);
 			context.subscriptions.push(providerDisposable);
