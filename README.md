@@ -1,5 +1,11 @@
 
 <p align="center">
+<img src="assets/markdown statusbar logo (128 x 128 px) w bg.png">
+</p>
+
+
+<p align="center">
+   
   <a href="https://github.com/GSejas/markdown-toolbar"><img src="https://img.shields.io/badge/version-0.2.0-blue.svg?style=flat-square&logo=semantic-release" alt="Version"></a>
   <a href="https://code.visualstudio.com/"><img src="https://img.shields.io/badge/VS%20Code-^1.103.0-brightgreen.svg?style=flat-square&logo=visual-studio-code" alt="VS Code"></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9.2-blue.svg?style=flat-square&logo=typescript" alt="TypeScript"></a>
