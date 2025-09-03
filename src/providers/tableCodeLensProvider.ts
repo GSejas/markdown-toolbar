@@ -154,7 +154,7 @@ export class TableCodeLensProvider implements vscode.CodeLensProvider {
 
   private isTableSeparator(line: string): boolean {
     const trimmed = line.trim();
-    return /^\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?$/.test(trimmed);
+    return /^\|(\s*:?-+:?\s*\|)*\s*:?-+:?\s*\|$/.test(trimmed);
   }
 
   private parseTable(lines: string[], startLine: number): TableInfo | null {

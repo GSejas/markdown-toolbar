@@ -2,7 +2,14 @@
  * @moduleName: Dependency Detector - Extension Detection Service
  * @version: 1.0.0
  * @since: 2025-08-01
- * @lastUpdated: 2025-09-01
+ * @la  public detectExtension(extensionId: string, extension?: any): IExtensionInfo {
+    try {
+      // Use provided extension or get it from VS Code
+      const ext = extension !== undefined ? extension : this.vscode.extensions.getExtension(extensionId);
+
+      if (!ext) {
+        return this.createMissingExtensionInfo(extensionId);
+      }ed: 2025-09-01
  * @projectSummary: Intelligent detection and monitoring of VS Code extension dependencies with caching and event handling
  * @techStack: TypeScript, VS Code Extension API
  * @dependency: vscode (VS Code Extension API)
@@ -86,9 +93,15 @@ export class DependencyDetector implements IDependencyDetector {
     // Detect all tracked extensions and try to activate them if needed
     const extensions: Record<string, IExtensionInfo> = {};
     for (const extensionId of Object.values(EXTENSION_IDS)) {
-      // Try to ensure extension is active before detecting
-      await this.ensureExtensionActive(extensionId);
-      extensions[extensionId] = this.detectExtension(extensionId);
+      // Get extension once to avoid double calls
+      const extension = this.vscode.extensions.getExtension(extensionId);
+
+      // Try to ensure extension is active before detecting (only if extension exists)
+      if (extension && !extension.isActive) {
+        await this.ensureExtensionActive(extensionId);
+      }
+
+      extensions[extensionId] = extension ? this.detectExtension(extensionId, extension) : this.detectExtension(extensionId);
     }
 
     // Build dependency state - use isActive for availability
@@ -113,16 +126,17 @@ export class DependencyDetector implements IDependencyDetector {
   /**
    * Detect a specific extension with proper active/installed/disabled states
    */
-  public detectExtension(extensionId: string): IExtensionInfo {
+  public detectExtension(extensionId: string, extension?: any): IExtensionInfo {
     try {
-      const extension = this.vscode.extensions.getExtension(extensionId);
+      // Use provided extension or get it from VS Code
+      const ext = extension !== undefined ? extension : this.vscode.extensions.getExtension(extensionId);
 
-      if (!extension) {
+      if (!ext) {
         return this.createMissingExtensionInfo(extensionId);
       }
 
       // Extension exists (is installed)
-      const isActive = extension.isActive;
+      const isActive = ext.isActive;
       const isInstalled = true;
 
       // Check if extension is disabled (installed but not active due to user settings)
@@ -133,12 +147,12 @@ export class DependencyDetector implements IDependencyDetector {
       return {
         id: extensionId,
         name: this.extractNameFromId(extensionId),
-        displayName: extension.packageJSON?.displayName || extensionId,
+        displayName: ext.packageJSON?.displayName || extensionId,
         isInstalled,
         isActive,
         isDisabled,
-        version: extension.packageJSON?.version,
-        commands: this.extractCommands(extension),
+        version: ext.packageJSON?.version,
+        commands: this.extractCommands(ext),
         canUseAPI: isActive // Can only use ext.exports if active
       };
     } catch (error) {

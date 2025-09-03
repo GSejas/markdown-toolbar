@@ -417,7 +417,7 @@ export class EnhancedHoverProvider implements vscode.HoverProvider {
     let blockStart = -1;
     let blockContent = '';
 
-    for (let i = 0; i <= position.line; i++) {
+    for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
       if (line.trim().startsWith('```mermaid')) {
@@ -428,8 +428,8 @@ export class EnhancedHoverProvider implements vscode.HoverProvider {
       }
 
       if (inMermaidBlock && line.trim() === '```') {
+        // Check if the position is inside this mermaid block
         if (position.line > blockStart && position.line < i) {
-          // Position is inside this mermaid block
           const range = new vscode.Range(
             new vscode.Position(blockStart, 0),
             new vscode.Position(i, line.length)

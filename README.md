@@ -347,6 +347,48 @@ Press `F5` to launch extension in development mode.
 - Comprehensive test suite prevents regressions
 - Documentation required for all public APIs
 
+---
+
+## 📚 Lessons Learned & Continuous Learning
+
+### 🔍 Recent Insights
+
+- **Extension Detection Performance**: Real-time scanning can impact startup time - consider lazy loading strategies
+- **Preset Switching UX**: Users prefer explicit preset selection over automatic detection in complex workflows
+- **Context Awareness Balance**: Too much automation can confuse users - maintain clear visual feedback
+- **Testing Coverage Gaps**: CodeLens providers and UI components require specialized testing approaches
+
+### 💡 Future Considerations
+
+- **Accessibility Integration**: Consider screen reader support for status bar interactions
+- **Theme Compatibility**: Test across different VS Code themes for consistent visual feedback
+- **Performance Monitoring**: Implement telemetry for command usage patterns and performance metrics
+- **Cross-Platform Testing**: Ensure consistent behavior across Windows, macOS, and Linux
+
+### 📝 Development Notes
+
+- **Architecture Decisions**: Document rationale for major changes in ADR format
+- **Code Review Checklist**: Standardize review criteria for consistent quality
+- **Testing Strategy**: Maintain 85%+ coverage with focus on critical user paths
+- **Documentation Updates**: Keep examples current with latest VS Code APIs
+
+---
+
+## 📋 Document Review Status
+
+- [ ] **Content Accuracy**: All features and instructions are current and correct
+- [ ] **Code Examples**: All code snippets are tested and functional
+- [ ] **Links**: All external links are accessible and relevant
+- [ ] **Screenshots/Images**: Visual assets are up-to-date and clear
+- [ ] **Cross-Platform**: Instructions work across Windows, macOS, and Linux
+- [ ] **Accessibility**: Content follows accessibility best practices
+
+**Last Reviewed:** September 2, 2025  
+**Review Version:** v2.0.0  
+**Next Review Due:** December 2, 2025
+
+---
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
@@ -359,6 +401,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-**Enjoy enhanced markdown editing! 🎉**
+## 🎉 Enjoy Enhanced Markdown Editing
 
 *For support, feature requests, or bug reports, please visit our [GitHub Issues](https://github.com/your-repo/markdown-toolbar/issues) page.*

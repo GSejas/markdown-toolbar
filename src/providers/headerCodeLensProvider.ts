@@ -73,7 +73,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
       logger.info(`[HeaderCodeLens] Document has ${document.lineCount} lines`);
 
       if (structure.headers.length === 0) {
-        logger.info(`[HeaderCodeLens] No headers found - document content preview:`)
+        logger.info(`[HeaderCodeLens] No headers found - document content preview:`);
         logger.info(`[HeaderCodeLens] First 10 lines: ${document.getText().split('\n').slice(0, 10).join(' | ')}`);
       }
 
@@ -163,13 +163,34 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     let totalWords = 0;
 
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i].trim();
+      
+      // Debug: Check if line looks like a header
+      if (line.trim().startsWith('#')) {
+        logger.info(`[HeaderCodeLens] Line ${i} starts with #: "${line}"`);
+        logger.info(`[HeaderCodeLens] Line length: ${line.length}, char codes: [${line.split('').map(c => c.charCodeAt(0)).slice(0, 10).join(', ')}]`);
+        
+        // Test the regex step by step
+        const testRegex = /^(#{1,6})\s+(.+)$/;
+        const testMatch = line.match(testRegex);
+        logger.info(`[HeaderCodeLens] Regex test result: ${!!testMatch}`);
+        if (testMatch) {
+          logger.info(`[HeaderCodeLens] Match groups:`, testMatch);
+        }
+      }
+      
       const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      if (i < 20) { // Only log first 20 lines to avoid spam
+        logger.info(`[HeaderCodeLens] Line ${i} header match: ${!!headerMatch} | "${line}"`);
+      }
 
       if (headerMatch) {
         const level = headerMatch[1].length;
         const title = headerMatch[2].trim();
         const anchor = this.createAnchor(title);
+        
+        logger.info(`[HeaderCodeLens] Found header level ${level}: "${title}"`);
+        logger.info(`[HeaderCodeLens] Header match groups:`, headerMatch);
 
         // Calculate content for this section
         const sectionInfo = this.analyzeSectionContent(lines, i);
@@ -230,7 +251,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   private getHeaderLevel(line: string): number {
-    const headerMatch = line.match(/^#{1,6}/);
+    const headerMatch = line.trim().match(/^#{1,6}/);
     return headerMatch ? headerMatch[0].length : 0;
   }
 
@@ -265,7 +286,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     const line = document.lineAt(lineNumber);
-    const headerMatch = line.text.match(/^(#{1,6})\s+(.+)$/);
+    const headerMatch = line.text.trim().match(/^(#{1,6})\s+(.+)$/);
 
     if (!headerMatch) {
       logger.warn('No header found at line', lineNumber);
@@ -366,7 +387,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
 
   public async copyHeaderLink(document: vscode.TextDocument, lineNumber: number, anchor: string): Promise<void> {
     const line = document.lineAt(lineNumber);
-    const headerMatch = line.text.match(/^#{1,6}\s+(.+)$/);
+    const headerMatch = line.text.trim().match(/^#{1,6}\s+(.+)$/);
 
     if (!headerMatch) {
       return;

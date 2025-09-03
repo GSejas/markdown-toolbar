@@ -65,7 +65,33 @@ export class Range {
     }
 }
 
-// Mock Selection class
+// Mock CodeLens class
+class CodeLens {
+    constructor(public range: Range, public command?: any, public isResolved?: boolean) {}
+}
+
+// Mock Hover class
+class Hover {
+    constructor(public contents: any[], public range?: Range) {}
+}
+class MarkdownString {
+    constructor(value?: string) {
+        this.value = value || '';
+    }
+    value: string = '';
+    isTrusted: boolean = false;
+    supportHtml: boolean = false;
+
+    appendMarkdown(value: string): MarkdownString {
+        this.value += value;
+        return this;
+    }
+
+    appendText(value: string): MarkdownString {
+        this.value += value;
+        return this;
+    }
+}
 export class Selection extends Range {
     constructor(start: Position, end: Position) {
         super(start, end);
@@ -371,5 +397,8 @@ export {
     Uri,
     Disposable,
     ConfigurationTarget,
-    StatusBarAlignment
+    StatusBarAlignment,
+    CodeLens,
+    MarkdownString,
+    Hover
 };

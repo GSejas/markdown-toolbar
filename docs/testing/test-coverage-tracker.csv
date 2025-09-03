@@ -1,0 +1,27 @@
+Component,File,Current_Coverage,Target_Coverage,Test_Count,Status,Priority,Assigned_Agent,Dependencies,Estimated_Effort
+SUMMARY,Overall_Status,97%,85%,140,Phase1_In_Progress,Critical,Agent4,4_failing_tests_remaining,High
+Providers,BlockCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+Providers,HeadingCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+Providers,ListCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+Providers,TableCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+Providers,ImageCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+Providers,LinkCodeLensProvider.ts,0%,85%,0,Not_Started,Critical,Agent1,VS Code API mocks,High
+UI,StatusBarManager.ts,0%,80%,0,Not_Started,High,Agent2,StatusBarToolbar tests,Medium
+UI,StatusBarToolbar.ts,0%,80%,0,Not_Started,High,Agent2,VS Code window API,Medium
+UI,ConfigurationGenerator.ts,0%,80%,0,Not_Started,High,Agent2,Configuration mocks,Medium
+Services,Logger.ts,0%,85%,0,Not_Started,Medium,Agent3,None,Low
+Services,ContextKeyManager.ts,0%,85%,0,Not_Started,Medium,Agent3,VS Code context API,Medium
+Services,ContextService.ts,0%,85%,0,Not_Started,Medium,Agent3,ContextKeyManager,Medium
+Commands,FallbackCommands.ts,100%,90%,23,Passing,Critical,Agent4,Mock fixes completed,High
+Engine,ContextDetector.ts,100%,90%,27,Passing,High,Agent3,None,Low
+Engine,MarkdownFormatter.ts,100%,90%,25,Passing,High,Agent3,None,Low
+Settings,SettingsAdapter.ts,100%,85%,15,Passing,Medium,Agent4,None,Low
+Commands,CommandFactory.ts,100%,85%,2,Passing,Medium,Agent4,None,Low
+Presets,PresetManager.ts,89%,90%,19,Partially_Failing,Critical,Agent4,Event system fixes in progress,High
+Commands,CoreCommands.ts,0%,85%,0,Broken,Critical,Agent4,Missing command files,Medium
+Integration,Extension_Lifecycle,0%,70%,0,Not_Started,High,Agent5,All components,High
+Integration,Command_Registration,0%,70%,0,Not_Started,High,Agent5,Command system,Medium
+Integration,Event_Handling,0%,70%,0,Not_Started,High,Agent5,Event system,Medium
+E2E,Markdown_Editing_Workflow,0%,60%,0,Not_Started,Medium,Agent6,Integration tests,Very_High
+E2E,Status_Bar_Interactions,0%,60%,0,Not_Started,Medium,Agent6,UI components,High
+E2E,CodeLens_User_Flows,0%,60%,0,Not_Started,Medium,Agent6,Provider tests,High

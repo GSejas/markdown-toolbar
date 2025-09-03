@@ -1,0 +1,172 @@
+name: Testing Suite
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  schedule:
+    # Run weekly on Mondays at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      generate_report:
+        description: 'Generate weekly report'
+        required: false
+        default: 'false'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        vscode-version: ['stable', '1.85.0']
+        node-version: ['18', '20']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Type check
+      run: npm run check-types
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Compile
+      run: npm run compile
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Run integration tests
+      run: npm run test:integration
+
+    - name: Generate coverage report
+      run: npm run test:cov
+
+    - name: Update coverage tracker
+      run: npm run update-coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Generate weekly report
+      if: github.event.schedule != '' || github.event.inputs.generate_report == 'true'
+      run: npm run weekly-report
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.vscode-version }}-${{ matrix.node-version }}
+        path: |
+          coverage/
+          docs/testing/test-coverage-tracker.csv
+          docs/testing/implementation-progress.csv
+          docs/testing/weekly-report.md
+
+  quality-gate:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check coverage thresholds
+      run: |
+        # Parse coverage and check against thresholds
+        COVERAGE=$(node -p "JSON.parse(require('fs').readFileSync('./coverage/coverage-summary.json')).total.statements.pct")
+        echo "Current coverage: ${COVERAGE}%"
+
+        if (( $(echo "$COVERAGE < 75.0" | bc -l) )); then
+          echo "❌ Coverage below threshold: ${COVERAGE}% < 75%"
+          exit 1
+        else
+          echo "✅ Coverage meets threshold: ${COVERAGE}% >= 75%"
+        fi
+
+    - name: Check for failing tests
+      run: |
+        # Check if any tests are failing
+        if npm run test:unit > /dev/null 2>&1; then
+          echo "✅ All tests passing"
+        else
+          echo "❌ Some tests are failing"
+          exit 1
+        fi
+
+  weekly-maintenance:
+    runs-on: ubuntu-latest
+    if: github.event.schedule != ''
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Generate comprehensive report
+      run: npm run weekly-report
+
+    - name: Create maintenance issue
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('./docs/testing/weekly-report.md', 'utf8');
+
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `📊 Weekly Testing Report - ${new Date().toISOString().split('T')[0]}`,
+            body: report,
+            labels: ['testing', 'weekly-report', 'maintenance']
+          });
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, quality-gate]
+    if: failure()
+
+    steps:
+    - name: Notify on failure
+      run: |
+        echo "❌ Testing pipeline failed"
+        echo "Check the test results and fix any issues"
+        echo "Update the tracking spreadsheets if needed"

@@ -131,7 +131,12 @@ describe('DependencyDetector', () => {
       const state1 = await detector.getCurrentState();
       const state2 = await detector.getCurrentState();
 
-      // Assert - Should use cache (same timestamp)
+      // Assert - Should use cache (same object)
+      console.log('state1 === state2:', state1 === state2);
+      console.log('state1.lastUpdated:', state1.lastUpdated);
+      console.log('state2.lastUpdated:', state2.lastUpdated);
+      console.log('getExtension call count:', mockVscode.extensions.getExtension.mock.calls.length);
+      expect(state1).toBe(state2);
       expect(state1.lastUpdated).toBe(state2.lastUpdated);
       expect(mockVscode.extensions.getExtension).toHaveBeenCalledTimes(4); // Once for each extension
     });

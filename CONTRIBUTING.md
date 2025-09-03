@@ -294,4 +294,44 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
+## 📚 Lessons Learned & Continuous Learning
+
+### 🔍 Recent Insights
+
+- **Onboarding Experience**: New contributors struggle with extension development setup - improve documentation
+- **Testing Barriers**: Integration testing complexity deters contributions - provide better test utilities
+- **Code Review Process**: Inconsistent review criteria across maintainers - standardize checklists
+- **Documentation Gaps**: API documentation lags behind code changes - implement automated docs
+
+### 💡 Future Considerations
+
+- **Contributor Templates**: Create standardized PR and issue templates for better workflow
+- **Automated Testing**: Implement CI checks for common contribution mistakes
+- **Mentorship Program**: Pair new contributors with experienced maintainers
+- **Code Quality Tools**: Integrate automated code quality checks and formatting
+
+### 📝 Development Notes
+
+- **Contribution Workflow**: Document the complete contribution process with visuals
+- **Testing Guidelines**: Provide clear testing standards for different contribution types
+- **Review Criteria**: Maintain consistent code review standards across all PRs
+- **Release Process**: Document how contributions make it into releases
+
+---
+
+## 📋 Document Review Status
+
+- [ ] **Setup Instructions**: All installation and setup steps are accurate and complete
+- [ ] **Code Examples**: All code snippets compile and work as expected
+- [ ] **Links**: All internal and external links are functional
+- [ ] **Process Clarity**: Contribution workflow is clear and easy to follow
+- [ ] **Cross-Platform**: Instructions work across all supported platforms
+- [ ] **Accessibility**: Content follows accessibility best practices
+
+**Last Reviewed:** September 2, 2025  
+**Review Version:** v2.0.0  
+**Next Review Due:** December 2, 2025
+
+---
+
 **Thank you for making the Markdown Toolbar extension better! 🙌**

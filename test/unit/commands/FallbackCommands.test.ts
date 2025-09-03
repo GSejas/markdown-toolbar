@@ -251,10 +251,24 @@ describe('FallbackCommands', () => {
             };
             mockVSCode.window.activeTextEditor = mockEditor;
 
-            await (fallbackCommands as any).toggleBulletList();
+            // Spy on the lineAt method to ensure it's called
+            const lineAtSpy = vi.fn((lineNumber) => ({
+                text: 'hello',
+                range: { start: { line: lineNumber, character: 0 }, end: { line: lineNumber, character: 5 } }
+            }));
+            mockEditor.document.lineAt = lineAtSpy;
+
+            // Access the private method for testing
+            const toggleBulletListMethod = (fallbackCommands as any).toggleBulletList.bind(fallbackCommands);
+            await toggleBulletListMethod();
+
+            // Manually call the edit callback to execute the lineAt logic
+            const editCallback = mockEditor.edit.mock.calls[0][0];
+            const mockEditBuilder = { replace: vi.fn(), insert: vi.fn(), delete: vi.fn() };
+            editCallback(mockEditBuilder);
 
             expect(mockEditor.edit).toHaveBeenCalledWith(expect.any(Function));
-            expect(mockEditor.document.lineAt).toHaveBeenCalledWith(0);
+            expect(lineAtSpy).toHaveBeenCalledWith(0);
         });
 
         it('should toggle task list for single line', async () => {
@@ -282,10 +296,24 @@ describe('FallbackCommands', () => {
             };
             mockVSCode.window.activeTextEditor = mockEditor;
 
-            await (fallbackCommands as any).toggleTaskList();
+            // Spy on the lineAt method to ensure it's called
+            const lineAtSpy = vi.fn((lineNumber) => ({
+                text: 'hello',
+                range: { start: { line: lineNumber, character: 0 }, end: { line: lineNumber, character: 5 } }
+            }));
+            mockEditor.document.lineAt = lineAtSpy;
+
+            // Access the private method for testing
+            const toggleTaskListMethod = (fallbackCommands as any).toggleTaskList.bind(fallbackCommands);
+            await toggleTaskListMethod();
+
+            // Manually call the edit callback to execute the lineAt logic
+            const editCallback = mockEditor.edit.mock.calls[0][0];
+            const mockEditBuilder = { replace: vi.fn(), insert: vi.fn(), delete: vi.fn() };
+            editCallback(mockEditBuilder);
 
             expect(mockEditor.edit).toHaveBeenCalledWith(expect.any(Function));
-            expect(mockEditor.document.lineAt).toHaveBeenCalledWith(0);
+            expect(lineAtSpy).toHaveBeenCalledWith(0);
         });
     });
 
