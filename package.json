@@ -1,7 +1,7 @@
 {
   "name": "markdown-extended-toolbar",
   "displayName": "Markdown Extended Toolbar",
-  "description": "Context-aware markdown formatting toolbarin VS Code status bar",
+  "description": "Context-aware markdown formatting toolbar in VS Code status bar",
   "version": "0.2.0",
   "publisher": "GSejas",
   "icon": "assets/logo.png",

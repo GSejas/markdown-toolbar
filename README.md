@@ -36,7 +36,7 @@ A powerful VS Code extension that provides intelligent markdown formatting tools
 Right-click in any markdown file to access organized formatting options:
 
 
-| Format                        | Headings                      | New Column                               | New Column |
+| Format                        | Headings                      | Insert                               | Editor Features |
 | ----------------------------- | ----------------------------- | ---------------------------------------- | ---------- |
 | ![](assets/imgs/Cell%201.png) | ![](assets/imgs/Cell%202.png) | ![](assets/imgs/2025-09-03-02-31-25.png) |  ![](assets/imgs/%20%20%20%20%20%20%20.png)   |
 
