@@ -5,7 +5,11 @@
       "Bash(npm run check-types:*)",
       "Bash(rg:*)",
       "Bash(npm run compile:*)",
-      "Bash(npm run test:*)"
+      "Bash(npm run test:*)",
+      "Bash(npm run package:*)",
+      "Bash(npx vsce:*)",
+      "Bash(code:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

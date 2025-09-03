@@ -110,7 +110,7 @@ export const BUTTON_DEFINITIONS: Record<ButtonId, IButtonDefinition> = {
   'preview.side': {
     id: 'preview.side',
     title: 'Preview (Side)',
-    icon: '$(preview)',
+    icon: '$(layout-sidebar-right)',
     category: 'preview',
     commandId: 'mdToolbar.preview.side',
     delegatesTo: 'markdown.showPreviewToSide',

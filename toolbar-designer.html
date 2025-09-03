@@ -607,11 +607,21 @@ console.log("Hello World!");
                 
                 <div class="settings-section">
                     <h3>📋 Quick Presets</h3>
-                    <div class="preset-buttons">
+                    <div class="preset-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                         <button class="preset-btn" onclick="loadPreset('core', event)">📝 Core</button>
                         <button class="preset-btn" onclick="loadPreset('writer', event)">✍️ Writer</button>
                         <button class="preset-btn" onclick="loadPreset('pro', event)">🔧 Pro</button>
                         <button class="preset-btn active" onclick="loadPreset('custom', event)">⚙️ Custom</button>
+                        <button class="preset-btn" onclick="loadPreset('test-minimal', event)">🎯 Minimal</button>
+                        <button class="preset-btn" onclick="loadPreset('test-student', event)">🎓 Student</button>
+                        <button class="preset-btn" onclick="loadPreset('test-blogger', event)">📰 Blogger</button>
+                        <button class="preset-btn" onclick="loadPreset('test-developer', event)">💻 Developer</button>
+                        <button class="preset-btn" onclick="loadPreset('test-researcher', event)">🔬 Research</button>
+                        <button class="preset-btn" onclick="loadPreset('test-presenter', event)">📊 Presenter</button>
+                        <button class="preset-btn" onclick="loadPreset('test-qa', event)">❓ Q&A</button>
+                        <button class="preset-btn" onclick="loadPreset('test-mobile', event)">📱 Mobile</button>
+                        <button class="preset-btn" onclick="loadPreset('test-power', event)">⚡ Power</button>
+                        <button class="preset-btn" onclick="loadPreset('test-accessibility', event)">♿ A11y</button>
                     </div>
                 </div>
 
@@ -648,6 +658,9 @@ console.log("Hello World!");
                     <button class="btn btn-secondary" onclick="downloadConfig()">
                         💾 Download JSON
                     </button>
+                    <button class="btn btn-secondary" onclick="exportTelemetryData()" title="Export usage data for bug reports and analysis">
+                        📊 Export Telemetry
+                    </button>
                     <button class="btn btn-secondary" onclick="clearAll()">
                         🗑️ Clear All
                     </button>
@@ -663,51 +676,151 @@ console.log("Hello World!");
 
     <script>
         // Button definitions using VS Code Codicons for authentic look
+        // Complete button definitions matching current implementation
         const BUTTONS = {
-            // Format buttons
+            // Preview
+            'preview.side': { name: 'Preview (Side)', icon: '$(layout-sidebar-right)', category: 'Preview', color: '#0078d4' },
+            'preview.current': { name: 'Preview', icon: '$(preview)', category: 'Preview', color: '#0078d4' },
+            'preview.lock': { name: 'Lock Preview', icon: '$(lock)', category: 'Preview', color: '#0078d4' },
+            'preview.mpe.side': { name: 'Enhanced Preview (Side)', icon: '$(preview)', category: 'Preview', color: '#6b46c1' },
+            'preview.mpe.current': { name: 'Enhanced Preview', icon: '$(preview)', category: 'Preview', color: '#6b46c1' },
+
+            // Format
             'fmt.bold': { name: 'Bold', icon: '$(bold)', category: 'Format', color: '#e53e3e' },
             'fmt.italic': { name: 'Italic', icon: '$(italic)', category: 'Format', color: '#dd6b20' },
-            'fmt.strike': { name: 'Strike', icon: '$(text-size)', category: 'Format', color: '#718096' },
-            
+            'fmt.strike': { name: 'Strikethrough', icon: '$(md-strikethrough)', category: 'Format', color: '#718096' },
+            'fmt.code': { name: 'Code', icon: '$(code)', category: 'Format', color: '#2d3748' },
+            'fmt.highlight': { name: 'Highlight', icon: '$(symbol-color)', category: 'Format', color: '#fbbf24' },
+
+            // Headings
+            'heading.h1': { name: 'H1', icon: '$(md-header-one)', category: 'Heading', color: '#1e40af' },
+            'heading.h2': { name: 'H2', icon: '$(md-header-two)', category: 'Heading', color: '#2563eb' },
+            'heading.h3': { name: 'H3', icon: '$(md-header-three)', category: 'Heading', color: '#3b82f6' },
+            'heading.h4': { name: 'H4', icon: '$(md-header-four)', category: 'Heading', color: '#60a5fa' },
+            'heading.h5': { name: 'H5', icon: '$(md-header-five)', category: 'Heading', color: '#93c5fd' },
+            'heading.h6': { name: 'H6', icon: '$(md-header-six)', category: 'Heading', color: '#bfdbfe' },
+            'heading.toggle': { name: 'Cycle Heading', icon: '$(arrow-both)', category: 'Heading', color: '#3182ce' },
+
             // Structure
-            'list.toggle': { name: 'List', icon: '$(list-unordered)', category: 'Structure', color: '#38a169' },
-            'task.toggle': { name: 'Tasks', icon: '$(checklist)', category: 'Structure', color: '#319795' },
-            'header.cycle': { name: 'Headers', icon: '$(symbol-string)', category: 'Structure', color: '#3182ce' },
-            'blockquote': { name: 'Quote', icon: '$(comment)', category: 'Structure', color: '#805ad5' },
-            
+            'list.toggle': { name: 'Toggle List', icon: '$(list-unordered)', category: 'Structure', color: '#38a169' },
+            'task.toggle': { name: 'Toggle Task', icon: '$(checklist)', category: 'Structure', color: '#319795' },
+            'blockquote.toggle': { name: 'Blockquote', icon: '$(quote)', category: 'Structure', color: '#805ad5' },
+            'hr.insert': { name: 'Horizontal Rule', icon: '$(md-horizontal-rule)', category: 'Structure', color: '#6b7280' },
+
             // Code
-            'code.inline': { name: 'Code', icon: '$(code)', category: 'Code', color: '#2d3748' },
-            'code.block': { name: 'Block', icon: '$(terminal)', category: 'Code', color: '#1a202c' },
-            
+            'code.inline': { name: 'Inline Code', icon: '`', category: 'Code', color: '#2d3748' },
+            'code.block': { name: 'Code Block', icon: '$(code)', category: 'Code', color: '#1a202c' },
+
             // Media
-            'link.insert': { name: 'Link', icon: '$(link)', category: 'Media', color: '#2b6cb0' },
-            'image.insert': { name: 'Image', icon: '$(file-media)', category: 'Media', color: '#0078d4' },
-            'image.paste': { name: 'Paste', icon: '$(clippy)', category: 'Media', color: '#0086f0' },
-            
-            // Preview
-            'preview.side': { name: 'Preview', icon: '$(preview)', category: 'Preview', color: '#553c9a' },
-            'preview.mpe': { name: 'Enhanced', icon: '$(eye)', category: 'Preview', color: '#6b46c1' },
-            
+            'link.insert': { name: 'Insert Link', icon: '$(link)', category: 'Media', color: '#2b6cb0' },
+            'image.insert': { name: 'Insert Image', icon: '$(md-image-plus)', category: 'Media', color: '#0078d4' },
+            'image.paste': { name: 'Paste Image', icon: '$(file-media)', category: 'Media', color: '#0086f0' },
+
+            // Extended Features
+            'footnote.insert': { name: 'Footnote', icon: '$(note)', category: 'Extended', color: '#7c3aed' },
+            'math.inline': { name: 'Inline Math', icon: '$(md-math-inline)', category: 'Extended', color: '#7c3aed' },
+            'math.block': { name: 'Math Block', icon: '$(variable-group)', category: 'Extended', color: '#8b5cf6' },
+            'break.line': { name: 'Line Break', icon: '$(arrow-down)', category: 'Extended', color: '#6b7280' },
+            'mermaid.insert': { name: 'Mermaid Diagram', icon: '$(graph)', category: 'Extended', color: '#8b5cf6' },
+            'editor.wordWrap': { name: 'Word Wrap', icon: '$(word-wrap)', category: 'Extended', color: '#059669' },
+            'editor.lineNumbers': { name: 'Line Numbers', icon: '$(list-ordered)', category: 'Extended', color: '#059669' },
+            'editor.minimap': { name: 'Minimap', icon: '$(map)', category: 'Extended', color: '#059669' },
+            'export.pdf': { name: 'Export PDF', icon: '$(file-pdf)', category: 'Extended', color: '#dc2626' },
+            'nav.symbols': { name: 'Document Symbols', icon: '$(symbol-class)', category: 'Extended', color: '#0ea5e9' },
+            'nav.outline': { name: 'Document Outline', icon: '$(list-tree)', category: 'Extended', color: '#0ea5e9' },
+            'search.replace': { name: 'Find & Replace', icon: '$(search-replace)', category: 'Extended', color: '#0ea5e9' },
+            'git.status': { name: 'Git Status', icon: '$(source-control)', category: 'Extended', color: '#f59e0b' },
+            'git.commit': { name: 'Git Commit', icon: '$(check)', category: 'Extended', color: '#10b981' },
+            'git.diff': { name: 'Git Diff', icon: '$(diff)', category: 'Extended', color: '#f59e0b' },
+
+            // TOC
+            'toc.create': { name: 'Create TOC', icon: '$(list-tree)', category: 'TOC', color: '#0ea5e9' },
+            'toc.update': { name: 'Update TOC', icon: '$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
+            'toc.addNumbers': { name: 'Add TOC Numbers', icon: '+$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
+            'toc.removeNumbers': { name: 'Remove TOC Numbers', icon: '-$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
+
             // Tables
-            'table.menu': { name: 'Table', icon: '$(table)', category: 'Tables', color: '#059669' },
-            'table.insert': { name: 'Insert', icon: '$(add)', category: 'Tables', color: '#047857' },
-            'table.format': { name: 'Format', icon: '$(organization)', category: 'Tables', color: '#065f46' },
-            
+            'table.menu': { name: 'Table Menu', icon: '$(table)', category: 'Tables', color: '#059669' },
+
             // Quality
-            'lint.fix': { name: 'Fix', icon: '$(wrench)', category: 'Quality', color: '#dc2626' },
-            'spell.check': { name: 'Spell', icon: '$(pencil)', category: 'Quality', color: '#ea580c' },
-            
-            // Advanced
-            'math.inline': { name: 'Math', icon: '$(symbol-numeric)', category: 'Advanced', color: '#7c3aed' },
-            'diagram.mermaid': { name: 'Diagram', icon: '$(graph-line)', category: 'Advanced', color: '#8b5cf6' },
-            'emoji.picker': { name: 'Emoji', icon: '$(heart)', category: 'Advanced', color: '#ec4899' },
-            'toc.create': { name: 'TOC', icon: '$(list-ordered)', category: 'Advanced', color: '#0ea5e9' }
+            'lint.fix': { name: 'Fix All Issues', icon: '$(lightbulb-autofix)', category: 'Quality', color: '#dc2626' },
+            'lint.workspace': { name: 'Lint Workspace', icon: '$(github-action)', category: 'Quality', color: '#dc2626' },
+
+            // Debug
+            'debug.presetCycle': { name: '🔄', icon: '$(refresh)', category: 'Debug', color: '#6b7280' }
         };
 
         const PRESETS = {
-            core: ['fmt.bold', 'fmt.italic', 'code.inline', 'link.insert', 'list.toggle', 'preview.side'],
-            writer: ['fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'blockquote', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'table.menu'],
-            pro: ['fmt.bold', 'fmt.italic', 'fmt.strike', 'list.toggle', 'task.toggle', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'table.menu', 'lint.fix', 'math.inline', 'diagram.mermaid', 'preview.side']
+            core: {
+                name: 'Core',
+                description: 'Essential formatting tools for quick notes',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'heading.toggle', 'list.toggle', 'code.inline', 'link.insert', 'image.insert']
+            },
+            writer: {
+                name: 'Writer',
+                description: 'Tools for documentation and long-form writing',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'heading.h1', 'heading.h2', 'heading.h3', 'blockquote.toggle', 'list.toggle', 'task.toggle', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'hr.insert', 'break.line', 'toc.create', 'toc.update', 'table.menu']
+            },
+            pro: {
+                name: 'Pro',
+                description: 'Complete toolkit with quality checks and advanced features',
+                buttons: ['preview.side', 'preview.mpe.side', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'heading.toggle', 'blockquote.toggle', 'list.toggle', 'task.toggle', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'image.paste', 'footnote.insert', 'math.inline', 'hr.insert', 'toc.create', 'toc.update', 'toc.addNumbers', 'toc.removeNumbers', 'table.menu', 'lint.fix', 'lint.workspace']
+            },
+            custom: {
+                name: 'Custom',
+                description: 'User-defined button selection',
+                buttons: []
+            },
+            'test-minimal': {
+                name: 'Test: Minimal',
+                description: 'Absolute minimal set for basic markdown editing',
+                buttons: ['fmt.bold', 'fmt.italic', 'heading.toggle', 'preview.side']
+            },
+            'test-student': {
+                name: 'Test: Student Notes',
+                description: 'Optimized for note-taking and studying',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.highlight', 'heading.h1', 'heading.h2', 'heading.h3', 'list.toggle', 'task.toggle', 'code.inline', 'link.insert', 'math.inline', 'toc.create']
+            },
+            'test-blogger': {
+                name: 'Test: Blog Writer',
+                description: 'Perfect for blog posts and articles',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'heading.h1', 'heading.h2', 'heading.h3', 'blockquote.toggle', 'list.toggle', 'code.inline', 'link.insert', 'image.insert', 'image.paste', 'hr.insert', 'toc.create']
+            },
+            'test-developer': {
+                name: 'Test: Developer Docs',
+                description: 'Technical documentation with code focus',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.code', 'heading.h1', 'heading.h2', 'heading.h3', 'heading.h4', 'code.inline', 'code.block', 'link.insert', 'table.menu', 'mermaid.insert', 'toc.create', 'toc.update']
+            },
+            'test-researcher': {
+                name: 'Test: Academic Research',
+                description: 'Academic writing with citations and footnotes',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'heading.h1', 'heading.h2', 'heading.h3', 'heading.h4', 'blockquote.toggle', 'list.toggle', 'footnote.insert', 'link.insert', 'table.menu', 'math.inline', 'math.block', 'toc.create', 'toc.addNumbers']
+            },
+            'test-presenter': {
+                name: 'Test: Presentation',
+                description: 'Creating slides and presentation content',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'fmt.highlight', 'heading.h1', 'heading.h2', 'list.toggle', 'image.insert', 'image.paste', 'mermaid.insert', 'table.menu', 'hr.insert']
+            },
+            'test-qa': {
+                name: 'Test: Q&A Format',
+                description: 'FAQ and question-answer documentation',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'heading.h2', 'heading.h3', 'blockquote.toggle', 'list.toggle', 'task.toggle', 'code.inline', 'link.insert', 'toc.create']
+            },
+            'test-mobile': {
+                name: 'Test: Mobile Friendly',
+                description: 'Compact set for mobile/tablet editing',
+                buttons: ['fmt.bold', 'fmt.italic', 'heading.toggle', 'list.toggle', 'code.inline', 'link.insert']
+            },
+            'test-power': {
+                name: 'Test: Power User',
+                description: 'Everything enabled for advanced users',
+                buttons: ['preview.side', 'preview.lock', 'fmt.bold', 'fmt.italic', 'fmt.strike', 'fmt.code', 'fmt.highlight', 'heading.h1', 'heading.h2', 'heading.h3', 'heading.h4', 'heading.h5', 'heading.h6', 'heading.toggle', 'blockquote.toggle', 'list.toggle', 'task.toggle', 'code.inline', 'code.block', 'link.insert', 'image.insert', 'image.paste', 'table.menu', 'mermaid.insert', 'footnote.insert', 'math.inline', 'math.block', 'hr.insert', 'toc.create', 'toc.update', 'toc.addNumbers', 'lint.fix']
+            },
+            'test-accessibility': {
+                name: 'Test: Accessibility Focus',
+                description: 'Emphasizes accessible content creation',
+                buttons: ['preview.side', 'fmt.bold', 'fmt.italic', 'heading.h1', 'heading.h2', 'heading.h3', 'list.toggle', 'link.insert', 'image.insert', 'table.menu', 'toc.create', 'lint.fix']
+            }
         };
 
         let currentToolbar = [];
@@ -716,6 +829,13 @@ console.log("Hello World!");
 
         // Initialize the designer
         function init() {
+            // Track page load
+            trackEvent('page_loaded', { 
+                totalButtons: Object.keys(BUTTONS).length,
+                totalPresets: Object.keys(PRESETS).length,
+                categories: Object.values(BUTTONS).map(b => b.category).filter((v, i, a) => a.indexOf(v) === i)
+            });
+
             renderButtonLibrary();
             updateToolbarPreview();
             updateConfigOutput();
@@ -731,6 +851,19 @@ console.log("Hello World!");
             document.getElementById('compactMode').addEventListener('change', updateConfigOutput);
             document.getElementById('position').addEventListener('change', updateConfigOutput);
             document.getElementById('contextAware').addEventListener('change', updateConfigOutput);
+
+            // Error tracking
+            window.addEventListener('error', (e) => {
+                telemetryData.errors.push({
+                    timestamp: Date.now(),
+                    message: e.message,
+                    source: e.source,
+                    lineno: e.lineno,
+                    colno: e.colno,
+                    stack: e.error?.stack
+                });
+                trackEvent('error_occurred', { message: e.message, source: e.source });
+            });
         }
 
         function renderButtonLibrary() {
@@ -744,7 +877,13 @@ console.log("Hello World!");
             });
 
             library.innerHTML = '';
-            Object.entries(categories).forEach(([category, buttons]) => {
+            
+            // Sort categories in logical order matching current implementation
+            const categoryOrder = ['Preview', 'Format', 'Heading', 'Structure', 'Code', 'Media', 'Extended', 'TOC', 'Tables', 'Quality', 'Debug'];
+            const sortedCategories = categoryOrder.filter(cat => categories[cat]);
+            
+            sortedCategories.forEach(category => {
+                const buttons = categories[category];
                 const section = document.createElement('div');
                 section.className = 'category-section';
                 
@@ -773,12 +912,23 @@ console.log("Hello World!");
             buttonEl.dataset.buttonId = button.id;
             buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
             
-            // Convert $(icon-name) to proper codicon class
-            const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+            // Handle different icon formats - codicons and custom fonts
+            let iconHtml = '';
+            if (button.icon.startsWith('$(')) {
+                // VS Code Codicon format
+                const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+                iconHtml = `<i class="${iconClass}"></i>`;
+            } else if (button.icon.length === 1) {
+                // Single character (like backtick)
+                iconHtml = button.icon;
+            } else {
+                // Custom icon or text
+                iconHtml = button.icon;
+            }
             
             buttonEl.innerHTML = `
                 <div class="button-icon">
-                    <i class="${iconClass}"></i>
+                    ${iconHtml}
                 </div>
                 <div>${button.name}</div>
             `;
@@ -814,12 +964,23 @@ console.log("Hello World!");
             buttonEl.dataset.buttonId = button.id;
             buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
             
-            // Convert $(icon-name) to proper codicon class
-            const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+            // Handle different icon formats - codicons and custom fonts
+            let iconHtml = '';
+            if (button.icon.startsWith('$(')) {
+                // VS Code Codicon format
+                const iconClass = button.icon.replace('$(', 'codicon codicon-').replace(')', '');
+                iconHtml = `<i class="${iconClass}"></i>`;
+            } else if (button.icon.length === 1) {
+                // Single character (like backtick)
+                iconHtml = button.icon;
+            } else {
+                // Custom icon or text
+                iconHtml = button.icon;
+            }
             
             buttonEl.innerHTML = `
                 <span class="button-icon">
-                    <i class="${iconClass}"></i>
+                    ${iconHtml}
                 </span>
                 <span>${button.name}</span>
                 <span class="remove-btn" onclick="removeButton('${button.id}')">✕</span>
@@ -870,6 +1031,12 @@ console.log("Hello World!");
                         
                         currentToolbar.splice(insertIndex, 0, draggedElement.id);
                         renderToolbar();
+                        trackEvent('button_added', { 
+                            buttonId: draggedElement.id, 
+                            buttonName: draggedElement.name,
+                            category: draggedElement.category,
+                            insertIndex 
+                        });
                         
                         // Fun animation
                         setTimeout(() => {
@@ -1011,8 +1178,13 @@ console.log("Hello World!");
                 return;
             }
 
-            currentToolbar = [...PRESETS[presetId]];
-            renderToolbar();
+            const preset = PRESETS[presetId];
+            if (preset && preset.buttons) {
+                currentToolbar = [...preset.buttons];
+                renderToolbar();
+                showNotification(`✅ Loaded ${preset.name} preset: ${preset.description}`, 'success');
+                trackEvent('preset_loaded', { presetId, buttonCount: preset.buttons.length });
+            }
             
             // Fun loading animation
             const dropZone = document.getElementById('dropZone');
@@ -1046,6 +1218,60 @@ console.log("Hello World!");
             a.download = `markdown-toolbar-${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        // Telemetry collection
+        let telemetryData = {
+            sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            startTime: Date.now(),
+            events: [],
+            presetUsage: {},
+            buttonUsage: {},
+            userAgent: navigator.userAgent,
+            screenResolution: `${screen.width}x${screen.height}`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            errors: []
+        };
+
+        function trackEvent(eventType, data = {}) {
+            telemetryData.events.push({
+                timestamp: Date.now(),
+                type: eventType,
+                data: data
+            });
+            
+            // Track specific usage patterns
+            if (eventType === 'preset_loaded') {
+                telemetryData.presetUsage[data.presetId] = (telemetryData.presetUsage[data.presetId] || 0) + 1;
+            } else if (eventType === 'button_added') {
+                telemetryData.buttonUsage[data.buttonId] = (telemetryData.buttonUsage[data.buttonId] || 0) + 1;
+            }
+        }
+
+        function exportTelemetryData() {
+            const exportData = {
+                ...telemetryData,
+                endTime: Date.now(),
+                sessionDuration: Date.now() - telemetryData.startTime,
+                totalEvents: telemetryData.events.length,
+                currentToolbar: currentToolbar.map(id => ({ id, name: BUTTONS[id]?.name })),
+                totalButtons: currentToolbar.length,
+                categories: [...new Set(currentToolbar.map(id => BUTTONS[id]?.category).filter(Boolean))],
+                version: '0.1.1',
+                designerVersion: '2.0.0'
+            };
+
+            // Create downloadable file
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `toolbar-designer-telemetry-${telemetryData.sessionId}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showNotification('📊 Telemetry data exported! This helps improve the extension and fix bugs.', 'success');
+            trackEvent('telemetry_exported', { dataSize: JSON.stringify(exportData).length });
         }
 
         function clearAll() {

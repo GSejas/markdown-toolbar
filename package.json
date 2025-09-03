@@ -1,11 +1,11 @@
 {
   "name": "markdown-toolbar",
   "displayName": "Markdown Toolbar",
-  "description": "Context-aware markdown formatting toolbar in VS Code status bar",
-  "version": "0.1.0",
+  "description": "Context-aware markdown formatting toolbarin VS Code status bar",
+  "version": "0.1.1",
   "publisher": "GSejas",
   "engines": {
-    "vscode": "^1.102.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other"
