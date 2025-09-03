@@ -27,6 +27,7 @@ import { DocumentCache } from '../engine/DocumentCache';
 import { withProviderErrorBoundary } from '../utils/ErrorBoundary';
 import { PerformanceMonitor } from '../utils/PerformanceMonitor';
 import { service } from '../di/ServiceContainer';
+import { SettingsAdapter } from '../settings/SettingsAdapter';
 
 interface HeaderInfo {
   level: number;
@@ -51,9 +52,21 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
   private markdownService = new MarkdownLanguageServiceWrapper();
 
   constructor(
-    private cache: DocumentCache = new DocumentCache()
+    private cache: DocumentCache = new DocumentCache(),
+    private settingsAdapter: SettingsAdapter = new SettingsAdapter()
   ) {
     logger.info('HeaderCodeLensProvider initialized with DI and caching support');
+  }
+
+  /**
+   * Gets CodeLens title based on display mode setting
+   * @param icon Icon to display
+   * @param text Descriptive text
+   * @returns Formatted title string
+   */
+  private getCodeLensTitle(icon: string, text: string): string {
+    const displayMode = this.settingsAdapter.getCodeLensDisplayMode();
+    return displayMode === 'minimal' ? icon : `${icon} ${text}`;
   }
 
   async provideCodeLenses(
@@ -113,7 +126,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         if (headerIndex > 0) {
           logger.info(`[HeaderCodeLens] Adding "Move Up" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "$(arrow-up) Up",
+            title: this.getCodeLensTitle("$(arrow-up)", "Up"),
             command: 'mdToolbar.header.moveUp',
             arguments: [document.uri, header.line],
             tooltip: 'Move section up'
@@ -123,7 +136,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         if (headerIndex < structure.headers.length - 1) {
           logger.info(`[HeaderCodeLens] Adding "Move Down" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "$(arrow-down) Down",
+            title: this.getCodeLensTitle("$(arrow-down)", "Down"),
             command: 'mdToolbar.header.moveDown',
             arguments: [document.uri, header.line],
             tooltip: 'Move section down'
@@ -133,7 +146,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         // Copy link to section
         logger.info(`[HeaderCodeLens] Adding "Copy Link" for header "${header.title}"`);
         codeLenses.push(new vscode.CodeLens(range, {
-          title: "$(link) Copy Link",
+          title: this.getCodeLensTitle("$(link)", "Copy Link"),
           command: 'mdToolbar.header.copyLink',
           arguments: [document.uri, header.line, header.anchor],
           tooltip: 'Copy markdown link to this section'
@@ -143,7 +156,7 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         if (header.hasContent) {
           logger.info(`[HeaderCodeLens] Adding "Copy Section" for header "${header.title}"`);
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "$(copy) Copy Section",
+            title: this.getCodeLensTitle("$(copy)", "Copy Section"),
             command: 'mdToolbar.header.copySection',
             arguments: [document.uri, header.line],
             tooltip: 'Copy complete section content to clipboard'
@@ -153,7 +166,9 @@ export class HeaderCodeLensProvider implements vscode.CodeLensProvider {
         // Fold/Unfold section (if has content) - rightmost position
         if (header.hasContent) {
           const isFolded = await this.isSectionFolded(document, header.line);
-          const foldTitle = isFolded ? "$(unfold) Unfold" : "$(fold) Fold";
+          const foldTitle = isFolded ? 
+            this.getCodeLensTitle("$(unfold)", "Unfold") : 
+            this.getCodeLensTitle("$(fold)", "Fold");
           const foldTooltip = isFolded ? "Unfold this section" : "Fold this section";
           
           logger.info(`[HeaderCodeLens] Adding "${foldTitle}" for header "${header.title}" (currently ${isFolded ? 'folded' : 'unfolded'})`);

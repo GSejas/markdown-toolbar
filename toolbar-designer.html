@@ -6,6 +6,7 @@
     <title>Markdown Toolbar Designer - Drag & Drop Editor</title>
     <!-- VS Code Codicons Font -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.35/dist/codicon.css">
+    <!-- Using VS Code Codicons only -->
     <style>
         * {
             margin: 0;
@@ -149,6 +150,8 @@
             text-decoration: none;
             vertical-align: baseline;
         }
+
+        /* Icon styling for Codicons */
 
         .toolbar-btn i {
             font-size: 14px;
@@ -688,7 +691,7 @@ console.log("Hello World!");
             // Format
             'fmt.bold': { name: 'Bold', icon: '$(bold)', category: 'Format', color: '#e53e3e' },
             'fmt.italic': { name: 'Italic', icon: '$(italic)', category: 'Format', color: '#dd6b20' },
-            'fmt.strike': { name: 'Strikethrough', icon: '$(md-strikethrough)', category: 'Format', color: '#718096' },
+            'fmt.strike': { name: 'Strikethrough', icon: '$(strikethrough)', category: 'Format', color: '#718096' },
             'fmt.code': { name: 'Code', icon: '$(code)', category: 'Format', color: '#2d3748' },
             'fmt.highlight': { name: 'Highlight', icon: '$(symbol-color)', category: 'Format', color: '#fbbf24' },
 
@@ -703,23 +706,23 @@ console.log("Hello World!");
 
             // Structure
             'list.toggle': { name: 'Toggle List', icon: '$(list-unordered)', category: 'Structure', color: '#38a169' },
-            'task.toggle': { name: 'Toggle Task', icon: '$(checklist)', category: 'Structure', color: '#319795' },
+            'task.toggle': { name: 'Toggle Task', icon: '$(check-all)', category: 'Structure', color: '#319795' },
             'blockquote.toggle': { name: 'Blockquote', icon: '$(quote)', category: 'Structure', color: '#805ad5' },
-            'hr.insert': { name: 'Horizontal Rule', icon: '$(md-horizontal-rule)', category: 'Structure', color: '#6b7280' },
+            'hr.insert': { name: 'Horizontal Rule', icon: '$(horizontal-rule)', category: 'Structure', color: '#6b7280' },
 
             // Code
-            'code.inline': { name: 'Inline Code', icon: '`', category: 'Code', color: '#2d3748' },
-            'code.block': { name: 'Code Block', icon: '$(code)', category: 'Code', color: '#1a202c' },
+            'code.inline': { name: 'Inline Code', icon: '$(symbol-string)', category: 'Code', color: '#2d3748' },
+            'code.block': { name: 'Code Block', icon: '$(file-code)', category: 'Code', color: '#1a202c' },
 
             // Media
             'link.insert': { name: 'Insert Link', icon: '$(link)', category: 'Media', color: '#2b6cb0' },
-            'image.insert': { name: 'Insert Image', icon: '$(md-image-plus)', category: 'Media', color: '#0078d4' },
-            'image.paste': { name: 'Paste Image', icon: '$(file-media)', category: 'Media', color: '#0086f0' },
+            'image.insert': { name: 'Insert Image', icon: '$(file-media)', category: 'Media', color: '#0078d4' },
+            'image.paste': { name: 'Paste Image', icon: '$(clippy)', category: 'Media', color: '#0086f0' },
 
             // Extended Features
             'footnote.insert': { name: 'Footnote', icon: '$(note)', category: 'Extended', color: '#7c3aed' },
-            'math.inline': { name: 'Inline Math', icon: '$(md-math-inline)', category: 'Extended', color: '#7c3aed' },
-            'math.block': { name: 'Math Block', icon: '$(variable-group)', category: 'Extended', color: '#8b5cf6' },
+            'math.inline': { name: 'Inline Math', icon: '$(symbol-number)', category: 'Extended', color: '#7c3aed' },
+            'math.block': { name: 'Math Block', icon: '$(math)', category: 'Extended', color: '#8b5cf6' },
             'break.line': { name: 'Line Break', icon: '$(arrow-down)', category: 'Extended', color: '#6b7280' },
             'mermaid.insert': { name: 'Mermaid Diagram', icon: '$(graph)', category: 'Extended', color: '#8b5cf6' },
             'editor.wordWrap': { name: 'Word Wrap', icon: '$(word-wrap)', category: 'Extended', color: '#059669' },
@@ -736,15 +739,15 @@ console.log("Hello World!");
             // TOC
             'toc.create': { name: 'Create TOC', icon: '$(list-tree)', category: 'TOC', color: '#0ea5e9' },
             'toc.update': { name: 'Update TOC', icon: '$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
-            'toc.addNumbers': { name: 'Add TOC Numbers', icon: '+$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
-            'toc.removeNumbers': { name: 'Remove TOC Numbers', icon: '-$(list-ordered)', category: 'TOC', color: '#0ea5e9' },
+            'toc.addNumbers': { name: 'Add TOC Numbers', icon: '$(add)', category: 'TOC', color: '#0ea5e9' },
+            'toc.removeNumbers': { name: 'Remove TOC Numbers', icon: '$(remove)', category: 'TOC', color: '#0ea5e9' },
 
             // Tables
             'table.menu': { name: 'Table Menu', icon: '$(table)', category: 'Tables', color: '#059669' },
 
             // Quality
-            'lint.fix': { name: 'Fix All Issues', icon: '$(lightbulb-autofix)', category: 'Quality', color: '#dc2626' },
-            'lint.workspace': { name: 'Lint Workspace', icon: '$(github-action)', category: 'Quality', color: '#dc2626' },
+            'lint.fix': { name: 'Fix All Issues', icon: '$(wrench)', category: 'Quality', color: '#dc2626' },
+            'lint.workspace': { name: 'Lint Workspace', icon: '$(check-all)', category: 'Quality', color: '#dc2626' },
 
             // Debug
             'debug.presetCycle': { name: '🔄', icon: '$(refresh)', category: 'Debug', color: '#6b7280' }
@@ -912,7 +915,7 @@ console.log("Hello World!");
             buttonEl.dataset.buttonId = button.id;
             buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
             
-            // Handle different icon formats - codicons and custom fonts
+            // Handle different icon formats - primarily codicons and single characters
             let iconHtml = '';
             if (button.icon.startsWith('$(')) {
                 // VS Code Codicon format
@@ -920,9 +923,9 @@ console.log("Hello World!");
                 iconHtml = `<i class="${iconClass}"></i>`;
             } else if (button.icon.length === 1) {
                 // Single character (like backtick)
-                iconHtml = button.icon;
+                iconHtml = `<span style="font-family: monospace; font-weight: bold;">${button.icon}</span>`;
             } else {
-                // Custom icon or text
+                // Fallback for other formats
                 iconHtml = button.icon;
             }
             
@@ -964,7 +967,7 @@ console.log("Hello World!");
             buttonEl.dataset.buttonId = button.id;
             buttonEl.style.background = `linear-gradient(135deg, ${button.color}, ${adjustBrightness(button.color, -20)})`;
             
-            // Handle different icon formats - codicons and custom fonts
+            // Handle different icon formats - primarily codicons and single characters
             let iconHtml = '';
             if (button.icon.startsWith('$(')) {
                 // VS Code Codicon format
@@ -972,9 +975,9 @@ console.log("Hello World!");
                 iconHtml = `<i class="${iconClass}"></i>`;
             } else if (button.icon.length === 1) {
                 // Single character (like backtick)
-                iconHtml = button.icon;
+                iconHtml = `<span style="font-family: monospace; font-weight: bold;">${button.icon}</span>`;
             } else {
-                // Custom icon or text
+                // Fallback for other formats
                 iconHtml = button.icon;
             }
             

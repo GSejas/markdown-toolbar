@@ -1,11 +1,20 @@
 {
-  "name": "markdown-toolbar",
-  "displayName": "Markdown Toolbar",
+  "name": "markdown-extended-toolbar",
+  "displayName": "Markdown Extended Toolbar",
   "description": "Context-aware markdown formatting toolbarin VS Code status bar",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "GSejas",
+  "icon": "assets/markdown statusbar logo (128 x 128 px) w bg.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GSejas/markdown-toolbar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GSejas/markdown-toolbar/issues"
+  },
+  "homepage": "https://github.com/GSejas/markdown-toolbar#readme",
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.103.0"
   },
   "categories": [
     "Other"
@@ -97,6 +106,19 @@
           "maximum": 300000,
           "default": 30000,
           "description": "Cache timeout for dependency detection (ms)"
+        },
+        "markdownToolbar.codeLens.displayMode": {
+          "type": "string",
+          "enum": [
+            "minimal",
+            "explicit"
+          ],
+          "default": "explicit",
+          "description": "CodeLens display style for headers, tables, and other elements",
+          "enumDescriptions": [
+            "Show only icons to reduce visual clutter",
+            "Show icons with descriptive text for clarity"
+          ]
         }
       }
     },
@@ -860,7 +882,7 @@
   "devDependencies": {
     "@types/mocha": "10.0.10",
     "@types/node": "24.3.0",
-    "@types/vscode": "1.103.0",
+    "@types/vscode": "1.90.0",
     "@typescript-eslint/eslint-plugin": "8.41.0",
     "@typescript-eslint/parser": "8.41.0",
     "@vitest/coverage-v8": "3.2.4",

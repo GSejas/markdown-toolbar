@@ -7,6 +7,7 @@
  */
 
 import * as vscode from 'vscode';
+import { SettingsAdapter } from '../settings/SettingsAdapter';
 
 interface CheckboxItem {
   content: string;
@@ -18,9 +19,20 @@ interface CheckboxItem {
 export class CheckboxCodeLensProvider implements vscode.CodeLensProvider {
   private context: vscode.ExtensionContext;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(
+    context: vscode.ExtensionContext,
+    private settingsAdapter: SettingsAdapter = new SettingsAdapter()
+  ) {
     this.context = context;
     console.log('[markdown-checkbox-preview] CheckboxCodeLensProvider constructed');
+  }
+
+  /**
+   * Gets CodeLens title based on display mode setting
+   */
+  private getCodeLensTitle(icon: string, text: string): string {
+    const displayMode = this.settingsAdapter.getCodeLensDisplayMode();
+    return displayMode === 'minimal' ? icon : `${icon} ${text}`;
   }
 
   async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
@@ -39,7 +51,9 @@ export class CheckboxCodeLensProvider implements vscode.CodeLensProvider {
     for (const checkbox of checkboxItems) {
       // Create toggle command
       const toggleCommand = {
-        title: checkbox.checked ? '$(check) Uncheck' : '$(circle-outline) Check',
+        title: checkbox.checked ? 
+          this.getCodeLensTitle('$(check)', 'Uncheck') : 
+          this.getCodeLensTitle('$(circle-outline)', 'Check'),
         command: 'checkboxPreview.toggleCheckbox',
         arguments: [document.uri, checkbox.lineNumber]
       };

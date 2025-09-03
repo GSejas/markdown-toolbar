@@ -10,11 +10,11 @@
  * @requirementsTraceability:
  *   {@link Requirements.REQ_PROVIDER_001} (Table Management Support)
  *   {@link Requirements.REQ_UI_002} (CodeLens Integration)
- * @briefDescription: Provides interactive CodeLens actions above markdown tables including add row/column, format table, sort columns, and alignment controls. Handles complex table structures with proper cell alignment and formatting preservation
- * @methods: provideCodeLenses, parseTable, formatTable, addRow, addColumn, sortTable
+ * @briefDescription: Provides interactive CodeLens actions above markdown tables including add row/column, format table, and remove row. Handles complex table structures with proper cell alignment and formatting preservation
+ * @methods: provideCodeLenses, parseTable, formatTable, addRow, addColumn, removeRow
  * @contributors: VS Code Extension Team
  * @examples:
- *   - Above "| Header |" row: Shows "➕ Row | ➕ Column | 🔄 Format | ⬆️ Sort | ↔️ Align"
+ *   - Above "| Header |" row: Shows "➕ Row | ➕ Column | 🔄 Format | ➖ Remove Row"
  *   - Table operations: Preserves existing content while adding structure
  * @vulnerabilitiesAssessment: Table structure validation, content preservation during operations
  */
@@ -22,6 +22,7 @@
 import * as vscode from 'vscode';
 import { ContextDetector } from '../engine/ContextDetector';
 import { logger } from '../services/Logger';
+import { SettingsAdapter } from '../settings/SettingsAdapter';
 
 interface TableInfo {
   headerRow: string;
@@ -43,8 +44,16 @@ interface TableCell {
 export class TableCodeLensProvider implements vscode.CodeLensProvider {
   private contextDetector = new ContextDetector();
 
-  constructor() {
+  constructor(private settingsAdapter: SettingsAdapter = new SettingsAdapter()) {
     logger.info('TableCodeLensProvider initialized');
+  }
+
+  /**
+   * Gets CodeLens title based on display mode setting
+   */
+  private getCodeLensTitle(icon: string, text: string): string {
+    const displayMode = this.settingsAdapter.getCodeLensDisplayMode();
+    return displayMode === 'minimal' ? icon : `${icon} ${text}`;
   }
 
   async provideCodeLenses(
@@ -67,45 +76,30 @@ export class TableCodeLensProvider implements vscode.CodeLensProvider {
         
         // Add row command
         codeLenses.push(new vscode.CodeLens(range, {
-          title: "➕ Add Row",
+          title: this.getCodeLensTitle("➕", "Add Row"),
           command: 'mdToolbar.table.addRow',
           arguments: [document.uri, table.startLine]
         }));
 
         // Add column command
         codeLenses.push(new vscode.CodeLens(range, {
-          title: "➕ Add Column", 
+          title: this.getCodeLensTitle("➕", "Add Column"), 
           command: 'mdToolbar.table.addColumn',
           arguments: [document.uri, table.startLine]
         }));
 
         // Format table command
         codeLenses.push(new vscode.CodeLens(range, {
-          title: "🔄 Format",
+          title: this.getCodeLensTitle("🔄", "Format"),
           command: 'mdToolbar.table.format',
           arguments: [document.uri, table.startLine]
         }));
 
-        // Sort table command (if has data rows)
-        if (table.dataRows.length > 0) {
-          codeLenses.push(new vscode.CodeLens(range, {
-            title: "⬆️ Sort",
-            command: 'mdToolbar.table.sort',
-            arguments: [document.uri, table.startLine]
-          }));
-        }
-
-        // Alignment command
-        codeLenses.push(new vscode.CodeLens(range, {
-          title: "↔️ Align",
-          command: 'mdToolbar.table.align',
-          arguments: [document.uri, table.startLine]
-        }));
 
         // Remove row command (if has multiple rows)
         if (table.dataRows.length > 0) {
           codeLenses.push(new vscode.CodeLens(range, {
-            title: "➖ Remove Row",
+            title: this.getCodeLensTitle("➖", "Remove Row"),
             command: 'mdToolbar.table.removeRow',
             arguments: [document.uri, table.startLine]
           }));

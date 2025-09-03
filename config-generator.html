@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown Toolbar Configuration Generator</title>
+    <!-- Custom MyIcons Font - Integrated for enhanced icon support -->
+    <link rel="stylesheet" href="./fonts/MyIcons.css">
     <style>
         * {
             margin: 0;
@@ -12,7 +14,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'MyIcons', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
@@ -294,6 +296,11 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+        }
+
+        /* Ensure MyIcons render properly */
+        .myicon {
+            font-family: "MyIcons" !important;
         }
     </style>
 </head>

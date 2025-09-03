@@ -5,7 +5,7 @@ All notable changes to the Markdown Toolbar extension will be documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2025-09-XX
+## [Unreleased] - 2025-09-03
 
 ### ✨ Added
 
@@ -30,6 +30,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Git Integration**: Status checking, commit, and diff operations
 - **Enhanced Extension Support**: Added markdown-pdf extension detection
 
+#### **Modernized Architecture Components**
+
+- **DocumentCache**: Intelligent document caching with LRU eviction and version tracking
+- **ErrorBoundary**: Graceful error handling for provider failures
+- **ServiceContainer**: Dependency injection system for better testability
+- **PerformanceMonitor**: Instrumentation and timing analysis for optimization
+- **CodeLens Display Modes**: Minimal vs explicit text options to reduce visual clutter
+
+#### **CodeLens Enhancements**
+
+- **Display Mode Setting**: Toggle between minimal icons and full text descriptions
+- **Simplified Interface**: Reduced visual clutter with configurable display options
+- **Cleaned Provider Actions**: Removed non-functional table sort/align operations
+
 #### **Command System Expansion**
 
 - **25+ New Commands**: Complete command coverage for all toolbar features
@@ -44,6 +58,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Simplified Examples**: Cleaner code examples with better formatting
 - **Comprehensive README**: Complete rewrite with modern structure and visuals
 - **Architecture Documentation**: Enhanced with diagrams and implementation details
+- **Professional Banners**: Created SVG banners for documentation with multiple themes
+
+#### **Toolbar Designer Updates**
+
+- **Comprehensive Button Library**: Updated to include all 70+ current buttons
+- **Codicons Integration**: Migrated from custom MyIcons to VS Code's built-in Codicons
+- **Enhanced Export**: Added telemetry export for usage analytics and bug reporting
+- **Test Presets**: Complete preset testing functionality
 
 #### **Code Quality**
 
@@ -57,6 +79,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolved extension detection timing issues
 - Improved error handling for missing dependencies
 - Fixed context menu visibility conditions
+- **Table CodeLens Cleanup**: Removed non-functional sort and align table actions
+- **Font Rendering**: Fixed MyIcons font family conflicts with body text
+- **Icon Compatibility**: Resolved icon parsing issues with mixed icon formats
 
 ### 📖 Documentation
 

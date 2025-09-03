@@ -34,6 +34,7 @@ export interface IMarkdownToolbarConfig {
     position: 'left' | 'right';
     preset: string;
     customButtons: ButtonId[];
+    codeLensDisplayMode: 'minimal' | 'explicit';
 }
 
 /**
@@ -99,7 +100,18 @@ export class SettingsAdapter {
         // For non-custom presets, we should let PresetManager handle button selection
         // This method is mainly for legacy UI compatibility
         return [];
-    }    /**
+    }
+
+    /**
+     * Gets the CodeLens display mode setting
+     * @returns Display mode: 'minimal' (icons only) or 'explicit' (icons + text)
+     */
+    public getCodeLensDisplayMode(): 'minimal' | 'explicit' {
+        const config = this.vscode.workspace.getConfiguration(SettingsAdapter.SECTION);
+        return config.get('codeLens.displayMode', 'explicit') as 'minimal' | 'explicit';
+    }
+
+    /**
      * Gets complete configuration object
      * @returns Full configuration interface
      */
@@ -108,7 +120,8 @@ export class SettingsAdapter {
             enabled: this.isToolbarEnabled(),
             position: this.getToolbarPosition(),
             preset: this.getPreset(),
-            customButtons: this.getActiveButtons()
+            customButtons: this.getActiveButtons(),
+            codeLensDisplayMode: this.getCodeLensDisplayMode()
         };
     }
 

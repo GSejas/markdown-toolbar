@@ -270,8 +270,6 @@ class ExtensionState {
 			'mdToolbar.table.addRow',
 			'mdToolbar.table.addColumn',
 			'mdToolbar.table.format',
-			'mdToolbar.table.sort',
-			'mdToolbar.table.align',
 			'mdToolbar.table.removeRow'
 			// Note: 'mdToolbar.debug.cyclePreset' is registered through BUTTON_DEFINITIONS
 		];

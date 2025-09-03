@@ -688,39 +688,6 @@ export class TableFormatHandler implements ICommandHandler {
   }
 }
 
-export class TableSortHandler implements ICommandHandler {
-  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
-    try {
-      const document = await context.vscode.workspace.openTextDocument(uri);
-      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
-      // TODO: Implement sortTable method in TableCodeLensProvider
-      context.vscode.window.showInformationMessage('Table sorting not yet implemented');
-      return { success: true, message: 'Table sorting feature coming soon' };
-    } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to sort table'
-      };
-    }
-  }
-}
-
-export class TableAlignHandler implements ICommandHandler {
-  async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
-    try {
-      const document = await context.vscode.workspace.openTextDocument(uri);
-      const tableProvider = new (await import('../providers/tableCodeLensProvider')).TableCodeLensProvider();
-      // TODO: Implement alignTable method in TableCodeLensProvider
-      context.vscode.window.showInformationMessage('Table alignment picker not yet implemented');
-      return { success: true, message: 'Table alignment feature coming soon' };
-    } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to align table'
-      };
-    }
-  }
-}
 
 export class TableRemoveRowHandler implements ICommandHandler {
   async execute(context: ICommandContext, uri: any, tableStartLine: number): Promise<ICommandResult> {
@@ -801,8 +768,6 @@ export class PresetCycleHandler implements ICommandHandler {
 CommandFactory.registerHandler('mdToolbar.table.addRow', new TableAddRowHandler());
 CommandFactory.registerHandler('mdToolbar.table.addColumn', new TableAddColumnHandler());
 CommandFactory.registerHandler('mdToolbar.table.format', new TableFormatHandler());
-CommandFactory.registerHandler('mdToolbar.table.sort', new TableSortHandler());
-CommandFactory.registerHandler('mdToolbar.table.align', new TableAlignHandler());
 CommandFactory.registerHandler('mdToolbar.table.removeRow', new TableRemoveRowHandler());
 
 // Legacy header command handlers removed - these are not used by CodeLens providers

@@ -9,7 +9,8 @@
       "Bash(npm run package:*)",
       "Bash(npx vsce:*)",
       "Bash(code:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npx @vscode/vsce package:*)"
     ],
     "deny": [],
     "ask": []

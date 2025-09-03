@@ -22,6 +22,7 @@
 import * as vscode from 'vscode';
 import { ContextDetector } from '../engine/ContextDetector';
 import { logger } from '../services/Logger';
+import { SettingsAdapter } from '../settings/SettingsAdapter';
 
 interface MermaidBlock {
   content: string;
@@ -45,10 +46,21 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
   private context: vscode.ExtensionContext;
   private contextDetector: ContextDetector;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(
+    context: vscode.ExtensionContext,
+    private settingsAdapter: SettingsAdapter = new SettingsAdapter()
+  ) {
     this.context = context;
     this.contextDetector = new ContextDetector();
     logger.info('[MarkdownToolbar] MermaidCodeLensProvider constructed');
+  }
+
+  /**
+   * Gets CodeLens title based on display mode setting
+   */
+  private getCodeLensTitle(icon: string, text: string): string {
+    const displayMode = this.settingsAdapter.getCodeLensDisplayMode();
+    return displayMode === 'minimal' ? icon : `${icon} ${text}`;
   }
 
   async provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.CodeLens[]> {
@@ -201,7 +213,7 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
 
     // Preview command
     const previewCommand = {
-      title: '🔍 Preview',
+      title: this.getCodeLensTitle('🔍', 'Preview'),
       command: 'markdownToolbar.previewMermaid',
       arguments: [block.content, block.diagramType]
     };
@@ -210,7 +222,7 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
 
     // Export command
     const exportCommand = {
-      title: '📤 Export',
+      title: this.getCodeLensTitle('📤', 'Export'),
       command: 'markdownToolbar.exportMermaid',
       arguments: [block.content, block.diagramType]
     };
@@ -223,7 +235,7 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
     // Add syntax error warning if needed
     if (block.hasErrors) {
       const errorCommand = {
-        title: '⚠️ Fix Syntax',
+        title: this.getCodeLensTitle('⚠️', 'Fix Syntax'),
         command: 'markdownToolbar.fixMermaidSyntax',
         arguments: [block.range, block.errorMessage]
       };
@@ -240,7 +252,7 @@ export class MermaidCodeLensProvider implements vscode.CodeLensProvider {
 
     // Copy code block content
     const copyCommand = {
-      title: "$(copy) Copy",
+      title: this.getCodeLensTitle("$(copy)", "Copy"),
       command: 'mdToolbar.codeblock.copy',
       arguments: [block.content, block.language],
       tooltip: `Copy ${block.language} code block to clipboard`
